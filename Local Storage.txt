@@ -1,0 +1,8 @@
+You can use these links to test how much data your browser can store in localstorage.
+
+http://dev-test.nemikor.com/web-storage/support-test/
+http://arty.name/localstorage.html
+
+You can find the stored data here
+
+\<User>\Local Settings\Application Data\Google\Chrome\User Data\Default\Local Storage

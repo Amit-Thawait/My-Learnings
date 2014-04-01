@@ -1,0 +1,111 @@
+Security in RoR :-
+------------------
+
+http://blog.codeclimate.com/blog/2013/03/27/rails-insecure-defaults/
+
+1) Versioned Secret Tokens :-
+   --------------------------
+   Use a different secret token in each environment. Inject it via an ENV var into the application. As an alternative, symlink the production secret token in during deployment.
+   
+2) Offsite Redirects :-
+   --------------------
+   An attacker can construct a URL that will cause an unsuspecting user to be sent to a malicious site after they login:
+
+   class SignupsController < ApplicationController
+	  def create
+		# ...
+		if params[:destination].present?
+		  redirect_to params[:destination]
+		else
+		  redirect_to dashboard_path
+		end
+	  end
+	end
+
+   Ex: https://example.com/sessions/new?destination=http://evil.com/
+   
+   Best Practice: When passing a hash to #redirect_to, use the only_path: true option to limit the redirect to the current host:
+   redirect_to params.merge(only_path: true)
+
+   When passing a string, you can parse it an extract the path:
+   redirect_to URI.parse(params[:destination]).path
+
+   The Fix: By default, Rails should only allow redirects within the same domain (or a whitelist). For the rare cases where external redirects are intended, the developer should be required to pass an external: true option to redirect_to in order to opt-in to the more risky behavior.
+   
+3) Cross Site Scripting (XSS) Via link_to :-
+   -----------------------------------------
+   Many developers don’t realize that the HREF attribute of the link_to helper can be used to inject JavaScript. Here is an example of unsafe code:
+   <%= link_to "Homepage", user.homepage_url %>
+
+   Assuming the user can set the value of their homepage_url by updating their profile, it creates the risk of XSS. This value:
+   user.homepage_url = "javascript:alert('hello')"
+
+   Will generate this HTML:
+   <a href="javascript:alert('hello')">Homepage</a>
+
+   Best Practice: Avoid using untrusted input in HREFs. When you must allow the user to control the HREF, run the input through URI.parse first and sanity check the protocol and host.
+
+   The Fix: Rails should only allow paths, HTTP, HTTPS and mailto: href values in the link_to helper by default. Developers should have to opt-in to unsafe behavior by passing in an option to the link_to helper, or link_to could simply not support this and developers can craft their links by hand.
+
+4) SQL Injection :-
+   ----------------
+    Suppose a developer needs to pull either subtotals or totals off the orders table, based on a parameter. They might write:
+	Order.pluck(params[:column])
+
+	This is not a safe thing to do. Clearly, the user can now manipulate the application to retrieve any column of data from the orders table that they wish. What is less obvious, however, is that the attacker can also pull values from other tables. For example:
+
+	params[:column] = "password FROM users--"
+	Order.pluck(params[:column])
+
+	Will become:
+
+	SELECT password FROM users-- FROM "orders"
+
+	Similarly, the column_name attribute to #calculate actually accepts arbitrary SQL:
+
+	params[:column] = "age) FROM users WHERE name = 'Bob'; --"
+	Order.calculate(:sum, params[:column])
+
+	Will become:
+
+	SELECT SUM(age) FROM users WHERE name = 'Bob'; --) AS sum_id FROM "orders"
+
+	Controlling the column_name attribute of the #calculate method allows the attacker to pull specific values from arbitrary columns on arbitrary tables.
+
+	Rails-SQLi.org 
+	details which ActiveRecord methods and options permit SQL, with examples of how they might be attacked.
+
+	Best Practice: Understand the APIs you use and where they might permit more dangerous operations than you’d expect. Use the safest APIs possible, and whitelist expected inputs.
+	
+5) YAML Deserialization :-
+   -----------------------
+   As many Ruby developers learned in January, deserializing untrusted data with YAML is as unsafe as eval. There’s been a lot written about YAML-based attacks, so I won’t rehash it here, but in summary if the attacker can inject a YAML payload, they can execute arbitrary code on the server. The application does not need to do anything other than load the YAML in order to be vulnerable.
+
+	Although Rails was patched to avoid parsing YAML sent to the server in HTTP requests, it still uses YAML as the default serialization format for the #serialize feature, as well as the new #store feature (which is itself a thin wrapper around #serialize). Risky code looks like this:
+	
+	class User < ActiveRecord::Base
+	  # ...
+	  serialize :preferences
+
+	  store :theme, accessors: [ :color, :bgcolor ]
+	end
+
+	Best Practice: Use the JSON serialization format instead of YAML for #serialize and #store:
+
+	class User < ActiveRecord::Base
+	  serialize :preferences, JSON
+	  store :theme, accessors: [ :color, :bgcolor ], coder: JSON
+	end
+
+	The Fix: Rails should switch its default serialization format for ActiveRecord from YAML to JSON. The YAML behavior should be either available by opt-in or extracted into an optional Gem.
+	
+	
+===================================================================================================================================================
+
+Use "rack-protection" and "secure_headers" as they both provide more protection.
+
+Run "rails_best_practices" gem, as picks up a lot of the points mentioned automatically.
+
+Run "cane" gem as a general code quality analyser.
+
+Run "brakeman" to find security holes is software.	

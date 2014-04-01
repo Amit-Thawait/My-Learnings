@@ -1,0 +1,7 @@
+This is exciting stuff! 
+http://www2.sqlonrails.org/ 
+
+- checkout the screencast 
+http://www.youtube.com/watch?v=0_PK1eDQyVg to see it in action
+
+They're using MySQL but I wonder if this would work with Oracle? 

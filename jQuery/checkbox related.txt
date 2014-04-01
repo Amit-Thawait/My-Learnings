@@ -1,0 +1,39 @@
+To check whether a check box is checked or not :-
+-------------------------------------------------
+<input type="checkbox" name= "project" id =  "project"  value ="1"> Appdev Gurgaon
+
+jQuery("#project:checked").val()
+
+The above will return "1" if checked otherwise return undefined.
+
+We can also use the below line to check whether a checkbox(or radio button) is checked or not -
+
+jQuery("#project").attr('checked')  ---> returns true or false
+
+To check/uncheck a checkbor(or radio button) we can use the command :-
+
+<input type="radio" name= "send_noti" value ="No" checked> No </input>
+or
+<input type="checkbox" name= "appdev_new_york" value ="1" checked id ="appdev_new_york">   Appdev New York
+
+jQuery("#project").attr('checked',true)  or  jQuery("#project").attr('checked',false)
+
+
+.each function in jQuery :-
+----------------------------
+arr = jQuery("input[id*='project']")
+jQuery.each(arr,function(i){alert(jQuery(this).attr('checked'))})
+
+
+
+To check all the check-boxes :
+------------------------------
+  jQuery('.select_multiple').click(function() {
+    var b_check = this.checked;
+    jQuery(".person_event_table input[type='checkbox']").each(function(){
+      this.checked = b_check;
+    });
+  });
+  
+  select_multiple -> class of the header checkbox
+  person_event_table -> class of the checkbox of each row

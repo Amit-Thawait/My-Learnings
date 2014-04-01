@@ -1,0 +1,32 @@
+<!-- http://javascript.info/tutorial/mouse-events -->
+
+<input type="text" id="mouseX" />
+
+<script type="text/javascript">
+function fixPageXY(e) {
+  if (e.pageX == null && e.clientX != null ) { 
+    var html = document.documentElement
+    var body = document.body
+
+    e.pageX = e.clientX + (html.scrollLeft || body && body.scrollLeft || 0)
+    e.pageX -= html.clientLeft || 0
+    
+    e.pageY = e.clientY + (html.scrollTop || body && body.scrollTop || 0)
+    e.pageY -= html.clientTop || 0
+  }
+}
+
+
+
+
+document.onmousemove = function(e){
+	//alert("=====");
+	e = e || window.event
+	
+	fixPageXY(e);
+
+//	alert("====="+e.pageX);
+	document.getElementById('mouseX').value = e.pageX
+}
+</script>
+

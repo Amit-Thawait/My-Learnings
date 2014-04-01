@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<body onLoad="init()">
+
+<canvas id="myCanvas" width="200" height="200" style="border:1px solid #c3c3c3;">
+Your browser does not support the canvas element.
+</canvas>
+
+<script type="text/javascript">
+var context;
+var x=50;
+var y=50;
+
+var xR=50;
+var yR=194;
+
+var dxR=8;
+var dyR=1;
+
+var dx=1;
+var dy=1;
+
+var WIDTH = 200;
+var HEIGHT = 200;
+
+ //starting position of bricks
+ var xBStart,yBStart,bInt,bWidth,bHeight;
+ var brickCount=0;
+ xBStart=0;
+ yBStart=0;
+ bInt=3;
+ bWidth=20;
+ bHeight=10;
+ 
+ //var bricks={xB:1,yB:1};
+ 
+ var brickX= new Array(8);
+ var brickY= new Array(8);
+ 
+ var broken=new Array(8);
+ 
+ broken[0]=0;
+ broken[1]=0;
+ broken[2]=0;
+ broken[3]=0;
+ broken[4]=0;
+ broken[5]=0;
+ broken[6]=0;
+ broken[7]=0;
+ 
+ var drewB = new Array(8);
+ 
+ drewB[0]=0;
+ drewB[1]=0;
+ drewB[2]=0;
+ drewB[3]=0;
+ drewB[4]=0;
+ drewB[5]=0;
+ drewB[6]=0;
+ drewB[7]=0;
+ 
+function doKeyDown(evt){
+switch (evt.keyCode) {
+/*case 38:  /* Up arrow was pressed */
+/*if (y - dy > 0){
+y -= dy;
+}
+break;*/
+/*case 40:  /* Down arrow was pressed */
+/*if (y + dy < HEIGHT){
+y += dy;http://html5.litten.com/moving-shapes-on-the-html5-canvas-with-the-keyboard/
+}
+break;*/
+case 37:  /* Left arrow was pressed */
+if (xR - dxR > 0){
+xR -= dxR;
+}
+break;
+case 39:  /* Right arrow was pressed */
+if (xR + dxR < (WIDTH-40)){
+xR += dxR;
+}
+break;
+}
+}
+
+function whiteBricks(xR,yR,w,h) {
+context.beginPath();
+context.rect(xR,yR,w,h);
+context.closePath();
+context.fillStyle="white";
+context.fill();
+context.stroke();
+}
+
+function rectBricks(xR,yR,w,h) {
+context.beginPath();
+context.rect(xR,yR,w,h);
+context.closePath();
+context.fillStyle="#FF1001";
+context.fill();
+context.stroke();
+}
+
+function rect(xR,yR,w,h) {
+context.beginPath();
+context.rect(xR,yR,w,h);
+context.closePath();
+context.fill();
+context.stroke();
+}
+function makeBricks()
+{
+
+ //alert('i am here ');
+ // console.log('broken and now start from '+broken[0]);
+
+
+ /*if(broken[0]==1)
+ {
+ if(drewB[0]==0)
+ {
+ xBStart=xBStart+23;
+ }
+ }*/
+ 
+ console.log();
+ for(xBStart=bInt+4;xBStart<(WIDTH-bWidth);xBStart+=(bWidth+bInt))
+ {
+ var i=0;
+ rectBricks(xBStart,yBStart,bWidth,bHeight);
+ brickX[i]=xBStart;
+ brickY[i]=yBStart;
+ i++;
+ brickCount++;
+ }
+ 
+}
+function init()
+{
+  //alert('in init');
+  var c=document.getElementById("myCanvas");
+  context= c.getContext('2d'); 
+  makeBricks();
+  //makeBricks();
+  return setInterval(draw,10);
+}
+function draw()
+{
+
+var randomnumber=Math.floor(Math.random()*11)
+//contx=c.getContext("2d");
+
+context.clearRect(0,10, 200,190);
+context.fillStyle="#FF0000";
+context.beginPath();
+context.arc(x,y,8,0,Math.PI*2,true);
+context.closePath();
+context.fill();
+if( x<10 || x>192) dx=-dx;
+if( y<21 || y>192) dy=-dy;
+
+//draw the slider
+rect(xR,yR,40,2);
+
+//if(x==186 || y==186)
+//console.log(distCalc(x,y,xR,yR)+'  '+xR+'  '+yR+'  '+x+'  '+y);
+//defining touch points at any time on the circle
+var tchX,tchY;
+
+tchX=x;
+tchY=y+8;
+
+
+//defining touch points on brick 
+var tchBX,tchBY;
+tchBX=x;
+tchBY=y;
+
+if(tchBY==20)
+{
+//alert('touch brick');
+
+//calculate coordinates of brick
+///console.log('The cordinates of Bricks are : '+xBStart+' and '+yBStart)
+
+if(x>7 && x<30)
+{
+broken[0]=1;
+whiteBricks(7,0,bWidth,bHeight);
+}
+if(x>30 && x<53)
+{
+broken[1]=1;
+whiteBricks(30,0,bWidth,bHeight);
+}
+if(x>53 && x<76)
+{
+broken[2]=1;
+whiteBricks(53,0,bWidth,bHeight);
+}
+if(x>76 && x<99)
+{
+broken[3]=1;
+whiteBricks(76,0,bWidth,bHeight);
+}
+if(x>99 && x<122)
+{
+broken[4]=1;
+whiteBricks(99,0,bWidth,bHeight);
+}
+if(x>122 && x<145)
+{
+broken[5]=1;
+whiteBricks(122,0,bWidth,bHeight);
+}
+if(x>145 && x<168)
+{
+broken[6]=1;
+whiteBricks(145,0,bWidth,bHeight);
+}
+if(x>168 && x<191)
+{
+broken[7]=1;
+whiteBricks(168,0,bWidth,bHeight);
+}
+
+//level completion
+if(broken[0] && broken[1] && broken[2] && broken[3] && broken[4] && broken[5] && broken[6] && broken[7])
+alert('LEVEL COMPLETE');
+
+
+}
+
+
+if(tchY==192)
+{
+ if((tchX>=(xR+2) && tchX<=(xR+2)+40))
+ {
+  
+	dy=-dy;
+	//draw();
+ }
+ else
+alert('u lost');
+ //stopGame();
+}else
+{
+
+}
+x+=dx;
+y+=dy;
+}
+function stopGame()
+{
+
+}
+window.addEventListener('keydown',doKeyDown,true);
+</script>
+
+</body>
+</html>

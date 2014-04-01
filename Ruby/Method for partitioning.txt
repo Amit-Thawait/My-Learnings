@@ -1,0 +1,14 @@
+  def full_content(content,link,full_string_content="")
+    c = content.partition('a href')
+    full_string_content << c[0] << c[1]
+    if !c[2].empty?
+      if c[2].include?('http')
+        full_string_content << full_content(c[2],link)
+      else
+        d = c[2].partition('/')
+        #full_string_content << d[0].to_s << link+d[1].to_s+d[2]
+	    full_string_content << d[0].to_s << link+d[1].to_s << full_content(d[2],link)
+      end
+    end
+    full_string_content
+  end 

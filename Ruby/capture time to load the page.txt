@@ -1,0 +1,1 @@
+<div style="text-align: right; color: red"><i><b><%= (runtime * 10**3).round.to_f / 10**3 %>&nbsp;seconds</b></i></div>

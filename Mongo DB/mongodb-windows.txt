@@ -1,0 +1,91 @@
+Mongo DB Installation for windows :-
+------------------------------------
+Follow the steps from
+http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/#start-mongodb
+
+To start the server :-
+create the data/db directory in your main(windows) partition
+
+C:\> mkdir \data
+C:\> mkdir \data\db
+
+and then go to your mongo_directory/bin and run mongod.exe
+
+C:\> cd \my_mongo_dir\bin
+
+C:\my_mongo_dir\bin> mongod
+
+DON't CLOSE THIS WINDOW
+
+now in a different command prompt window run mongo
+
+C:\> cd \my_mongo_dir\bin
+C:\my_mongo_dir\bin> mongo
+
+(REMEMBER YOU HAVE TO KEEP THAT OTHER WINDOW OPEN)
+
+===================================================================================
+	CREATE MOGODB SERVICES LINKS BY FOLOOWING THE LAST 3 OPENED TABS
+
+===================================================================================
+
+-------------------------------------------------------------------------------------
+
+rails new windows_mongo_app --skip-active-record
+
+Add the following to the Gemfile :-
+gem 'mongo'
+gem 'mongo_mapper'
+gem 'bson_ext'
+
+bson_ext :-  this is a collection of C extensions used to increase the speed of serialization. While this is optional, I recommend that you install it.
+
+-----------------------------------------------------------------------------------
+Add the following line in a new file named mongo.rb in config/initializers folder
+
+mongo.rb :-
+------------
+MongoMapper.connection = Mongo::Connection.new('localhost', 27017)
+MongoMapper.database = "#myapp-#{Rails.env}"
+
+-----------------------------------------------------------------------------------
+
+Start the mongo server :
+C:\mongodb\bin>mongod.exe
+
+Nothing will work unless u start the mongo server
+
+------------------------------------------------------------------------------------
+
+Now u can start the rails server 
+rails s
+
+localhost:3000/users
+
+create users 
+
+---------------------------------------------
+Go to rails console
+
+Users.all   ---> Displays all users
+--------------------------------------------
+
+To change the location of the data files and mongodb log file
+
+In Terminal ---> mongod (press enter)  ---> Displays the list of all the available options
+
+It can also be changed by using the command
+mongod dbpath -------> It gives the current path
+mongod --dbpath <new db path>
+                              
+mongodb.log file ----> edit logpath variable in the same
+From console
+mongod --logpath <new log path>
+
+---------------------------------------------------------------------------------------------
+
+For windows we have to configure mongodb service by using the command
+
+C:\mongodb\bin>mongod --dbpath C:\data\db --logpath C:\mongodb\log\mongodb.log --install
+
+Then go to run --> services.msc  --> search for MongoDB ---> set as Automatic & start the service by clicking on start

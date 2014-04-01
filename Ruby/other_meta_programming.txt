@@ -1,0 +1,108 @@
+Good Stuffs related to Meta Programming :-
+------------------------------------------
+__FILE__ and __LINE__ are sort of dynamic constants that hold the file and line that are currently executing. Passing them in here allow errors to properly report their location.
+
+instance_eval <<-end_eval, __FILE__, __LINE__
+  def foo
+    a = 123
+    b = :abc
+    a.send b
+  end
+end_eval
+
+foo
+
+When you run this
+
+$ ruby foo.rb 
+foo.rb:5:in `send': undefined method `abc' for 123:Fixnum (NoMethodError)
+    from foo.rb:5:in `foo'
+    from foo.rb:11
+
+Note it says the file and line #5 even though that was just text in an eval. Without those the file/line trick the output would look like this:
+
+$ ruby foo.rb 
+(eval):5:in `send': undefined method `abc' for 123:Fixnum (NoMethodError)
+    from (eval):5:in `foo'
+    from foo.rb:11
+
+The stack trace simply shows (eval) which isn't as helpful.
+
+
+Some useful methods :-
+----------------------
+instance_variables ---> gives the instance variables of a class
+
+instance_methods(include_super=true)  ---> Returns an array containing the names of the public and protected instance methods in the receiver. For a module, these are the public and protected methods; for a class, they are the instance (not singleton) methods. With no argument, or with an argument that is false, the instance methods in mod are returned, otherwise the methods in mod and mod’s superclasses are returned.
+
+similarly public_instance_methods, protected_instance_methods, private_instance_methods are also there.
+Ex:
+
+class R
+	def aaa
+	end
+
+	private
+	def bbb
+	end
+end
+
+R.instance_methods(false)  --> [:bbb]
+R.private_instance_methods(false)  --> [:aaa]
+ 
+singleton_methods(all=true) ---> returns array
+----------------------------------------------
+Returns an array of the names of singleton methods for obj. If the optional all parameter is true, the list will include methods in modules included in obj. Only public and protected singleton methods are returned.
+
+module Other
+  def three() end
+end
+
+class Single
+  def Single.four() end
+end
+
+a = Single.new
+
+def a.one()
+end
+
+class << a
+  include Other
+  def two()
+  end
+end
+
+Single.singleton_methods    #=> [:four]
+a.singleton_methods(false)  #=> [:two, :one]
+a.singleton_methods         #=> [:two, :one, :three]
+
+respond_to :-
+-------------
+The respond_to? method is another example of introspection or reflection. You can determine in advance (before you ask the object to do something) whether the object knows how to handle the message you want to send it, by using the respond_to? method. This method exists for all objects; you can ask any object whether it responds to any message.
+Ex1 :-
+obj = Object.new
+if obj.respond_to?(:program)
+  obj.program
+else
+  puts "Sorry, the object doesn't understand the 'program' message."
+end
+
+--> Sorry, the object doesn't understand the 'program' message.
+
+Ex2 :-
+
+class Rubyist
+ def rails_dev
+	'I am also a Rails Developer'
+ end
+end
+
+rubyist = Rubyist.new
+if rubyist.respond_to?(:rails_dev)
+  puts rubyist.send(:rails_dev)
+else
+  puts "No such information available"
+end
+
+--> 'I am also a Rails Developer'

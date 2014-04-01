@@ -1,0 +1,25 @@
+app/models/upload_status.rb
+
+	def update_rejected(job_id, action)
+ 	  job = find_by_job_id(job_id)
+ 	  restart_god if action.downcase == 'cancelled'	  
+ 	  job.update_attributes(:status => action) if job
+	end
+
+ 	def restart_god
+ 	  raise Exception
+ 	  system "cd #{Rails.root} && RAILS_ENV=integration bundle exec god terminate"
+ 	  system "cd #{Rails.root} && RAILS_ENV=integration bundle exec god -c config/delayed_job.god"	 	  
+ 	end
+	
+app/controllers/admin/uploads_controller.rb
+
+  def cancel_data_upload
+    job_id = params[:job_id]
+    if !job_id.blank?
+      UploadStatus.update_rejected(job_id, 'Cancelled')
+    end
+    flash[:success] = "Data Upload Cancelled"
+    redirect_to status_admin_uploads_url
+  end
+	

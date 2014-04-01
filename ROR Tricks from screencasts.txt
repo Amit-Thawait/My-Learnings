@@ -1,0 +1,2405 @@
+1) To use controller methods into views ---> helper_method :action_name  (Screencast - 20)
+
+1.5) To include any helper file(helper module) in controller ---> helper :authentication (for authentication_helper.rb) (Screencast - 64)
+
+	If u want to use any helper method provided by rails then, u can use it by calling the method on ActionController::Base.helpers 
+
+	def description
+	  "This category has #{helpers.pluralize(products.count, 'product')}."
+	end
+
+	def helpers
+	  ActionController::Base.helpers
+	end
+
+    However, some of the helper methods link link_to will not be accessible on models because they depend on request object but they can be accessed on controllers which has access to request object, by using @template variable. Ex
+
+	def create
+	  @product = Product.new(params[:product])
+	  if @product.save
+		flash[:notice] = "Successfully created #{@template.link_to('product', @product)}."
+		redirect_to products_url
+	  else
+		render :action => 'new'
+	  end
+	end
+
+2) In the view, we can use pluralize method to display 1 or more items.
+   <%= pluralize project.tasks.size, 'task' %>
+   
+3) In :include --> name of the association should be used .It can also be chained 
+   Task.find(:all, :include => [:projects, {:comments => :user}])
+
+   Task --> belongs_to :project, has_many :comments .  Comment ---> belongs_to :user
+   
+4) Use CGI::escapeHTLM(...) in controller to reject html content   
+   Use CGI.escape to embed a sentence or set of words containing spaces in a URL
+   url = "http://www.walmart.com/search/search-ng.do?search_constraint=0&ic=48_0&search_query=#{CGI.escape(product.name)}&Find.x=0&Find.y=0&Find=Find"
+   
+5) size method uses the counter cache feature of rails but length doesnot. 
+   project.tasks.size --> uses counter cache
+   
+6) Use attr_accessible to prevent mass_assignment.    
+   attr_accessible :name --> means only name can inputed using mass assignment (curl)
+   
+   curl -d "user[name]=hacker&user[admin]=1" http://localhost:3000/Users/
+   curl -d "user[name]=hacker&user[admin]=1&user[comment_ids][]=1&user[comment_ids]=2" http://localhost:3000/users/create
+   
+7)  >> a = (1..12).to_a
+	=> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+	>> a.in_groups_of(4)
+	=> [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]
+	>> a.in_groups_of(3)
+	=> [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]] 
+
+	>> a.in_groups_of(5)
+	=> [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, nil, nil, nil]]
+	
+	>> a.in_groups_of(5, false)
+	=> [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12]]
+	>> a.in_groups_of(5, 0)
+	=> [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 0, 0, 0]]
+	
+8) From cmd type
+   > ri strftime 
+     Display the documentation (classes that have method strftime)
+	 
+   > ri Time.strftime
+     Shows description
+
+9) http://localhost:3000/tasks/completed == http://localhost:3000/tasks;completed (In Edgerails only / works ; doesn't)
+
+10) Creating a rails pluggin (Railscast 33): similar to gem creation
+
+	module StringifyTime
+	  def stringify_time(*names)
+		names.each do |name|
+		  define_method "#{name}_string" do
+			read_attribute(name).to_s(:db) unless read_attribute(name).nil?
+		  end
+		  
+		  define_method "#{name}_string=" do |time_str|
+			begin
+			  write_attribute(name, Time.parse(time_str))
+			rescue ArgumentError
+			  instance_variable_set("@#{name}_invalid", true)
+			end
+		  end
+		  
+		  define_method "#{name}_invalid?" do
+			instance_variable_get("@#{name}_invalid")
+		  end
+		end
+	  end
+	end
+
+    read_attribute & write_attribute are methods of active record
+	
+11) Use form_tag to make a generic form & form_form to update a database model attributes.
+
+12) 
+
+<% form_tag projects_path, :method => 'get' do %>
+  <p>
+    <%= text_field_tag :search, params[:search] %>
+    <%= submit_tag "Search" %>  === <input name="commit" type="Submit" value="Search" />
+  </p>
+<% end %>
+
+The above form submit the form with URL:
+http://localhost:3000/projects?search=yard&commit=Search
+
+yard :- searched project
+So to remove commit=Search from the URL write 
+<%= submit_tag "Search", :name => nil %>
+
+Then the URL becomes : http://localhost:3000/projects?search=yard
+
+13) If you are using form_remote_for then instaed of submit_tag (if you have two submit buttons : Create & Preview) for a project, you should use submit_to_remote becoz form_remote_for serealizes the whole form and submits.
+
+14) helper_method : capture(&block) --> returns content of block as string
+
+15) @user.save(false)  ---> this false bypasses all model validations
+
+16) Conditional validations :- Railscast-41
+    --------------------------
+	validates_presence_of :password, :if => :should_validate_password?
+	validates_presence_of :country
+	validates_presence_of :state, :if => :in_us?
+	attr_accessor :updating_password
+
+	def in_us?
+	  country == 'US'
+	end
+
+	def should_validate_password?
+	  updating_password || new_record?
+	end
+
+	# in controller
+	@user.updating_password = true
+	@user.save
+
+	# or...
+	@user.save(false)
+	
+17) with_options :-
+    ---------------
+	user.validates_presence_of :password, :if => :should_validate_password?
+	user.validates_confirmation_of :password, :if => :should_validate_password?
+	user.validates_format_of :password, :with => /^[^\s]+$/, :if => :should_validate_password?
+	   ===
+	with_options :if => :should_validate_password? do |user|
+	  user.validates_presence_of :password
+	  user.validates_confirmation_of :password
+	  user.validates_format_of :password, :with => /^[^\s]+$/
+	end
+	
+	def should_validate_password?
+	  updating_password || new_record?
+	end
+	
+18) flash.discard  --> discards flash upon redirect
+
+19) map.connect '*path', :controller => 'redirect', :action => 'index'  (Should be at the end of routes.rb)
+    redirect ctrl
+	def index
+	  render :text => params.inspect
+	end
+	
+    http://localhost:3000/scis   --->  {"action"=>"index", "controller"=>"redirect", "path"=>["scic"]}
+    http://localhost:3000/scis/bar  --->  {"action"=>"index", "controller"=>"redirect", "path"=>["scic","bar"]}
+	http://localhost:3000/scis/bar?search=test  --->  {"search"=>"test", "action"=>"index", "controller"=>"redirect", "path"=>["scic","bar"]}
+	
+	render :text => request.request_uri ---> gives the part after http://localhost:3000
+	
+20) Naming convention for has_many :through association --> name of the join model
+    User , Group ---> Membership
+    Person, Company --> Employement	
+    Category, Product --> Categorization
+	
+21) Differentiating between HABTM & has_many :through
+    i) do I need to store extra information besides ids of both model
+	ii)do I need to treat join as its own model
+	
+	If ans of anyone is yes the its has_many :through otherwise HABTM.
+	
+22) Check www.coderpath.com
+
+23) sandbox option for rails console rolebacks changes made to the DB on exit.
+    Ex: rails c --sandbox
+        rails c production --sandbox
+
+24) Beautifing objects in rails console
+    >> project = Project.new  --> inspects object in a single line
+	
+	>> y project  --> prints the object in yaml format
+	   OR
+	>> require 'pp'   --> Pretty Printing
+       pp project   --> prints object in more readable format
+	   
+25) Console Tricks -- Railscast 48 (plus some links in show notes section)
+
+26) Alternative ROR API Sites
+	* railsapi.org
+	* railsbrain.com
+	* gotapi.com
+	* railsmanual.org
+	* noobkit.com
+	* ruby.search
+	* rorapi.com	   
+	
+27) zeus gem (Loads server, console and initializes rails env so that everthing runs under 1 sec)
+
+28) http://reverbhq.com/blog/2012/12/ensuring-data-integrity/
+
+29) Product model :-
+    belongs_to :category  ---> Association of category with product
+
+	def create_category_from_name
+	  create_category(:name => new_category_name) unless new_category_name.blank?
+	end
+	
+	create_category method is by default provided by rails (create_methodname for any association)
+	
+30) Flash notice :-
+    flash[:notice] can aslo be written as
+    redirect_to root_url, notice: "Products imported."
+
+31) For generating different color for alternate rows :
+    <tr class="<%= cycle :odd, :even %>">
+    cycle is a helper method provided by rails.
+
+32) Coverting block to proc :-
+    line_items.to_a.sum(&:full_price) === 	line_items.to_a.sum {|l| l.full_price}
+	
+33) <% @cart.line_items.each do |line_item| %>
+      <%= render :partial => 'line_item' %>
+	<% end %>  
+	
+	===
+	
+	<%= render :partial => 'line_item', :collection => @cart.line_items %>
+	
+34) logger.debug "Hello world! #{@cart.to_yaml}"   (Railscast 56)
+	# debug, info, warn, error, fatal (Severity from low to high)
+	
+35) By default quries are not shown up in production.log so to see it,
+	In environments/production.rb set:
+	config.log_level = :debug	(default is :info due to which queries are not shown)
+	
+36) To display queries in rails console :
+    create a .irbrc file in root dir
+	~/.irbrc
+    --------  
+	if ENV.include?('RAILS_ENV') && !Object.const_defined?('RAILS_DEFAULT_LOGGER')
+	  require 'logger'
+	  RAILS_DEFAULT_LOGGER = Logger.new(STDOUT)
+	end
+
+37) Overriding of methods can also be done alias_method_chain  (Screencast - 62)
+    Ex: alias_method_chain :valid?(method to over-ride), :without_validation(new method)
+	
+38) By overriding the below method in  model u can change the id of any object wrt that model. (Screencast - 63) (Check Revised - 63 as well)
+	def to_param
+		"#{id}-#{permalink}"
+	end
+	
+	Product.find_each :- find_each method fetches the record in batches.
+	
+	routes.rb
+	resources :pages, only: [:index, :new, :create]  --> will generate the routes for only these pages.
+	resources :pages, path: "", except: [:index, :new, :create]
+	By passing path: "" , it will generate the URL's without the word pages in it.
+	Ex localhost:3000/pages/product-categories will become localhost:3000/product-categories
+	
+39) task :greet do
+      p "Hello World"
+	end
+
+    task :ask do
+	  p "How r u ?"
+    end
+	
+	task :abc => :greet do
+	  p 'Task abc called'
+	end
+
+    > rake abc
+      Calls :greet tak first then calls task :abc 
+	  
+40) task :winner do
+      user = User.find(:first, :order => 'RAND()')
+      puts "Winner: #{user.name}"
+    end
+	rake winner --> Throws error : uninitialized constant User
+	
+	task :winner => :environment do
+      user = User.find(:first, :order => 'RAND()')
+      puts "Winner: #{user.name}"
+    end
+	Loads the rails env first.
+	
+41)  map.connect 'articles/:year/:month/:day', :controller => 'articles', :month => nil, :day => nil, :requirements => { :year => /\d{4}/ }
+     If no action mentioned then ----> default is index action
+     Pass optional parameters as nil.
+     As the routes are being checked from top to bottom, so to avoid this routes getting executed for some other URL like
+     localhost:3000/articles/show/6 ---> we hould specify some requirements as matching condition.
+
+42) <%= link_to_destroy "Destroy", project_path(project), :confirm => 'Are u sure?', :method => :delete %>
+
+43) respond_to do |format|
+      format.pdf do
+	  end
+	end
+    ---> throws error (Undefined method pdf for ActionController) because pdf is not one of the default formats in Rails. So we have to register it.
+
+    In any of the config files :-
+    Mime::Type.register 'application/pdf', :pdf
+
+44) In ProductsController --> For Basic HTTP Authentication (Railscasts - 82) (Pop up box promting for username/password)
+
+	before_filter :authenticate
+
+	protected
+
+	def authenticate
+	  authenticate_or_request_with_http_basic do |username, password|
+		username == "foo" && password == "bar"
+	  end
+	end
+	
+45) YAML.load_file("#{RAILS_ROOT}/config/config.yml") ---> returns a hash
+
+46) Customized method to print the values of variable in log
+
+    logger.debug_variables(binding)
+
+    initializer/logger_addition.rb
+    logger = ActiveRecord::Base.logger
+	def logger.debug_variables(bind)
+	  vars = eval('local_variables + instance_variables', bind)
+	  vars.each do |var|
+		debug  "#{var} = #{eval(var, bind).inspect}"
+	  end
+	end
+	
+47) Routes by default also generates formatted rotes means routes for different formats (ex : html, rss etc)
+    check rake routes
+	
+48) To execute any kind of format(extns like pdf, rss, xml etc) for any given action, write the below line in routes.rb
+    map.connect ':controller/:action.:format'
+
+49) RESTful == Hypermedia APIs
+
+50) Caching is by default off in development environment & ON on production env.
+    config.action_controller.perform_caching = false ---> devleopment
+	
+51) If u add any new folders(for ex: services) in app directory then, u have to mention it in the environment.rb file like this
+    config/environment.rb  (or any initializer file)
+	config.load_paths << "#{RAILS_ROOT}/app/services"
+	
+52) See caching in rails (types of caching in rails). One is page caching
+    We can also expire cache based on a given condition. (Railscast - 89)(Also has a revised episode)
+	
+53) One more type of caching in fragment caching in which we cache only a portion of the page instead of the whole page(Page Caching).
+    Railscast - 90 (Also has a revised episode)
+	
+54) Third type of caching is Action Caching.
+    Suppose there is a before filter like :
+    before_filter :authorize #---> Method for checking authorization
+	then if page caching is enabled and once the page is cached then this before_filter will be bypassed
+    whereas in case of action caching it will not be bypassed means it will executed for every single action.
+
+54.1) Fragment Caching can improved by using touch (Railscasts : 172)
+
+	comment.rb
+	belongs_to :article, :touch => true
+
+	articles/show.html.erb
+	<% cache @article do %>
+	  ...
+	<% end %>
+
+	So, here if we only caching articles and not their comments(using :touch => true through the assciation) then comments will not get reflected and cached page for the article will appear.
+	So, by passing :touch => true through assciation, whenever a comment object is created or altered it touches the article object thereby changing articles timestamp, so the cache for @article auto-expires
+	
+	<% cache @article do %> means <% cache @article.cache_key do %>
+	
+	article = Article.first
+	article.cache_key ===> articles/1-20090606223425
+	article.touch   # this will change the updated_at column for article with current timestamp.
+	article.updated_at or article.cache_key ===> articles/1-20090606223450
+	
+55) content_for :-
+	You can use the content_for method in your template to store up the content of the block inside the variable :side, so that it can be used later on in the layout.
+	<% content_for :side do %>
+	  ...
+	<% end %>
+
+	application.html.erb :-
+	<div id="side">
+	  <%= yield(:side) || render(:partial => '...' %>
+	</div>
+
+56) Debugging Variables in Views
+	<%= debug @products %>
+	<%= debug params %>
+	<%= debug request.env %>
+
+57) reverse_merge! method is used to not to merge any existing params in the given hash.
+
+58) rake -T time --> list all tasks related to Timezone
+	rake time:zones:all  --> list all time zones which can be set in config/application.rb
+    rake time:zones:local  --> Displays local time zone by checking system time.
+	rake time:zones:us
+	
+	In config/environment.rb
+	config.time_zone = "Pacific Time (US & Canada)"  -->(i.e; the output of rake time:zones:local)
+	
+	Rails saves the time as UTC in DB and while displaying it coverts to mentioned time zone.
+	
+	In rails console :-
+	>> Product.first.released_at ---> Displays time by translating UTC into Pacific time zone
+	>> Product.first.released_at_before_type_cast ---> Displays UTC
+	
+	Watch Revised Episode 106 for more details
+	
+59) Detecting change in attribute :-
+    --------------------------------
+    p = Product.first
+	p.name = 'book'
+    p.changed? => false
+    p.name = 'pen'
+    p.changed? => true
+    p.name_changed? => true	(<attribute-name>_changed? method)
+	
+	p.name_was => 'book'
+	p.name_change => ['book', 'pen']  (old_name, new_name)
+	p.changed => ['name'] (Array of attributes that were changed)
+	
+	p.changes => {'name' => ['book', 'pen']}
+	
+	But this change method will only work it the attribute value is being changed with setter method.
+	so if u do
+	p.name.upcase! => 'PEN'
+	p.changed => false
+	p.save => no update query will be fired
+	
+	But the above problem can be resolved if u call a method named (<attribute-name>_will_change!)
+	p.name_will_change! => returns old name
+	p.name.upcase! => 'PEN'
+	p.changed => true
+	and all the other change methods will also function properly.
+
+59) scopes are useful because they can be used for chaining. (means we can chain one scope after the other).
+	
+	class Product < ActiveRecord::Base
+	  belongs_to :category
+	  scope :cheap, :conditions => { :price => 0..5 }
+	  scope :recent, lambda { |*args| {:conditions => ["released_at > ?", (args.first || 2.weeks.ago)]} }
+	  scope :visible, :include => :category, :conditions => { 'categories.hidden' => false }
+	end
+
+    we can do chaining like 
+	Product.recent.cheap
+	
+	Also, lambda is useful because it becomes active only when it get called. For ex: say our sever has been started a month back then 2.weeks.ago would become (1 month + 2 weeks) ago if we are not using lambda.
+	Lambda can be written to accept an argument or without any arguments as well.
+	scope :recent, lambda { {:conditions => ["released_at > ?", 2.weeks.ago]} }
+	
+	We can also use these scopes of Product model with their association.
+	Ex: Category.first.products.cheap.recent
+	
+	We can also use association with a scope.
+	For ex:- scope :visible, :include => :category, :conditions => { 'categories.hidden' => false }
+	Product.visible will only output the products which have categories which are not hidden.
+	
+	We can also do Product.visible.cheap.recent (scope chaining)
+	
+	We can also append ActiveRecord queries after the scopes like
+	Product.recent.cheap.where("name like 'a%'")
+	Product.recent.cheap.all(:order => 'released_at')
+	
+60) check : rake -T gems
+    rake gems:unpack --> unpacks the gem inside vendor directory
+	rake gems:build  --> generates the code for native gems
+	
+61) caching through an instance variable :-
+    def products
+	  @products ||= Product.find(:all, :conditions => conditions)
+	end
+	The above will fire the query only once & return the cached instance variable for every other request.
+	
+62) Get browser details of a user by using the gem : browser_details
+    https://github.com/gshutler/browser_details
+
+63) Anonymous scope :-
+    ------------------
+	def find_products
+      scope = Product.scoped({})
+	  scope = scope.scoped(:conditions => ["products.name LIKE ?", "%#{keywords}%"]) unless keywords.blank?
+	  scope = scope.scoped(:conditions => ["products.price >= ?", minimum_price]) unless minimum_price.blank?
+	  scope
+	end
+
+64) Rails.cache ---> added in Rails 2.1 which is a much lower level cache and can be used to cache anything not only view layers. 
+	(Railscast - 115)
+	Rails.cache.write('date', Date.today)  --> Writes data onto the cache
+	Rails.cache.read('date')               --> Reads data from the cache
+	Rails.cache.fetch('time') { Time.now } --> Writes for the first time then reads on subsequent request
+	Ex :- To cache all the categories
+	def self.all_cached
+	  Rails.cache.fetch('Category.all') { all }
+	end
+	
+	Can also fetch newly created categories, by destroying the cache on callback & creating again.
+
+	Rails.cache.read('date')			   --> Destroys data from the cache
+	
+65) Rails.cache is a normal hash
+    But for 3 differnt servers it will create a problem(cache gets created on only 1 server)
+	So, a better way to store is to set up mem cache server(mem_cache_store) , point the app to that server to get cache
+	
+	cache = ActiveSupport::Cache.lookup_store(:mem_cache_store)
+	cache.fetch('time') { Time.now }
+	
+	We can also set expiry time on the cache if we are using mem_cache ,so that it destroyed in 5 secs & gets newly created since we are using fetch method.
+	
+	cache.fetch('time', :expires_in => 5) { Time.now }
+
+66) simple_format is a helper method that recognizes line breaks within the text. (Railscast - 117)
+	<%= simple_format(h(@page.content))%>
+	
+	Similar to simple_format there is one more helper method : textilize (Ex : <%= textilize @page.content %>)
+	
+	There is another gem RedCloth(Version 3.3) which can be used for test styling instead of the helper method : simple_format
+	
+67) Raising an error explicitly.
+
+	def show
+	  if params[:permalink]
+		@page = Page.find_by_permalink(params[:permalink])
+		raise ActiveRecord::RecordNotFound, "Page not found" if @page.nil?    #----> Throwing an exception explicitly
+	  else
+		@page = Page.find(params[:id])
+	  end
+	end
+
+	routes.rb
+	map.static ':permalink', :controller => 'pages', :action => 'show'
+	---> matches http://localhost:3000/about
+	
+68) Liquid is a templating languague which is used to bind dynamic content inside static pages. (Railscast - 118)
+
+69) We can access RDoc in our local system by using command	
+    > gem server
+	Then RDoc gets rendered in port 8808 and can accessed using the link :- http://localhost:8808
+	
+70) populator gem is used to populate the database with large number of records with random data.
+    This gem cannot be used to generate email_ids or phone nos or postal code etc, so there is another gem for that known as faker.
+	
+71) <%= request.subdomains.inspect %>
+    Gives an array of subdomains from the request object.
+	Check the subdomain-fu gem for using subdomain in ur rails website.
+	
+72) Creating association for same model but with a different name to tell different relationship
+    
+	invitation.rb model :-
+	belongs_to :sender, :class_name => 'User'
+	has_one :recipient, :class_name => 'User'
+	
+73) Seeting layout inside a method :
+    self.class.layout(@current_blog.layout_name || 'application') --> For Blog object having layout_name as a column in blogs table
+	
+74) To find Rails environment for inside of a Rails app
+    env = Rails.env
+
+75) system method is used to execute system commands for inside of a Rails app
+    system "/usr/bin/rake #{task} #{args.join(' ')} --trace >> #{Rails.root}/log/rake.log &"	
+	
+	& at the end is used to run the rake task in background
+	>> is used to put the log in a seperate log file.
+	
+76) MemCache class can be used for client server communication. (Railscast - 128)
+
+77) You can also go back from a action by using :- redirect_to :back
+    Ex:
+	def create
+      current_cart.cart_items.create!(params[:cart_item])
+	  flash[:notice] = "Product added to cart"
+	  redirect_to :back
+	end
+	
+    the value stored in :back is actually request.env['HTTP_REFERER'] which is sent by the browser.
+	Ex : Good Example of Shopping Cart (Railscast - 131)
+	cart_items_controller.rb
+	def create
+	  current_cart.cart_items.create!(params[:cart_item])
+	  flash[:notice] = "Product added to cart"
+	  session[:last_product_page] = request.env['HTTP_REFERER'] || products_url
+	  redirect_to current_cart_url
+	end
+	
+	carts/show.html.erb
+	<% if session[:last_product_page] %>
+	  <%= link_to "Continue Shopping", session[:last_product_page] %> |
+	<% end %>
+
+78) To load all the rake file in one line :
+	Dir["#{File.dirname(__FILE__)}/tasks/*.rake"].sort.each { |ext| load ext }
+	
+79) To vendorize a gem u need to use the below command from vendor/gems dir
+    app/vendor/gems> gem unpack gem_name_version
+	
+80) flash.delete(:notice) means flash the notice then delete the flash message, so that it doesnot get carried over to the next request.
+
+81) respond_to do |format|
+      format.html { redirect_to @review.product }   ---> renders show.html.erb
+      format.js									    ---> 		 show.js.erb
+	  format.pdf									--->		 show.pdf.erb
+	  ..etc
+	end
+	
+82) To create a function for a jQuery element use jQuery.fn.<function_name>
+	jQuery.fn.submitWithAjax = function() {
+	  this.submit(function() {
+		$.post(this.action, $(this).serialize(), null, "script");
+		return false;
+	  })
+	  return this;
+	};
+
+	$(document).ready(function() {
+	  $("#new_review").submitWithAjax();
+	})
+	
+83) To reset a form in jQuey, u can reset method.
+    $("#new_review")[0].reset();  --> [0] since $("#new_review") returns an array of jQuery Element.
+
+84) Memoization :- (Railscast - 137, Revised episode available)
+    --------------
+    Its an alternative to caching instance varible.
+    old :- @file_size ||= calculate_filesize
+    new :- 
+	
+	class Product < ActiveRecord::Base
+	  extend ActiveSupport::Memoizable
+	  
+	  belongs_to :category
+	  
+	  def filesize(num = 1)
+		# some expensive operation
+		sleep 2
+		12345789 * num
+	  end
+	  memoize :filesize
+	end
+
+	Memoization is deprecated from Rails 3.2.8 so u can use memoist gem for this as an alternative
+         OR	
+	class Product < ActiveRecord::Base
+	  def filesize(*args)
+		@filesize ||= {}
+		@filesize[args] ||= calculate_filesize(*args)
+	  end
+
+	private
+	  def calculate_filesize(num = 1)
+		sleep 0.5
+		4815162342 * num
+	  end
+	end
+	
+85) t method means translate method of I18n is available only on controllers & views , to access the same at other places use
+    I18n.translate  --> Railscast - 138
+
+86) There are few ways to create nested routes :-  (Article --> has_many Comments)
+    1) map.resources :articles do |article|
+		article.resources :comments
+	   end
+	
+	2) map.resources :articles, :has_many => :comments  (Make sure use correct routing paths in views)  --> Railscast 139
+	
+	3) map.resources :articles, :has_many => :comments, :shallow => true
+	
+87) application_helper.rb
+	def admin_area(&block)
+	  if admin?
+		concat content_tag(:div, capture(&block), :class => 'admin')
+	  end
+	end
+
+	rhtml
+	<% admin_area do %>
+	  <%= link_to "Edit", edit_product_path(@product) %> |
+	  <%= link_to "Destroy", @product, :confirm => 'Are you sure?', :method => :delete %>
+	<% end %>
+
+88) Product.find_by_price(3) # => nil
+
+	Product.find_by_price!(3) # => Raises RecordNotFound Exception
+	
+	Product.find_last_by_price(4.99) => Finds last record directly (instead of fetching all records and then displaying the last one)
+	
+	Product.all(:joins => :category, :conditions => { :categories => { :name => 'Clothing' } })	=> We can give the join condition in terms of Hash as well.
+
+89) PayPal for Developers for Testing purpose :- http://developer.paypal.com
+
+90) To render nothing write :
+    render :nothing => true
+	
+91) serialize :params
+    This will convert the params hash into YAML format and saves it to DB & while retrieving it converts back to hash(means original format), means o/p will always be in the form of i/p.
+
+92) Payment Gateway sites :-
+    Paypal
+    authorize.net
+	
+93) after_initialize method is used in config files to run something after initialization. 
+	Ex : Initializing payment gateway using active merchant
+	config.after_initialize do
+	  ActiveMerchant::Billing::Base.mode = :test
+	  ::GATEWAY = ActiveMerchant::Billing::PaypalGateway.new(
+		:login => "seller_1229899173_biz_api1.railscasts.com",
+		:password => "FXWU58S7KXFC6HBE",
+		:signature => "AGjv6SW.mTiKxtkm6L9DcSUCUgePAUDQ3L-kTdszkPG8mRfjaRZDYtSu"
+	  )
+	end
+
+94) ::GATEWAY --> :: is used to prepend before a constant so that it can be accessed from applications root, otherwise it will be accessible from from the scope of current class.
+
+95) gem install ---
+    Install the gem on your system(can also run some malacious code on ur system or servers)
+	
+	so to cross check do
+	gem fetch <gem_name> then
+	gem unpack <gem_name>
+	
+96) rails store -m <template_name> (Railscast 148) See the links in show notes section (Refer : http://m.onkey.org/rails-templates)
+	rails store -m base_template.rb :- This base_template will contain the commands that we want to run after the new rails project store is created.
+	
+	base_template.rb :-
+
+	run "echo TODO > README"
+
+	gem 'RedCloth', :lib => 'redcloth'
+	gem 'mislav-will_paginate', :lib => 'will_paginate', :source => 'http://gems.github.com'
+	rake "gems:install"
+
+	if yes?("Do you want to use RSpec?")
+	  plugin "rspec", :git => "git://github.com/dchelimsky/rspec.git"
+	  plugin "rspec-rails", :git => "git://github.com/dchelimsky/rspec-rails.git"
+	  generate :rspec
+	end
+
+	git :init
+
+	file ".gitignore", <<-END
+	.DS_Store
+	log/*.log
+	tmp/**/*
+	config/database.yml
+	db/*.sqlite3
+	END
+
+	run "touch tmp/.gitignore log/.gitignore vendor/.gitignore"
+	run "cp config/database.yml config/example_database.yml"
+
+	git :add => ".", :commit => "-m 'initial commit'"
+	
+100)ab command (Appache Benchmark) is used for benchmarking (comparing). Server should be run in production mode while benchmarking.
+    > script/server -e production -d (-d option is used to detach this process)
+	> ab -n 100 http://127.0.0.1:3000/processes/list
+	> ab -n 100 http://127.0.0.1:3000/processes_list
+
+101) Rails 2.3 extras :-
+	# find in batches
+	Product.count
+	Product.find_in_batches(:batch_size => 10) do |batch|    ---> batch => array of 100 objects
+	  puts "Products in batch: #{batch.size}"
+	end
+	Product.each(:batch_size => 10) do |product|             ---> passing single product at a time while loading 10 products at 1 go 
+	  puts product.name
+	end
+
+	# scoped_by (Dynamic scopes --> scoped_by_<attr-name>)
+	Product.scoped_by_price(4.99).size     --> Till Product.scoped_by_price(4.99) query is not fired, its fired on .size or .first etc
+	Product.scoped_by_price(4.99).first
+	Product.scoped_by_price(4.99).scoped_by_category_id(3).first   --> chaining of these dynamic scopes can also be done
+
+	# try method  (Returns product's name if there's product with price 4.99 otherwise nil instead of NoMethodError)
+	Product.find_by_price(4.99).try(:name)
+	
+	product.rb --> Default scope gets applied on every query
+	default_scope :order => "name"
+
+	categories_controller.rb
+	render 'new' --> action_name
+	render 'products/edit' --> controller/action_name
+
+	products/index.html.erb
+	<%= render @products %>  (Render partial products with collection of products)
+
+	products/show.html.erb
+	<%= render @product %>  (Render partial product for a single products)
+
+	Checkout release notes for more : http://guides.rubyonrails.org/2_3_release_notes.html
+	
+102) If u r writing (redirect_to :id => nil) on a create action like
+	
+	def create
+	  @commentable = find_commentable
+	  @comment = @commentable.comments.build(params[:comment])
+	  if @comment.save
+		flash[:notice] = "Successfully created comment."
+		redirect_to :id => nil   ---> will redirect you to the index action of the respective commentable type (Article or photo or event)
+	  else
+		render :action => 'new'
+	  end
+	end
+	
+103) To get class methods get included when we include a module, add a module named ClassMethods inside that module and place all the methods inside ClassMethods module and add a small hook to get it included means include the methods inside ClassMethods when ever the parent module gets included.
+	module ControllerMacros
+	  def self.included(base)
+		base.extend(ClassMethods)
+	  end
+	  
+	  module ClassMethods
+		def it_should_require_admin_for_actions(*actions)
+		  actions.each do |action|
+			it "#{action} action should require admin" do
+			  get action, :id => 1
+			  response.should redirect_to(login_url)
+			  flash[:error].should == "Unauthorized Access"
+			end
+		  end
+		end
+	  end
+	end
+	
+104) Grouping gems for two environments
+	 gem 'debugger', group: [:development, :test]
+	 
+105) logger.debug { "Article Count: #{Article.count}" } 
+     Putting {} braces besides logger.debug will only excute the code inside {} when the logger is in debug mode.
+ 	 
+	config/environments/development.rb (log_tags appends the mentioned stuffs into the beginning of the log message)
+	config.log_tags = [:uuid, :remote_ip, lambda { |req| Time.now }] --> (unique user id, User IP Addr, Time)
+
+	config/initializers/log_formatter.rb (Over-riding the below Logger class will allow you to modify the log messages)
+	class Logger::SimpleFormatter
+	  def call(severity, time, progname, msg)
+		"[#{severity}] #{msg}\n"
+	  end
+	end
+
+106) date.to_time   -------> 2012-04-08 00:00:00 +0530
+	 But while making queries rails will convert time it to UTC time --> 2012-04-08 05:30:00
+	 date.to_time_in_current_zone ---->Prints the Time in UTC -> Sun, 08 Apr 2012 00:00:00 UTC +00:
+	 So, always check the time that's in the query.
+	 
+107) Always set whitlisting to true	
+	 config/application.rb
+	 config.active_record.whitelist_attributes = true
+     so that nobody is able to access any protected attributes like is_admin through mass assignment.
+	 Use attr_accessible in all the models for the attributes that a user can modify. (attr_protected --> attributes that a user cannnot access.)
+	 
+108) To access routes in rails console use 
+     > app.products_path   --> "/products"
+     > app.get _   or app.get "/products"   --> select * from products --> 200 (Success Code)
+     > app.class  --> ActionDispatch::Integration::Session
+     > app.cookies --> gives u what cookies were set
+     > app.response.headers	--> Gives response header
+     > app.response.body --> Response body
+     > app.assigns(:products).size --> Gives u the instance variable which was set on the last request
+
+109) By default the rails console prints the sql query which is being fired in the console like
+     Product.count ---> Select count(*) from products
+     To off it just set ActiveRecord::Base.logger.level to anything greater than 0.
+     Ex : ActiveRecord::Base.logger.level = 1
+
+110) To set the default behaviour of rails console create a file at ~ named .irbrc, this file will be loaded whenver a rails console is loaded
+	 This is for apps having rails < Rails 3.2
+    > touch ~/.irbrc
+	
+	#!/usr/bin/env ruby
+	require 'irb/completion'   # tab completion in irb
+	require 'irb/ext/save-history' # To enable saving history of previous commands
+
+	IRB.conf[:PROMPT_MODE] = :SIMPLE
+	IRB.conf[:SAVE_HISTORY] = 1000  # 1000 previous commands
+	IRB.conf[:HISTORY_FILE] = "#{ENV['HOME']}/.irb_history"
+
+	# ActiveRecord::Base.logger.level = 1 if defined? ActiveRecord::Base   # To restrict sql query logging
+
+	# Prints the object in yaml format
+	def y(obj)
+	  puts obj.to_yaml
+	end
+
+	# open the called in textmate
+	class Object
+	  def mate(method_name)
+		file, line = method(method_name).source_location
+		`mate '#{file}' -l #{line}`
+	  end
+	end
+
+	Install the hirb gem to see the output of queries in nice table format
+	gem install hirb 
+	Add the below code in .irbrc file to make use it in every project's rails console (Otherwise can also add this gem to ur gemfile to access this gem in every environment)
+	
+	# Break out of the Bundler jail
+	# from https://github.com/ConradIrwin/pry-debundle/blob/master/lib/pry-debundle.rb
+	if defined? Bundler
+	  Gem.post_reset_hooks.reject! { |hook| hook.source_location.first =~ %r{/bundler/} }
+	  Gem::Specification.reset
+	  load 'rubygems/custom_require.rb'
+	end
+
+	if defined? Rails
+	  begin
+		require 'hirb'
+		Hirb.enable
+	  rescue LoadError
+	  end
+	end
+	
+	Ex :-
+	require 'hirb'
+	Hirb.enable
+	Product.limit(5)
+	
+	Rails 3.2 onwards :- (Revised :- 148)
+	--------------------
+	In Rails 3.2 create a .railsrc file in ~ and place all the options which u want to apply every time u create a new rails app. 
+	> echo -d mysql --skip-test-unit --skip-sprockets > ~/.railsrc
+	
+	To see all the available options
+	> rails new --help
+	
+	We can also tell what app template to refer after creating a rails project means whats commands to be fired every time a new rails app 
+	is created using -m option
+	> rails new abc -m app_template.rb
+		
+	app_template.rb (This is based on Thor gem and its documentation is at : http://guides.rubyonrails.org/generators.html#generator-methods)
+	----------------
+	remove_file "README.rdoc"
+	create_file "README.md", "TODO"
+
+	gem "rspec-rails", group: [:test, :development]
+	run "bundle install"
+	generate "rspec:install"
+
+	if yes? "Do you want to generate a root controller?"
+	  name = ask("What should it be called?").underscore
+	  generate :controller, "#{name} index"
+	  route "root to: '#{name}\#index'"
+	  remove_file "public/index.html"
+	end
+
+	git :init
+	append_file ".gitignore", "config/database.yml"
+	run "cp config/database.yml config/example_database.yml"
+	git add: ".", commit: "-m 'initial commit'"
+
+	---------------------------------------------------------------------------------------------------------------------------------------
+	We can also use app builders using -b option to generate app builders which can override default methods of rails app creation
+	> rails new abc -b app_builder.rb
+	
+	app_builder.rb
+	--------------
+	class AppBuilder < Rails::AppBuilder
+	  def readme  # Overridden method readme
+		create_file "README.md", "TODO"
+	  end
+	  
+	  def test # Overridden method readme
+		@generator.gem 'rspec-rails', group: [:test, :development]
+		run 'bundle install'
+		generate 'rspec:install'
+	  end
+	  
+	  def leftovers
+		if yes? "Do you want to generate a root controller?"
+		  name = ask("What should it be called?").underscore
+		  generate :controller, "#{name} index"
+		  route "root to: '#{name}\#index'"
+		  remove_file "public/index.html"
+		end
+
+		git :init
+		append_file ".gitignore", "config/database.yml"
+		run "cp config/database.yml config/example_database.yml"
+		git add: ".", commit: "-m 'initial commit'"
+	  end
+	end
+
+	To check the list of methods that we can override , check the file :
+	https://github.com/rails/rails/blob/master/railties/lib/rails/generators/rails/app/app_generator.rb
+
+	To do all these we can also use 
+	http://railswizard.org --> Not maintained nowadys
+	http://appscrolls.org/ --> Very good (http://drnicwilliams.com/2012/04/10/instant-new-rails-applications-with-the-app-scrolls/)
+	> gem install appscrolls
+	> scrolls list --> gives u the list of different scolls available
+	> scrolls new app_name -s rspec capybara guard
+	
+111) gem install awesome_print  --> Prints the object in nice & organized way
+	 > require 'awesome_print'
+	 > ap Product.first.attributes
+
+112) gem install methodfinder
+     > require 'methodfinder'     --> Print all the method names that can give the desired output
+	 > "abc".find_method("ABC")   --> ["String#swapcase", "String#swapcase!", "String#upcase", "String#upcase!"]
+
+113) Checkout irbtools gem which contains all the gems like awesome_print , methodfinder etc
+     https://github.com/janlelis/irbtools
+	 
+114) To run commands with sudo permission on a server use
+	 default_run_options[:pty] = true  --> this will ask u for password in the shell
+
+	 task :hello do
+	  run "#{sudo} cp ~/hello /hello"
+	 end
+     
+115) Time.parse(@released_at_text) --> will give u the DateTime object (@released_at_text = '2012-11-17 11:17:00')
+     Time.zone.parse(@released_at_text) --> will give u the DateTime object in the current time zone
+	 Use chronic gem to input date in various string formats like Tomorrow at 20:00 etc
+	 
+116) Values of virtual attributes can be persisted and displayed in the form using attr_writer 
+     attr_writer :released_at_text, :tag_names
+	 validate :check_released_at_text  
+	 before_save :save_released_at_text
+   	 
+	 def save_released_at_text
+		self.released_at = Time.zone.parse(@released_at_text) if @released_at_text.present?
+	 end
+
+	 def check_released_at_text
+		if @released_at_text.present? && Time.zone.parse(@released_at_text).nil?
+			errors.add :released_at_text, "cannot be parsed"
+		end
+	 rescue ArgumentError
+		errors.add :released_at_text, "is out of range"
+	 end
+	 
+117) > export RAILS_ENV=staging
+     > rails c --> starts the rails console or whatever u want in staging env.
+	 
+118) Gems can be grouped  and given whatever name u want(for example checks assets group in gemfile & how its included in application.rb file)
+	For Ex : 
+	Gemfile
+	group :profiling do
+	  gem 'ruby-prof'
+	end
+
+	config/application.rb
+	Bundler.require(*Rails.groups(:assets => %w(development test), :profiling => %w[staging development])
+
+119) Sending e-mail in a Rails App
+
+	terminal : rails g mailer user_mailer signup_confirmation
+
+	app/mailers/user_mailer.rb
+	class UserMailer < ActionMailer::Base
+	  default from: "railscasts@example.com"
+
+	  def signup_confirmation(user)
+		@user = user
+		mail to: user.email, subject: "Sign Up Confirmation"
+	  end
+	end
+
+	app/views/user_mailer/signup_confirmation.text.erb
+	<%= @user.name %>,
+	Thank you for signing up.
+	<%= user_url(@user) %>
+
+	Note: In the episode I just passed the @user model in directly in the HTML template (below) but that generates a relative URL. You need to use the url helper method to generate a full URL.
+
+	app/views/user_mailer/signup_confirmation.html.erb
+	<p><%= @user.name %>,</p>
+	<p>Thank you for signing up.</p>
+	<p><%= link_to "User Profile", user_url(@user) %></p>
+
+	users_controller.rb
+	UserMailer.signup_confirmation(@user).deliver
+
+	config/development.rb
+	# Don't care if the mailer can't send
+	config.action_mailer.raise_delivery_errors = true
+
+	# Change mail delvery to either :smtp, :sendmail, :file, :test
+	config.action_mailer.delivery_method = :smtp
+	config.action_mailer.smtp_settings = {
+	  address: "smtp.gmail.com",
+	  port: 587,
+	  domain: "railscasts.com",
+	  authentication: "plain",
+	  enable_starttls_auto: true,
+	  user_name: ENV["GMAIL_USERNAME"],
+	  password: ENV["GMAIL_PASSWORD"]
+	}
+
+	# Specify what domain to use for mailer URLs
+	config.action_mailer.default_url_options = {host: "localhost:3000"}
+
+120) Storing private info in YAML file (Can also check Figaro gem)
+	
+	terminal
+	echo /config/application.yml >> .gitignore
+	cp config/application.yml config/application.example.yml
+
+	articles_controller.rb
+	http_basic_authenticate_with name: CONFIG[:username], password: CONFIG[:password]
+
+	config/initializers/secret_token.rb
+	Blog::Application.config.secret_token = CONFIG[:secret_token]
+
+	config/application.yml
+	username: "admin"
+	password: "secret"
+	secret_token: "024e1460..."
+	development:
+	  host: "localhost:3000"
+	test:
+	  host: "test.local"
+	production:
+	  host: "blog.example.com"
+
+	config/application.rb (Should be written in between bundler def and class def)
+	CONFIG = YAML.load(File.read(File.expand_path('../application.yml', __FILE__)))
+	CONFIG.merge! CONFIG.fetch(Rails.env, {})
+	CONFIG.symbolize_keys!
+
+	# config/application.rb
+	config.action_mailer.default_url_options = {host: CONFIG[:host]}
+
+	ENV Alternative
+	config/application.rb
+	config = YAML.load(File.read(File.expand_path('../application.yml', __FILE__)))
+	config.merge! config.fetch(Rails.env, {})
+	config.each do |key, value|
+	  ENV[key] = value unless value.kind_of? Hash
+	end
+
+121) Alternative solution to optimistic locking (Revised Episode :- 59)
+	Alternative solution using updated_at
+	products/_form.html.erb
+	<%= f.hidden_field :original_updated_at %>
+
+	product.rb
+	attr_accessible :original_updated_at # ...
+	validate :handle_conflict, only: :update
+
+	def original_updated_at
+	  @original_updated_at || updated_at.to_f
+	end
+	attr_writer :original_updated_at
+
+	def handle_conflict
+	  if @conflict || updated_at.to_f > original_updated_at.to_f
+		@conflict = true
+		@original_updated_at = nil
+		errors.add :base, "This record changed while you were editing. Take these changes into account and submit it again."
+		changes.each do |attribute, values|
+		  errors.add attribute, "was #{values.first}"
+		end
+	  end
+	end
+
+122) Use letter_opener gem in development env to open the exception notifications in a browser window (Revised :- 104)
+	gem 'letter_opener', group: :development   # Gemfile
+	config.action_mailer.delivery_method = :letter_opener   # config/development.rb
+	
+123) Migration for a polymorphic association  (Checkout Revised : 154 for more polymorphic association tips)
+     class CreateComments < ActiveRecord::Migration
+       def change
+		 create_table :comments do |t|
+		   t.text :content
+		   t.belongs_to :commentable, polymorphic: true
+		   
+		   t.timestamps
+		 end
+		 add_index :comments, ["commentable_id, :commentable_type]
+	   end
+	 end
+
+124) To escape(execute) erb-html code inside javascript, we have to use the j method (use remote: true to make a ajax request) (Revised-136)
+	 <%= link_to "New Task", new_task_path, id: "new_link", remote: true %>
+	 new.js.erb :-
+     Ex: $('#new_link').hide().after('<%= j render("form") %>')
+	 
+	 We can also use escape_javascript method :
+	 Ex: products/index.js.erb
+	     $("#products").html("<%= escape_javascript(render("products")) %>");
+
+
+	 
+125) Use link_to_unless_current helper method so to switch between hyperlink & text for a given link. (Revised - 138) 	
+	layouts/application.html.erb
+	Language:
+	<%= link_to_unless_current "English", locale: "en" %> |
+	<%= link_to_unless_current "Wookieespeak", locale: "wk" %>
+
+126)For translation, if the keys are unique can we can directly use the keys to display their values. 
+	config/locals/en.yml
+	en:
+	  products:
+		index:
+		  title: "Browse Products"
+		  description: "Thank you for visiting our store. Now take out your wallet and buy something."
+
+	<h1><%= t ".title" %></h1> instead of <h1><%= t "products.index.title" %></h1>
+	
+127) Different ways to set locale for a user
+	def set_locale
+	  I18n.locale = params[:locale] if params[:locale].present?
+	  # current_user.locale
+	  # request.subdomain
+	  # request.env["HTTP_ACCEPT_LANGUAGE"]  -- sent through user's browser
+	  # request.remote_ip  -- find locale using geolocation with IP
+	end	
+	
+128) Use 'Globalize 3' gem translate say product name which is stored in the database
+	 Check guides page on Internationalization
+	 
+129) We can set categories for a product using category ids as well
+	p = Product.first
+	p.category_ids # []
+	p.category_ids = [1, 2]  # Insert 2 records
+	p.categories	# Returns array of two categories
+	
+130) To assign a unique id to a set of checkboxes(say categories belonging to a product), use the helper method dom_id
+	
+	products/_form.html.erb
+	<%= hidden_field_tag "product[category_ids][]", nil %>   // Set to nil so that if no checkboxes are selected then nil is submitted
+	<% Category.all.each do |category| %>
+	  <%= check_box_tag "product[category_ids][]", category.id, @product.category_ids.include?(category.id), id: dom_id(category) %>
+	  <%= label_tag dom_id(category), category.name %><br>  //Labels added along with dom_id for the category so that clicking on name checks the checkbox
+	<% end %>
+	
+	simple_form, formtastic are the two gems which provide many more methods to build a form easily.
+	
+131) For populating states of a country
+	people/new.html.erb
+	<%= f.grouped_collection_select :state_id, Country.order(:name), :states, :name, :id, :name, include_blank: true %>
+
+	app/assets/javascripts/people.js.coffee
+	jQuery ->
+	  $('#person_state_id').parent().hide()
+	  states = $('#person_state_id').html()
+	  $('#person_country_id').change ->
+		country = $('#person_country_id :selected').text()
+		escaped_country = country.replace(/([ #;&,.+*~\':"!^$[\]()=>|\/@])/g, '\\$1')
+		options = $(states).filter("optgroup[label='#{escaped_country}']").html()
+		if options
+		  $('#person_state_id').html(options)
+		  $('#person_state_id').parent().show()
+		else
+		  $('#person_state_id').empty()
+		  $('#person_state_id').parent().hide()
+
+132)There is no need to give format in the respond_to block like
+	respond_to do |format|
+	  format.html 
+	  format.atom
+	end
+	Mention the format directly in the link
+	<%= link_to image_tag("feed-icon-28x28.png"), articles_url(format: "atom") %>
+
+133) Since jQuery comes by default with Rails 3, so to use any jQuery pluggin like accordion or autocomplete just include jquery-ui JS.
+
+	app/assets/javascripts/application.js
+	//= require jquery
+	//= require jquery-ui
+    //= require jquery_ujs
+	//= require_tree .
+
+134) From Rails 3.1, there is a new attribute named data which can be very useful. (Revised - 102)
+
+	products/_form.html.erb
+	<%= f.text_field :category_name, data: {autocomplete_source: Category.order(:name).map(&:name)} %>
+	
+	Further this data attribute can used for autocompletion
+	
+	app/assets/javascripts/products.js.coffee
+	jQuery ->
+	  $('#product_category_name').autocomplete
+		source: $('#product_category_name').data('autocomplete-source')
+
+135) To chain a search query :
+
+	models/search.rb
+	def products
+	  @products ||= find_products
+	end
+
+	private
+	def find_products
+	  products = Product.order(:name)
+	  products = products.where("name like ?", "%#{keywords}%") if keywords.present?
+	  products = products.where(category_id: category_id) if category_id.present?
+	  products = products.where("price >= ?", min_price) if min_price.present?
+	  products = products.where("price <= ?", max_price) if max_price.present?
+	  products
+	end
+
+136) While using Thinking Sphinx as a search engine for ur rails app, to solve the problem of re-indexing for every new record created, check the Delta Indexes section of Thinking Sphinx.
+
+137) Defining associations with Factory Girl.
+     Say, there is a class User and a class Article and Article belongs_to User
+	 
+	Factory.define :user do |f|
+	  f.sequence(:username) { |n| "foo#{n}" }
+	  f.password "foobar"
+	  f.password_confirmation { |u| u.password }
+	  f.sequence(:email) { |n| "foo#{n}@example.com" }
+	end
+
+	Factory.define :article do |f|
+	  f.name "Foo"
+	  f.association :user  # or f.association :author, :factory => :user # if the association name is author instead of user
+	end
+	
+	spec/factories.rb  (From Revised Episode)
+	FactoryGirl.define do
+	  factory :user do
+		sequence(:username) { |n| "foo#{n}" }
+		password "foobar"
+		email { "#{username}@example.com" }
+		admin false
+		
+		factory :admin do
+		  admin true
+		end
+	  end
+	  
+	  factory :article do
+		name "Foo"
+		user
+	  end
+	end
+
+138) user = Factory(:user, :username => 'frank', :password => 'secret') # creates a record in test database
+     is same as 
+	 user = Factory.create(:user, :username => 'frank', :password => 'secret')
+	 
+	 user = Factory.build(:user, :username => 'frank', :password => 'secret') # creates a object in memory
+	 
+	Alternatives of Factory Girl are Machinist, Object Daddy	
+
+139) We need not pass the id for the resource when its the current one :- (Railscast :- 160)
+
+	layouts/application.html.erb
+	<div id="user_nav">
+	  <% if current_user %>
+		<%= link_to "Edit Profile", edit_user_path(:current) %> |
+		<%= link_to "Logout", logout_path %>
+	  <% else %>
+		<%= link_to "Register", new_user_path %> |
+		<%= link_to "Login", login_path %>
+	  <% end %>
+	</div>
+
+140) Profiling tools for performance optimization :- (Railscast :- 161)
+     1. New Relic RPM Developer Mode
+	 2. FiveRuns TuneUp
+	 3. Rack::Bug
+	 
+141) Using includes & joins
+	@products = Product.order("categories.name").joins(:category).select("products.*, categories.name as category_name")
+    # or Product.order("name").includes(:category)
+	
+142) Creating index for a column while creating a migration 
+     rails g scaffold page name content:text ancestry:string:index
+	 
+143) Inverse relationship :-
+     
+	models/friendship.rb
+	--------------------
+	belongs_to :user
+	belongs_to :friend, :class_name => "User"
+
+	models/user.rb
+	--------------
+	has_many :friendships
+	has_many :friends, :through => :friendships
+	has_many :inverse_friendships, :class_name => "Friendship", :foreign_key => "friend_id"
+	has_many :inverse_friends, :through => :inverse_friendships, :source => :user
+
+144) To update multiple records in which array of product_ids comes from params and rest of the attributes, either some value or blank
+    
+    def update_multiple
+	  @products = Product.find(params[:product_ids])
+	  @products.each do |product|
+		product.update_attributes!(params[:product].reject { |k,v| v.blank? })  # Reject nil means not modified
+	  end
+	  flash[:notice] = "Updated products!"
+	  redirect_to products_path
+	end
+	
+145) fields_for :-
+     -------------
+	 fields_for is a helper method which is used inside a form_tag to create a form either for a single or multiple model objects and acess the form builder methods.
+	 
+146) There is a class method update for a model with the help of which we can update multiple records
+     @products = Product.update(params[:products].keys, params[:products].values)
+
+	 But this update method igonres validation errors.
+	 But the above query returns all the sucessfully updated objects. So, it can be done by the below code (Railscast - 198)
+	 
+	def update_individual
+	  @products = Product.update(params[:products].keys, params[:products].values).reject { |p| p.errors.empty? }
+	  if @products.empty?
+		flash[:notice] = "Products updated"
+		redirect_to products_url
+	  else
+		render :action => "edit_individual"
+	  end
+	end
+	 
+147) Has_many throygh association example :-
+
+	script/generate model tag name:string
+	script/generate model tagging article_id:integer tag_id:integer
+	rake db:migrate
+
+	models/tagging.rb
+	class Tagging < ActiveRecord::Base
+	  belongs_to :article
+	  belongs_to :tag
+	end
+
+	models/tag.rb
+	class Tag < ActiveRecord::Base
+	  has_many :taggings, :dependent => :destroy
+	  has_many :articles, :through => :taggings
+	end
+
+	models/article.rb
+	class Article < ActiveRecord::Base
+	  has_many :comments, :dependent => :destroy
+	  has_many :taggings, :dependent => :destroy
+	  has_many :tags, :through => :taggings
+	  validates_presence_of :name, :content
+	  attr_writer :tag_names
+	  after_save :assign_tags
+	  
+	  def tag_names
+		@tag_names || tags.map(&:name).join(' ')
+	  end
+	  
+	  private
+	  
+	  def assign_tags
+		if @tag_names
+		  self.tags = @tag_names.split(/\s+/).map do |name|
+			Tag.find_or_create_by_name(name)
+		  end
+		end
+	  end
+	end
+
+	articles/_form.html.erb
+	<p>
+	  <%= f.label :tag_names %><br />
+	  <%= f.text_field :tag_names %>
+	</p>
+
+148) firequark is a firefox pluggin which works with firebug to get tha CSS selector for a particular element (Railscast-173)
+
+149) $(function(){
+	   ---
+	 });
+	 is equal to
+	 $(document).ready(function(){
+	   ---
+	 });
+	 
+150) Pagination with ajax : (Railscast-174)
+		$(function() {
+		  $(".pagination a").live("click", function() {    // live is used so that the links work even after new contents are fetched by ajax
+			$(".pagination").html("Page is loading...");
+			$.getScript(this.href);
+			return false;
+		  });
+		});
+		
+	 Check Railscast-175 to get ajax pagination + restful page URL's with help of JS.
+	 
+151) If u want to print the log into ur rails console then set the log level as below :
+	 ActiveRecord::Base.logger = Logger.new(STDOUT)
+	 
+152) searchlogic gem :- Searchlogic makes searching models(DB objects) easier than ever with its assortment of named scopes. 
+	(Diadvantage : some security issues since it creates a url containing all the searched strings even which is not mentioned in the form. Advised only for admin pages.)
+	
+153) say_with_time method on the migration file displays the time taken by the set of statements written inside the block of that nethod.
+	 Ex: #version_existing_pages migration
+	 class VersionExistingPages < ActiveRecord::Migration
+	   def self.up
+		 say_with_time "Setting initial version for pages" do
+		   Page.find_each(&:touch)
+		 end
+	   end
+     end	   
+	 
+154) Validating attachment type using paperclip :
+	 validates_attachment_content_type :photo, :content_type => ['image/jpeg', 'image/png']
+	 But this can also be cracked in some ways, so we should make changes at the apache webserver level, so that any script cannot be executed. (http://www.mysql-apache-php.com/fileupload-security.htm)
+	 
+155) To restrict passwords to be displayed in log files use the 
+     class ApplicationController < ActionController::Base
+	   filter_parameter_logging :password
+	 end
+	 
+156) Suppose there are several users and every user has certain projects and we wanr to restrict one user from accessing other users project the can do something like this :
+	projects_controller.rb
+	def show
+	  @project = current_user.projects.find(params[:id])
+	end
+
+157) ActiveRecord joins uses INNER JOIN and
+     ActiveRecord include uses LEFT OUTER JOIN
+	 
+158) define_method add a instance method to the class or module defining it.
+
+159) Difference between include & extend :-
+    include : mixes in specified module methods as instance methods in the target class
+    extend : mixes in specified module methods as class methods in the target class
+	
+	module ReusableModule
+	  def module_method
+		puts "Module Method: Hi there!"
+	  end
+	end
+
+	class ClassThatIncludes
+	  include ReusableModule
+	end
+	class ClassThatExtends
+	  extend ReusableModule
+	end
+
+	puts "Include"
+	ClassThatIncludes.new.module_method       # "Module Method: Hi there!"
+	puts "Extend"
+	ClassThatExtends.module_method            # "Module Method: Hi there!"
+	
+	If you include module ReusableModule in class ClassThatIncludes, the methods, constants, classes, submodules, and other declarations gets referenced.
+
+	If you extend class ClassThatExtends with module ReusableModule, then the methods and constants gets copied. Obviously, if you are not careful, you can waste a lot of memory by dynamically duplicating definitions.
+
+	--> extend - adds the specified module's methods and constants to the target's metaclass (i.e. the singleton class) e.g.
+
+    if you call Klazz.extend(Mod), now Klazz has Mod's methods (as class methods)
+    if you call obj.extend(Mod), now obj has Mod's methods (as instance methods), but no other instance of of obj.class has those methods.
+    extend is a public method
+
+	--> include - By default, it mixes in the specified module's methods as instance methods in the target module/class. e.g.
+
+    if you call class Klazz; include Mod; end;, now all instances of Klazz have access to Mod's methods (as instance methods)
+    include is a private method, because it's intended to be called from within the container class/module.
+
+	module CroppableImage
+	  def self.included(base)
+		base.extend(ClassMethods)
+	  end
+
+	  module ClassMethods
+		def bar
+		  puts 'class method'
+		end
+	  end
+
+	  def foo
+		puts 'instance method'
+	  end
+	end
+	
+160) To check how your application behaves in production mode set
+	config/environments/development.rb
+	config.consider_all_requests_local = false
+
+161) Alternative of serialization :- bitmask index
+	Consider the example of an application having users who can have many roles, then instead of serializing roles in yaml format we can also store a bitmask index for those array of roles.
+	%w[admin super normal]
+	for admin, super  --> 2**0 + 2**1 = 3
+	for admin, normal --> 2**0 + 2**2 = 5
+	for super, normal --> 2**1 + 2**2 = 6
+	for admin,super,normal --> 2**0 + 2**1 + 2**2 = 7
+	
+	Ex: models/user.rb
+	class User < ActiveRecord::Base
+	  acts_as_authentic
+	  has_many :articles
+	  has_many :comments
+	  
+	  # this will allow us to fetch all the users whith the given role (User.with_role('admin'))
+	  named_scope :with_role, lambda { |role| {:conditions => "roles_mask & #{2**ROLES.index(role.to_s)} > 0"} }
+	  
+	  ROLES = %w[admin moderator author]
+	  
+	  def roles=(roles)
+		self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
+	  end
+	  
+	  def roles
+		ROLES.reject { |r| ((roles_mask || 0) & 2**ROLES.index(r)).zero? }
+	  end
+	  
+	  def role_symbols
+		roles.map(&:to_sym)
+	  end
+	end
+
+162) Command to get all the commands u typed in 
+	script/console
+	puts Readline::HISTORY.entries.split("exit").last[0..-2].join("\n")
+
+163) To override any kind of exception and display a flash error instead of the default error page, you can override that exception in the application controller
+
+	application_controller.rb
+	class ApplicationController < ActionController::Base
+	  helper :all #gives access to helper module methods in the controllers
+	  protect_from_forgery
+	  rescue_from CanCan::AccessDenied do |exception|
+	    flash[:error] = "Access denied."
+	    redirect_to root_url
+	  end
+	end
+
+164) rake middleware : command lists the middleware of our rails application.
+
+165) Model without a backend database table :-
+
+	models/recommendation.rb
+	class Recommendation < ActiveRecord::Base
+	  def self.columns() @columns ||= []; end
+	 
+	  def self.column(name, sql_type = nil, default = nil, null = true)
+		columns << ActiveRecord::ConnectionAdapters::Column.new(name.to_s, default, sql_type.to_s, null)
+	  end
+	  
+	  column :from_email, :string
+	  column :to_email, :string
+	  column :article_id, :integer
+	  column :message, :text
+	  
+	  validates_format_of :from_email, :to_email, :with => /^[-a-z0-9_+\.]+\@([-a-z0-9]+\.)+[a-z0-9]{2,4}$/i
+	  validates_length_of :message, :maximum => 500
+	  
+	  belongs_to :article
+	end
+
+	recommendations_controller.rb
+	def new
+	  @recommendation = Recommendation.new(:article_id => params[:article_id])
+	end
+
+	def create
+	  @recommendation = Recommendation.new(params[:recommendation])
+	  if @recommendation.valid?
+		# send email
+		flash[:notice] = "Successfully created recommendation."
+		redirect_to root_url
+	  else
+		render :action => 'new'
+	  end
+	end
+
+166) feilds_for is used for displaying associated model in the form.
+     Ex:- Survey has many questions & Question has many answers
+	 
+	Note: If you are protecting attributes with attr_accessible be certain to add the nested attributes to that (such as questions_attributes and answers_attributes).
+	
+	models/survey.rb
+	class Survey < ActiveRecord::Base
+	  attr_accessible :name, :questions_attributes
+	  has_many :questions, :dependent => :destroy
+	  accepts_nested_attributes_for :questions, :reject_if => lambda { |a| a[:content].blank? }, :allow_destroy => true
+	end
+
+	# accepts_nested_attributes_for is used to manage associated records in a single form.
+	
+	models/question.rb
+	class Question < ActiveRecord::Base
+	  attr_accessible :content, :survey_id, :answers_attributes
+	  belongs_to :survey
+	  has_many :answers, :dependent => :destroy
+	  accepts_nested_attributes_for :answers, :reject_if => lambda { |a| a[:content].blank? }, :allow_destroy => true
+	end
+
+	models/answer.rb
+	class Answer < ActiveRecord::Base
+	  belongs_to :question
+	end
+
+	views/surveys/_form.html.erb
+	<%= form_for @survey do |f| %>
+	  <%= f.error_messages %>
+	  <p>
+		<%= f.label :name %><br />
+		<%= f.text_field :name %>
+	  </p>
+	  <%= f.fields_for :questions do |builder| %>
+		<%= render "question_fields", :f => builder %>
+	  <% end %>
+	  <p><%= f.submit "Submit" %></p>
+	<% end %>
+
+	views/surveys/_question_fields.html.erb
+	<fieldset>
+	  <%= f.label :content, "Question" %><br />
+	  <%= f.text_area :content %><br />
+	  <%= f.check_box :_destroy %>
+	  <%= f.label :_destroy, "Remove Question" %>
+	  <%= f.fields_for :answers do |builder| %>
+		<%= render 'answer_fields', f: builder %>
+	  <% end %>
+	  <%= link_to_add_fields "Add Answer", f, :answers %>
+	</fieldset>
+
+	views/surveys/_answer_fields.html.erb
+	<fieldset>
+	  <%= f.label :content, "Answer" %>
+	  <%= f.text_field :content %>
+	  <%= f.hidden_field :_destroy %>
+	  <%= link_to "remove", '#', class: "remove_fields" %>
+	</fieldset>
+
+	surveys.js.coffee
+	jQuery ->
+	  $('form').on 'click', '.remove_fields', (event) ->
+		$(this).prev('input[type=hidden]').val('1')
+		$(this).closest('fieldset').hide()
+		event.preventDefault() // since we donot want the normal link behaviour
+
+	  $('form').on 'click', '.add_fields', (event) ->
+		time = new Date().getTime()
+		regexp = new RegExp($(this).data('id'), 'g')
+		$(this).before($(this).data('fields').replace(regexp, time))
+		event.preventDefault()
+
+	application_helper.rb
+	module ApplicationHelper
+	  def link_to_add_fields(name, f, association)
+		new_object = f.object.send(association).klass.new
+		id = new_object.object_id
+		fields = f.fields_for(association, new_object, child_index: id) do |builder|
+		  render(association.to_s.singularize + "_fields", f: builder)
+		end
+		link_to(name, '#', class: "add_fields", data: {id: id, fields: fields.gsub("\n", "")})
+	  end
+	end
+
+167) Rendering customized json response
+     contoller/owners_controller.rb
+	 def index
+	   @owner = Owner.all
+	   respond_to do |format|
+	     format.html
+		 fromat.json {render json: @owner}
+	   end
+	 end
+	 
+	 o/p --> @owner object in json format
+	 
+	 In Rails 3
+	 To send a cutomized json we can use jbuilder template handler (we can use jbuilder API to build our custom json object)
+	 views/owners/indev.json.builder
+	 json.array!(@owners) do |owner|
+	   json.extract! owner, :name
+	   json.url owner_url(owner)
+	 end
+	 
+	 Now in Rails 4 we can also write the custom json object in pure ruby
+	 views/owners/indev.json.ruby
+	 owner_hash = @owners.map do |owner|
+	   { name: owner.name, url: owner_url(owner) }
+	 end
+	 owner_hash.to_json
+	 
+168)bundle install --without db
+	This command will install all dependencies except the MySQL and PostgreSQL Ruby drivers (means database drivers).
+	
+169) Rails default file based cache store (ActiveSupport::Cache::FileStore) is slower.
+	 That's why centralized memory based store like mem-cache is used in production servers
+	 
+	 config/environments/production.rb
+	 config.cache_store = :mem_cache_store
+	 
+170) bundle check
+     The above command lists any missing gems or dependencies.
+	
+	 bundle help
+	 The above command lists the commands available for bundler.
+	 
+	 bundle help install
+	 Gives u the help for install
+	 
+	 bundle install --without=production 
+	 The above command  runs bundle for all gems except that are listed under production group.
+	 
+	 bundle outdated
+	 Lists the gems whose higher versions are available than those mentioned in ur gemfile.
+	 
+	 Locking & Unlocking :-
+	 bundle lock
+	 This will lock the gemfile versions in Gemfile.lock and not allow it to be modified even on bundle install
+	 
+	 To update gems, modify the Gemfile, then run
+	 bundle install --relock
+	 
+	 To bundle the gems inside your application run
+	 bundle pack
+	 The above command will generate .gem file inside vendor/cache
+	 Next time when u run bundle install then gems will be installed from this vendor/cache directory instead of rubygems website.
+	 
+171) In Gemfile
+     gem 'capistrano', '~> 2.11.3'
+     ~> means on bundle install if higher tiny version is available then it will update it (means 2.11.4), but willnot update for higher minor version (like 2.12.0)
+     ~> updates minor version if its mentioned like
+     gem 'capistrano', '~> 2.11'
+	 updates to 2.12
+	 
+172) gem 'ruby-debug19', :require => 'ruby-debug'
+     It means ruby-debug.rb file has to be loaded in case the name of the gem is not matched.
+	 
+173) gem 'rails', github: 'rails/rails', branch: '3-2-stable', ref: 'dfdfs231abc123...'
+     With option github, we can give the github_username/repo_name along with branch to be used and commit SHA as ref to be referenced.
+	 
+174) To reference the gems from uy system use the path option.
+     gem 'rails', path: '~/code/rails'
+	 
+175) To avoid using bundle exec in production environment, u can use the command 
+     bundle install --binstubs
+     this will create a bin folder in the application which contains the executables for all the gems.
+     Then rake can be used as 
+     ./bin/rake db:migrate (for example)
+	 instead of bundle exec rake db:migrate
+	 
+176) ActiveRecord query in Rails 3 (Episode - 203)
+	 articles = Article.order("name") ---> Doesnot fires a  query in the DB, it just created a ActiveRecord::Relation object.
+	 Query is fired when we perform other methods like all or first or each.
+	 article.all.to_sql ---> Returns the SQL performed on the DB.
+	 
+177) Routing in Rails 3
+	 match "/about.:format" => "info#about", :as => :about
+	 The above line gives us the route for formatted path like
+	 localhost:3000/about.pdf but not the default html.erb
+	 
+	 match "/about(.:format)" => "info#about", :as => :about
+	 The above line enables us to use both localhost:3000/about or localhost:3000/about.pdf
+	 It makes format as optional.
+	 
+	 # Routes with constraints
+	 match "/:year(/:month(/:day))" => "info#about", :constraints => { :year => /\d{4}/, :month => /\d{2}/, :day => /\d{2}/ }
+  
+	 # With user_agent which is used to determine the browser
+     match "/secret" => "info#about", :constraints => { :user_agent => /Firefox/ }
+	
+	 # For this, constraint will be applied to the routes within the block
+     constraints :host => /localhost/ do
+       match "/secret" => "info#about"
+     end
+  
+	 # Rack app route
+     match "/hello" => proc { |env| [200, {}, "Hello Rack!"] }
+	 
+178) XSS Protection in Rails 3 :- (Railscast - 204)
+     By default  <p><%= comment.content %></p> is already escaped , there is no need to place h method. But can also place it.
+	 
+	 # rails c
+	 "foo".html_safe?  --> false
+	 safe = "safe".html_safe
+	 safe.html_safe?   --> true
+	 
+	 Example to use both h and html_safe method in helper method to create a link :
+	 
+	views/comments/_comment.html.erb
+	<div class="comment">
+	  <%= strong link_to(comment.name, comment.url) %>
+	  <p><%= comment.content %></p>
+	</div>
+
+	application_helper.rb
+	def strong(content)
+	  "<strong>#{h(content)}</strong>".html_safe
+	end
+
+	The h method in the helper method escaped any script or tag if present and the html_safe method generates a html_safe string after escaping.
+	
+179) Unobtrusive Javascript is a way to seperate out javascript from html document, so that we may not place javascript code directly inline.
+
+180) Purpose of javascript include tag and CSRF meta tag :-
+	 <%= javascript_include_tag :defaults %>
+	 <%= csrf_meta_tag %>
+
+	 To include default js like jquery.js in rails 3 app, we write <%= javascript_include_tag :defaults %> so that jquery gets loaded in all the pages.
+	 
+	 <%= csrf_meta_tag %> helper method outputs the meta tag for the authenticity token which is necessary to submit requests like delete request or other requests so that authenticity is guaranteed. This is necessary to prevent cross-site request forgery (means any delete or post request is coming from an authenticated user but not from another site or hacker).
+	 
+181) A way to put * on mandatory feilds using a helper method and method provided by ActiveModel::Validations module :
+	 >> User.validators  --> lists validations applied for user model
+	 
+	 <div class="field">
+		<%= f.label :email %><%= mark_required(@user, :email) %><br />
+		<%= f.text_field :email %>
+	 </div>
+	 
+	application_helper.rb
+	def mark_required(object, attribute)
+	  "*" if object.class.validators_on(attribute).map(&:class).include? ActiveModel::Validations::PresenceValidator
+	end
+	
+182) @products = Product.scoped
+	 The above line is similar to Product.all but in .all a query is triggered to the DB where as .scoped method doesnot fires a query, it just tells that additional conditions can be added before executing a query.
+	 Ex:
+      def index
+		@products = Product.scoped
+		@products = @products.where("name like ?", "%" + params[:name] + "%") if params[:name]
+		@products = @products.where("price >= ?", params[:price_gt]) if params[:price_gt]
+		@products = @products.where("price <= ?", params[:price_lt]) if params[:price_lt]
+	  end
+	
+	  http://localhost:3000/products?name=video&price_gt=50   -->  Returns Products name containing video having price >= 50.
+	  
+	  To chain multiple conditions, you should create a delegator class --> (Refer Railscasts - 212)
+	  
+183) Creating class using Struct.new and use of delegate method :-
+	 
+	helpers/calendar_helper.rb
+	module CalendarHelper
+	  def calendar(date = Date.today, &block)
+		Calendar.new(self, date, block).table
+	  end
+
+	  class Calendar < Struct.new(:view, :date, :callback)
+		HEADER = %w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday]
+		START_DAY = :sunday
+
+		delegate :content_tag, to: :view
+
+		def table
+		  content_tag :table, class: "calendar" do
+			header + week_rows
+		  end
+		end
+
+		def header
+		  content_tag :tr do
+			HEADER.map { |day| content_tag :th, day }.join.html_safe
+		  end
+		end
+	end
+	
+	In the above example,
+	Calendar class inherits from a new Struct which is a convenient way do define accessors for the various attributes. The first attribute here is the view and it’s important to pass this in as we don’t have access to the helper methods in our class. We can easily delegate to the view for any helper methods we want to access in the calendar or maybe override method_missing in here.
+
+184) To check whether a robot is hitting your server :-
+     request.user_agent =~ /\b(Baidu|Gigabot|Googlebot|libwww-perl|lwp-trivial|msnbot|SiteUptime|Slurp|WordPress|ZIBB|ZyBorg)\b/i
+	 
+185) Whenever we are writing the condition in a query in the form of string then we should always add the table name in column name to avoid ambiguity.
+     If we are using hash to write the condition then rails will add the table name, we need not worry about it.
+	 
+	Ex :-
+	scope :discontinued, where(:discontinued => true)
+
+	def self.cheaper_than(price)
+	  where("products.price < ?", price)
+	end
+	
+186) If we want to join a join query and a scope then there are 2 ways to do it :-
+
+	Ex:-
+	ruby-1.8.7-p249 > Product.cheap.to_sql
+	=> "SELECT    \"products\".* FROM      \"products\" WHERE    (price < 5)"
+	
+	ruby-1.8.7-p249 > Category.joins(:products).to_sql
+	=> "SELECT     \"categories\".* FROM       \"categories\" INNER JOIN \"products\" ON \"products\".\"category_id\" = \"categories\".\"id\""
+	
+	If we want to join the above queries then either we can use merge method :-
+	Category.joins(:products).merge(Product.cheap)
+	
+	OR (use & which is an alias for merge method)
+	
+	Category.joins(:products) & Product.cheap
+	
+	(Category.joins(:products) & Product.cheap).to_sql
+	=> "SELECT     \"categories\".* FROM       \"categories\" INNER JOIN \"products\" ON \"products\".\"category_id\" = \"categories\".\"id\" WHERE     (price < 5)"
+	
+187) Product.discontinued  --> Gives products list which are discontinued
+	 => [#<Product id: 3, name: "Some DVD", price: 13.49, discontinued: true, category_id: 1, created_at: "2010-05-25 19:45:05", updated_at: "2010-05-25 19:45:05">]
+	 
+	 As the named scope uses a hash we can call the build method on it to build a new product with its discontinued attribute already set to true.
+	 p = Product.discontinued.build
+	 => #<Product id: nil, name: nil, price: nil, discontinued: true, category_id: nil, created_at: nil, updated_at: nil>
+
+188) Arel :-
+	 Arel drives ActiveRecord queries under the bonnet.
+	 To access Arel directly in Rails 3 we can access an arel_table so we’ll get the arel_table for the Product model in the console and assign it to a variable.
+	 > t = Product.arel_table
+	 t[:price]
+	 => <Attribute price>
+	 t[:price].eq(2.99)
+	 => #<Arel::Predicates::Equality:0x1040dd9f0 @operand1=<Attribute price>, @operand2=2.99>
+	 > t[:name].matches('%lore').to_sql
+	 => "\"products\".\"name\" LIKE '%lore'"
+	 t[:price].eq(2.99).or(t[:name].matches('%lore'))
+	 > t[:price].eq(2.99).or(t[:name].matches('%lore')).to_sql
+	 => "(\"products\".\"price\" = 2.99 OR \"products\".\"name\" LIKE '%lore')"
+	 
+	 We can pass predicates as arguments to an ActiveRecord where call. This means that we can pass the predicate we’ve created to Product.where to return all of the products whose price is £2.99 or whose name ends in ‘lore’.
+	 Product.where(t[:price].eq(2.99).or(t[:name].matches('%lore')))
+	 
+	 There are a number of plugins now available that take the power of Arel and put it into a more convenient interface such as MetaWhere. This allows you to access Arel methods such as matches and eq inside the conditions hash like this:
+	 Ex:- Product.where(:price.eq => 2.99, :name.matches => '%lore')
+
+189) XSS :-
+	 ------
+	As of Rails 3, values interpolated into a template are automatically escaped. Escaping refers to turning something like "<script>" into "&lt;script&gt;". This renders the tag harmless, since the browser now sees it as simple text to display and will not execute it.
+ 
+	Rails' automatic escaping is accomplished by giving all strings an `html_safe` boolean which defaults to false. When Rails renders a string, it performs escaping on any whose boolean is not true. Developers who are certain that a certain string will not contain user input can call `#html_safe` on it, which sets the boolean to true.
+ 
+	That last sentence is important: only call `#html_safe` on strings which you're certain will not contain unescaped user input. 
+ 
+	Where you can still be vulnerable
+ 
+	Since Rails does a great job at protecting you from XSS, the biggest danger lies in inadvertently disabling this protection.
+ 
+	Imagine you've written a helper to display a bolded version of a user's name:
+ 
+    def strong_user_name(user)
+      "<strong>#{user.name}</strong>"
+    end
+ 
+	Reloading the page, you see that Rails has escaped your strong tags. Unthinking, you quickly append ".html_safe" to the end of your returned string and verify the user's name now displays correctly.
+ 
+	Welcome to Ownedville, population you. If users can specify their own names, it's only a matter of time before one of your users changes his legal name to "<script>copyOutSomeCookies</script>".
+ 
+	Here's what you should have done:
+ 
+    def strong_user_name(user)
+      "<strong>#{h user.name}</strong>".html_safe
+    end
+ 
+	The call to `#h` forces escaping on the user's name.
+ 
+	Or, you could have used Rails' built-in `#content_tag`:
+ 
+    def strong_user_name(user)
+      content_tag(:strong, user.name)
+    end
+ 
+	Either would have prevented your eventual tears.
+	
+190) Ruby Dev-Ops cheat sheat :- 
+	http://rubytune.com/cheat
+	
+191) MySQL user creation & grant privileges :-
+     A good view of all users and their approximate privileges is shown by the below query. If there is a password, it will by an encrytped string; if not, this field is blank. Select is a very general privilege; insert allows table manipulation within a database; shutdown allows major system changes, and should only be usable by root; the ability to grant permissions is separate from the others.
+
+	SELECT user, host, password, select_priv, insert_priv, shutdown_priv, grant_priv FROM mysql.user;
+
+	View permissions for individual databases.
+
+	SELECT user, host, db, select_priv, insert_priv, grant_priv FROM mysql.db;
+
+	User creation & granting privileges :-
+	--------------------------------------
+	CREATE USER 'carlos'@'localhost' IDENTIFIED BY 'p@$$w3rd';
+
+	But now if you drop this user & try to recreate it then u will get an error like 
+	ERROR 1396 (HY000): Operation CREATE USER failed for 'user_name'@'localhost'
+
+	So, its a bug in MySQL, to rectify it first, drop user then flush privilges the recreate that user.
+
+	drop user 'carlos'@'localhost';
+	flush privileges;
+	create user 'carlos'@'localhost' identified by 'p@$$w3rd'
+
+	GRANT SELECT ON user_name.* TO 'carlos'@'localhost' IDENTIFIED BY 'p@$$w3rd' WITH GRANT OPTION;
+
+	SELECT user, host, password, select_priv, insert_priv, shutdown_priv, grant_priv  FROM mysql.user;
+	--> this will show N ,N, N, N  (since its showing global privileges for *.*)
+
+	Instead we have to check at mysql.db table using the below query.
+
+	select * from mysql.db where user='user_name' and host='localhost' and db='db_name'\G
+	--> *************************** 1. row ***************************
+                 Host: localhost
+                   Db: db_name
+                 User: user_name
+          Select_priv: Y
+          Insert_priv: Y
+          Update_priv: Y
+          Delete_priv: Y
+          Create_priv: Y
+            Drop_priv: Y
+           Grant_priv: Y
+      References_priv: Y
+           Index_priv: Y
+           Alter_priv: Y
+Create_tmp_table_priv: Y
+     Lock_tables_priv: Y
+     Create_view_priv: Y
+       Show_view_priv: Y
+  Create_routine_priv: Y
+   Alter_routine_priv: Y
+         Execute_priv: Y
+           Event_priv: Y
+         Trigger_priv: Y
+
+192) To make json api, we should onlu use respond_to :json at the top in the class.
+     Ex :
+	 # app/controllers/api/feeds_controller.rb
+	class Api::FeedsController < ApplicationController
+	  respond_to :json
+
+	  def index
+        feeds = Feed.rss
+		respond_with feeds, each_serializer: FeedSerializer
+	  end
+
+      def show
+        feeds = Feed.where(id: params[:id]).rss
+		respond_with feeds, each_serializer: FeedSerializer
+      end
+	end
+	
+193) We can manipulate multiple elements using gsub :
+	def geekify(string)
+      string.gsub(/[leto]/, 'l' => '1', 'e' => '3', 't' => '7', 'o' => '0')
+	end
+
+	geekify('leet') # => '1337'
+	geekify('noob') # => 'n00b'
+
+	def doctorize(string)
+	  string.gsub(/M(iste)?r/, 'Mister' => 'Doctor', 'Mr' => 'Dr')
+	end
+
+	doctorize('Mister Freeze') # => 'Doctor Freeze'
+	doctorize('Mr Smith')   # => 'Dr Smith'
+
+194) :dependent => :destroy or :dependent => :delete_all in the association declaration. The former will run callbacks in the association and the later one does not.
+
+195) Please do not close and reopen pull-requests for the same topic. Simply modify the commits using git commit --amend or git rebase -i and then force push to github (git push -f). This will update the Pull Requests with your modifications. If you close and reopen the discussion is spread across and it's hard to follow. It generates more noise than necessary.
+
+196) Browser Console Tricks :-
+    i) console.table() can be used to output data from an array of arrays or a list of objects in a sortable, tabular format.
+   ii) A timer can be started in the console by using console.time(label). The string label is needed so we have a reference to the timer when we want to stop it. The timer is stopped by calling console.timeEnd(label), which will output to the console the time in milliseconds since the timer (identified by label) was started.
+  iii) If you need the result of the previous expression for your next console evaluation, you can use the variable $_, which is automatically set to the last expression result for you.
+   iv) You can automatically create a breakpoint in your code by adding the following line to your JavaScript: debugger; . This will automatically create a breakpoint in the code when it is run with Developer Tools open.
+	   Although useful for quickly adding breakpoints without having to find the line in the Developer Tools, be careful not to send code with debugger; live.
+	   
+197) ActiveModel contains all the code related to table-less model (Ex: Validations..etc). ActiveRecord heavily depends upon ActiveModel.
+The non-database functionality of Active Record is extracted out into Active Model
+
+198) Redirecting route to a new path whose name is same as that of existing route :- Redirecting about to aboutus(new path)
+     match "/about" => redirect("/aboutus")
+	 match "/aboutus" => "info#about"
+	 
+199) Creating a smaller Rack Application for faster performance :- (Railscasts - 222)
+     routes.rb:-
+	 -----------
+	 match "/processes" => ProcessesApp.action(:index)  #--> ProcessApp (Rack App)
+	 
+	 
+	lib/processes_app.rb:-
+	----------------------
+	class ProcessesApp < ActionController::Metal
+		include ActionController::Rendering   #--> WIth this we can use erb template rendering in this lib dir
+  
+		append_view_path "#{Rails.root}/app/views"  #--> With this line we r telling from where to pick the view files
+  
+		def index
+			@processes = `ps -axcr -o "pid,pcpu,pmem,time,comm"`
+			render
+		end
+	end
+
+	app/views/processes_app/index.html.erb:-
+	----------------------------------------
+	<h1>Processes</h1>
+	<pre><%= @processes %></pre>
+
+200) date function of sql is used to convert the created_at stored in our database to date.
+	  def self.total_on(date)
+		where("date(purchased_at) = ?",date).sum(:total_price)
+	  end
+	  
+201) Inline flash notice with redirect_to
+	 redirect_to @product, :notice => "Successfully created product."
+	 
+202) Shortcut for edit_product_path(@product)  -->  [:edit, @product]
+	 This is similar to the path written for nested resource [@category, @product] --> for show page
+
+203) cookies[:last_product_id] = @product.id  --> Expires when the user closes the browser window.
+	 cookies.permanent[:last_product_id] = @product.id  --> Has expiry of 20 Yrs.
+	 
+204) "Remember me" functionality :- (http://m.onkey.org/signed-and-permanent-cookies-in-rails-3)
+
+	# User.rb
+	def self.authenticated_with_token(id, stored_salt)
+	  u = find_by_id(user_id)
+	  u && u.salt == stored_salt ? u : nil
+	end
+
+	And when the user checks “Remember me” box, make sure the following gets run :
+
+	cookies.permanent.signed[:remember_me] = [current_user.id, current_user.salt]
+
+	This will set a permanent and signed cookie using the secret specified in ActionController::Base.cookie_verifier_secret. If you don’t have the cookie_verifier_secret defined, you might want to do that in one of the initializers.
+
+	Now when you want to login using the cookie :
+
+	user = User.authenticated_with_token(*cookies.signed[:remember_me])
+
+	In this specific case, it’s very important to use the salt in the cookie value. That makes sure the cookie gets invalidated if the user changes his password.
+	
+205) Shortcut for respond_to   ---> (Railscast - 224) -- See for detailed usage
+    class Product
+	  def index
+	    @products = Product.all
+		respond_to do |format|
+		  format.html
+		  format.xml { render :xml => @products }
+		end
+	  end
+	end
+	
+	Can be written as 
+	
+	class Product
+	  respond_to :html, :xml
+	  
+	  def index
+	    @products = Product.all
+		respond_with(@products)
+	  end
+	end
+	
+	URL should end with correct format for the type of response required.
+	For XML :- http://localhost:3000/products.xml
+
+206) Dynamic content in config yml file
+
+	config/locales/en.yml
+	---------------------
+	en:
+	  flash:
+		actions:
+		  create:
+			notice: "Your %{resource_name} has been created!"
+
+207) rake stats ---> Gives you the statistics related to your project.
+
+208) match 'products/recent'   (This is short-hand option)
+	 # same as
+	 match 'products/recent', :to =>'products#recent', :as => 'products_recent'
+
+209) For inspecting a large content in the browser itself :
+	 render :text => params.inspect
+	 OR
+	 raise params.inspect
+
+210) To disable mass assignment in rails 3 for only some cases : use without_protection: true  
+	 Post.new(params[:post], without_protection: true)  -- Try it out
+	 OR
+	 def self.new_with_session(params, session)
+	  if session["devise.user_attributes"]
+		new(session["devise.user_attributes"], without_protection: true) do |user|
+		  user.attributes = params
+		  user.valid?
+		end
+	  else
+		super
+	  end
+	end
+
+211) In a user form, to access say user object's method(password_required?) use f.object
+	<% if f.object.password_required? %>
+	  ...
+	<% end %>
+
+212) If you want to create a mthod with chainable scope with if else condition then use scoped method for non-matching condition, otherwise it will return nil :
+
+	def self.search(search)
+	  if search
+		where('name LIKE ?', "%#{search}%")
+	  else
+		scoped
+	  end
+	end
+
+213) To submit form input fields on ajax form submit, use serialize method in jQuery : (Railscasts - 240)
+
+	<%= form_tag products_path, :method => 'get', :id => "products_search" do %>
+	  <p>
+		<%= text_field_tag :search, params[:search] %>
+		<%= submit_tag "Search", :name => nil %>
+	  </p>
+	  <div id="products"><%= render 'products' %></div>
+	<% end %>
+
+	$("#products_search").submit(function() {
+		$.get($("#products_search").attr("action"), $("#products_search").serialize(), null, "script");
+		return false; # To prevent form submission (Page refresh)
+	});
+
+214) To load the rails environment at a place where its not loaded : say inside a custom config file
+	require File.expand_path("../environment", __FILE__)
+
+215) Tales OS should be used by journalists (For security purpose)
+
+216) Always use : flash.now with render & flash[:notice]/flash[:error] with redirects.
+	def create
+	  user = User.authenticate(params[:email], params[:password])
+	  if user
+		session[:user_id] = user.id
+		redirect_to root_url, :notice => "Logged in!"
+	  else
+		flash.now.alert = "Invalid email or password"
+		render "new"
+	  end
+	end
+
+217) number.replace(/[ -]/g, '')
+	 /g is used in regex to replace multiple occurences of say here in this example space & '-'.
+
+218) view_context :- An instance of a view class. The default view class is ActionView::Base.
+     view_context is used in controller to access ActionView::Base methods.
+
+219) Converting Hash to json in js.erb template :
+     <%
+	response = {
+		:success => @success,
+		:data    => @feed_comment,
+		:unread_count => current_user.whats_new_count,
+	        :feed_id => @feed.id,
+	        :feed_updates => @feed_updates,
+	        :html    => render( :partial => '/ce/pulse/feed/comment', :locals => {:feed => @feed, :comment => @feed_comment, :new_record => true})
+	    }
+     %>
+
+     var resp<%= "= #{response.to_json}".html_safe %>
+
+220) gem 'uglifier' --> is used to compress the assets in production
+
+221) :multipart => true options is no longer required after 3.1+ if you are using file_field in your form.
+
+222) If we are not streaming a rails application then : first the view file is rendered and then the layout.
+     For ex:-
+	 view file --> <% @title = 'Page Title' %>
+	 layout -----> <title><%= @title%></title>   will work
+
+	 But in streaming, first the layout is rendered and then the view file.
+
+223) To access a partial from any of the views folder like say products, stores, items etc :- (Railscasts :- 269)
+     create a folder named application (behaves just like application controller) in views folder and then any file placed inside application will be accessible from any views folder.
+
+224) Template Inheritance works just like inheritance in controllers.
+     If a file is placed in a folder named say employees and mangers & staffs controllers inherit form employees_controller then any file placed inside employees views folder will be accessible to mangers & staffs views folder.
+
+225) Basic user authentication without any gem can easily achived in Rails 3.1+ using has_secure_password method which gives a nice way to handle authentication. (Railscasts :- 270)
+      Also in Rails 3.1+ if we want to force ssl on any page then we can use force_ssl method in the controllers to redirect the user forcefully to https url.
+
+226) An example of after validation :
+	Geocoder Example :-
+	geocoded_by :address
+	after_validation :geocode, :if => :address_changed? # means geocode the address if address is changed
+
+227) Splat Operator in Ruby :-
+	The splat operator can be used in a case statement :
+
+	WILD = ['lion','gnu']
+	TAME = ['cat','cow']
+
+	case animal
+    when *WILD
+	  "Run"
+	when *TAME
+	  "Catch"
+	end
+
+	And it can be used to convert a hash into an array:
+	>> a = *{:a=>1,:b=>2}
+	=> [[:a,1],[:b,2]]
+	>> Hash[*a.flatten]
+	=> {:a=>1,:b=>2}
+
+228) scores = {
+	  'The Lady' => 3,
+	  'Fate' => 2,
+	  'Death' => 10
+	}
+	You want to to sort them by scores. You can do it with:
+
+	leaderboard = scores.sort_by { |_, score| -score }
+	IRB Output:
+
+	=> [["Death", 10], ["The Lady", 3], ["Fate", 2]]

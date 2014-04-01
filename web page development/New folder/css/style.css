@@ -1,0 +1,280 @@
+html
+{ height: 100%;}
+
+*
+{ margin: 0;
+  padding: 0;}
+
+body
+{ font: normal 14px sans-serif;
+  background: #FFF;
+  color: #5D5D5D;}
+
+p
+{ padding: 0 0 20px 0;
+  line-height: 1.7em;}
+  
+img
+{ border: 0;}
+
+h1, h2, h3, h4, h5, h6 
+{ font: bold 175% 'liberation sans', arial, sans-serif;
+  color: #3ED305;
+  margin: 0 0 5px 0;
+  padding: 15px 0 0 0;}
+
+h2
+{ font: bold 165% 'liberation sans', arial, sans-serif;}
+
+h3
+{ font: bold 125% 'liberation sans', arial, sans-serif;
+  padding: 0 0 5px 0;
+  color: #3ED305;}
+
+h4, h5, h6
+{ margin: 0;
+  padding: 0 0 5px 0;
+  font: bold 110% 'liberation sans', arial, sans-serif;
+  color: #1D1D1D;
+  line-height: 1.5em;}
+
+h5, h6
+{ font: italic 95% arial, sans-serif;
+  color: #1D1D1D;
+  padding-bottom: 15px;}
+
+h6
+{ color: #362C20;}
+
+a, a:hover
+{ background: transparent;
+  outline: none;
+  text-decoration: underline;
+  color: #5D5D5D;}
+
+a:hover
+{ text-decoration: underline;
+  color: #1D1D1D;}
+
+ul
+{ margin: 2px 0 22px 17px;}
+
+ul li
+{ margin: 2px 0 15px 17px;}
+
+ol
+{ margin: 8px 0 22px 20px;}
+
+ol li
+{ margin: 0 0 11px 0;}
+
+#main, #header, #banner, #menubar, #site_content, #footer, .container_footer, .container_header, #contact, #footer_content
+{ margin-left: auto; 
+  margin-right: auto;}
+
+#main
+{ background: #FFF url(../images/background.jpg) repeat-x;}
+
+#header
+{ width: 920px;
+  height: 200px;
+  padding-top: 20px;
+  background: transparent;}
+
+#banner
+{ background: #FFF;
+  width: 900px;
+  padding: 5px 0 0 20px;}
+  
+#banner_content
+{ width: 880px;
+  position: relative;
+  height: 250px;
+  background: #FFF url(../images/banner.jpg) no-repeat;}
+  
+#header H1
+{ font: normal 200% Arial, Helvetica, sans-serif;
+  color: #FFF;}
+
+span
+{ color: #3ED305;}
+
+#header H2
+{ font: italic 160% Arial, Helvetica, sans-serif;
+  color: #FFF;
+  margin-top: -15px;}
+
+#menubar
+{ width: 920px;
+  height: 50px;
+  text-align: center; 
+  margin: 0 auto;
+  background: transparent;
+  color: #000;} 
+  
+#contact{
+  width: 160px;
+  float: left;
+  height: 50px;
+  background: transparent;
+  padding: 0 0 0 10px;
+}
+
+#site_background
+{ margin: 0 auto;
+  padding: 0;
+  background: #FFF url(../images/pattern.png) repeat;}
+  
+#site_content
+{ width: 920px;
+  overflow: hidden;
+  margin: 0 auto;
+  padding: 0;
+  background: #FFF;} 
+
+.sidebar_container
+{ float: left;
+  width: 230px;
+  margin: 20px 0 20px 20px;
+  background: #1D1D1D;}
+
+.sidebar
+{ float: left;
+  width: 210px;
+  padding-left: 10px;
+  margin-bottom: 10px;}
+
+.sidebar_item
+{ font: normal 100% Arial, Helvetica, sans-serif;
+  padding: 0 15px 0 0;
+  width: 201px;}
+
+.sidebar h2
+{ color: #3ED305;}  
+  
+.sidebar h4
+{ font-size: 125%;
+  color: #FFF;}
+
+.sidebar p
+{ color: #FFF;}
+
+.sidebar a
+{ color: #FFF;}
+
+.sidebar a:hover
+{ text-decoration: none;}
+
+.sidebar ul li, .sidebar ul li.selected
+{ list-style: none; 
+  margin: 15px 0;
+  padding: 0;}
+
+.sidebar li.selected, .sidebar li:hover
+{ color: #5D5D5D;
+  text-decoration: none;} 
+
+#content
+{ text-align: left;
+  width: 870px;
+  padding: 0;
+  margin: 0 0 0 20px;
+  float: left;
+  background: #FFF;}
+
+.content_item
+{ width: 600px;
+  margin: 0 0 20px 20px;
+  float: left;}
+
+.content_image
+{ width: 250px;
+  padding: 0px 20px 20px 0px;
+  float: left;}
+  
+.container_header
+{ margin-top: 20px;
+  height: 15px;
+  margin-top: -100px;
+  width: 920px;
+  background: transparent url(../images/container_header.png) repeat-x top;}  
+  
+#footer
+{ padding: 0 20px 0 20px;
+  background: #1D1D1D;}
+  
+#footer_content
+{ width: 920px;
+  font: normal 115% "liberation sans", arial, sans-serif;
+  height: 45px;
+  padding: 30px 0 5px 0;
+  text-align: center; 
+  background: #1D1D1D;
+  color: #FFF;}
+
+#footer a, #footer a:hover
+{ color: #FFF;
+  background: #1D1D1D;
+  text-decoration: underline;}
+
+#footer a:hover
+{ text-decoration: none;}
+
+ul.links
+{ margin: 0;}
+
+ul.links li
+{ list-style: none;
+  padding: 8px 0;}
+
+ul.links li a, ul.links li a:hover
+{ padding: 0 0 0 28px;
+  background: transparent url(../images/page.png) no-repeat left center;
+  color: #06C4E6;
+  text-decoration: underline;} 
+
+ul.links li a:hover
+{ color: #5D5D5D;
+  text-decoration: none;} 
+  
+/* from here: http://www.gmarwaha.com/blog/2007/08/23/lavalamp-for-jquery-lovers */
+.lavaLampWithImage {
+  position: relative;
+  height: 30px;
+  padding: 5px 35px 5px 0px;
+  overflow: hidden;
+  float: left;
+  margin: 0 40px 0 0px;
+  width: 650px;
+}
+
+.lavaLampWithImage li {
+  float: left;
+  list-style: none;
+}
+
+.lavaLampWithImage li.back {
+  background: #E1E1E1;
+  height: 28px;
+  z-index: 8;
+  position: absolute;
+}
+
+.lavaLampWithImage li a {
+  font: normal 120% arial, sans-serif;
+  text-decoration: none;
+  color: #1D1D1D;
+  text-align: center;
+  letter-spacing: 0;
+  z-index: 10;
+  display: block;
+  float: left;
+  height: 60px;
+  padding: 5px 0px 0px 35px;
+  position: relative;
+  overflow: hidden;
+}
+
+.lavaLampWithImage li a:hover, .lavaLampWithImage li a:active, .lavaLampWithImage li a:visited {
+  border: none;
+}

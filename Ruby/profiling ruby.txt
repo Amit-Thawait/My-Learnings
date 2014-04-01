@@ -1,0 +1,28 @@
+Steps to Add rblineprof (Ruby Profiler) :-
+===========================================
+
+1) Gemfile :-
+-------------
+gem 'peek'
+gem 'peek-rblineprof'
+gem 'pygments.rb', :require => false
+
+2) Initializer :-
+-----------------
+Create a new initializer in config/initializers/peek.rb and put the below line
+Peek.into Peek::Views::Rblineprof
+
+3) application.js :-
+--------------------
+#= require peek
+#= require peek/views/rblineprof
+
+4) application.css :-
+---------------------
+//= require peek
+//= require peek/views/rblineprof
+//= require peek/views/rblineprof/pygments
+
+5) app/views/layout/application.html.erb :-
+-------------------------------------------
+Add <%= render 'peek/bar' %> inside body tag

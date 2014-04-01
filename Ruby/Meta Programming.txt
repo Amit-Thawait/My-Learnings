@@ -1,0 +1,603 @@
+http://rubymonk.com/learning/books/2
+
+http://patshaughnessy.net/2011/12/20/learning-from-the-masters-part-2-three-metaprogramming-best-practices
+
+http://ruby-metaprogramming.rubylearning.com/html/ruby_metaprogramming_1.html
+
+http://railscasts.com/episodes/239-activerecord-relation-walkthrough
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+The ability to treat data as executable code is called meta-programming.
+
+Every time you embed an expression inside a double-quoted string you are doing meta-programming. After all, the embedded expression is not really program code – it is a string – and yet Ruby clearly has to ‘turn it into’ program code in order to be able to evaluate it.
+
+the Rails framework makes extensive use of meta-programming.
+
+Dynamic (meta-programming) features are ubiquitous in Ruby. Con-sider, for example, attribute accessors: passing a symbol (such as :aValue) to the attr_accessor method causes two methods (aValue and aValue=) to be created.
+
+======================================
+Look Inside Rails Framework for the above point
+======================================
+
+define_method :-
+----------------
+The Module#define_method() is a private instance method of the class Module. The define_method is only defined on classes and modules. You can dynamically define an instance method in the receiver with define_method( ). You just need to provide a method name and a block, which becomes the method body:
+Ex:
+class Rubyist
+  define_method :hello do |arg|
+    p arg
+  end
+end
+obj = Rubyist.new
+obj.hello('Hello Rubyists') # => Hello Rubyists
+
+Eval :-
+-------
+The eval method provides a simple way of evaluation a Ruby expression in a string. At first sight, eval may appear to do exactly the same job as the #{ } markers delimiting expressions in a double-quoted string.
+
+puts( eval("1 + 2" ) ) 
+puts( "#{1 + 2}" )
+
+difference is : x = "1 + 2" then eval(x) and puts(x)
+
+eval(x) evaluates a string as an expression.
+
+Ex :2
+
+methodname = gets().chomp()  (For ex : upcase)
+exp2 = "'Hello world'."<< methodname
+puts( eval( exp2 ) )    ---> HELLO WORLD
+puts( "#{exp2}" )       ---> 'Hello world'.upcase
+puts( "#{eval(exp2)}" ) ---> HELLO WORLD
+
+Ex :3
+
+eval( 'def aMethod( x )
+		return( x * 2 ) 
+	   end 
+	   
+	   num = 100 
+	   puts( "This is the result of the calculation:" ) 
+	   puts( aMethod( num ))
+	  ' )
+This is the result of the calculation:
+200
+
+Ex :4
+
+input = ""
+
+until input == "q"
+	input = gets().chomp()
+	if input != "q" then eval( input ) end
+end
+class String; def aaa; puts 'aaa'; end; end
+''.aaa    ----> aaa
+
+irb inside irb
+
+eval() can be dangerous. If there's any chance that external data - stuff that comes from outside your application - can wind up inside the parameter to eval(), then you have a security hole, because that external data may end up containing arbitrary code that your application will blindly execute. eval() is now considered a method of last resort.
+	  
+SPECIAL TYPES OF EVAL :-
+------------------------	  
+instance_eval, module_eval and class_eval. 
+
+instance_eval :
+---------------
+The class Object has an instance_eval() public method which can be called from a specific object. It provides access to the instance variables of that object. It can be called either with a block or with a string.
+instance_eval can access obj's private methods.
+
+class MyClass
+ def initialize
+   @aVar = "Hello world"
+ end
+end
+
+ob = MyClass.new
+p( ob.instance_eval { @aVar } )			#=> "Hello world"
+p( ob.instance_eval( "@aVar" ) )		#=> "Hello world"
+# p( ob.eval( "@aVar" )  )				#=> error: eval is a private method  
+
+public :eval
+
+p( ob.eval( "@aVar" ) ) #=> "Hello world"
+
+Also in irb
+irb(main):009:0> instance_eval
+ArgumentError: block not supplied
+        from (irb):9:in `instance_eval'
+        from (irb):9
+        from C:/Ruby193/bin/irb:12:in `<main>'
+irb(main):010:0> instance_eval{}
+=> nil
+irb(main):011:0> instance_eval ""
+=> nil
+irb(main):012:0> instance_eval "p 'Amit'"
+"Amit"
+=> "Amit" 
+
+instance_eval can also be used to add class methods as shown below:
+
+class Rubyist
+end
+Rubyist.instance_eval do
+  def who
+    "Geek"
+  end
+end
+puts Rubyist.who # => Geek
+
+module_eval and class_eval :
+----------------------------
+class_eval(string [, filename [, lineno]]) ? obj
+module_eval {|| block } ? obj
+
+Evaluates the string or block in the context of mod. This can be used to add methods to a class. module_eval returns the result of evaluating its argument. The optional filename and lineno parameters set the text for error messages.
+
+These methods add instance methods to module & class.(can also access its variables)
+class_eval is just an alias for module_eval () and they both are defined in Module class (Similar to these two class_exec and module_exec methods are also there in Module class)
+
+class_eval evaluates a string or block in the context of the receiver self which can be a class or module.
+
+The module_eval and class_eval methods operate on modules and classes rather than on objects. For example, this code adds the xyz method to the X module (here xyz is defined in a block and added as an instance method of the receiver by define_method which is a method of the Module class); and it adds the abc method to the Y class:
+
+module X
+end
+
+class Y
+	@@x = 10
+	include X
+end
+
+X::module_eval{ define_method(:xyz){ puts("hello, xyz" ) } }
+Y::class_eval{ define_method(:abc){ puts("hello, abc" ) } }
+X::class_eval{ define_method(:xyz2){ puts("hello, xyz2" ) } }
+Y::module_eval{ define_method(:abc2){ puts("hello, abc2" ) } }
+String::class_eval{ define_method(:bye){ puts("goodbye" ) } }
+
+When accessing class and module methods you may use the scope resolution operator :: or a single dot. The scope resolution operator is obligatory when accessing constants and optional when accessing methods.
+
+ob = Y.new                
+ob.xyz					  ----> hello, xyz
+ob.abc					  ----> hello, abc
+ob.xyz2					  ----> hello, xyz2
+ob.abc2                   ----> hello, abc2
+"Hello".bye				  ----> goodbye
+p( Y.class_eval( "@@x" ) )----> 10	
+
+module_eval and class_eval method can be used interchangably for classes & modules.
+
+How to add class methods using these methods 
+Ex:-
+class X
+class << self
+class_eval{ define_method(:xyz2){ puts("hello again" ) } }
+end
+end
+
+OR
+ 
+class X
+self.class_eval{ define_method(:xyz2){ puts("hello again" ) } }
+end 
+X.xyz2   ---->  hello again
+
+OR in a single line
+
+Y::class_eval{ class << self ;define_method(:abc){ puts("hello, hello" ) } end }
+
+Y.abc ---> hello, hello
+
+class_eval gives error in irb if executed directly:-
+irb(main):041:0> class_eval <<-abc
+irb(main):042:0"   p "Line 2"
+irb(main):043:0" abc
+NoMethodError: undefined method `class_eval' for main:Object
+        from (irb):41
+        from C:/Ruby193/bin/irb:12:in `<main>'
+
+ADDING VARIABLES AND METHODS :-
+--------------------------------
+The module_eval and class_eval methods can also be used to retrieve the values of class variables (but bear in mind that the more you do this, the more your code becomes dependent on the implementation details of a class, thereby breaking encapsulation): 
+Y.class_eval( "@@x" )
+
+Returning to the earlier example of adding and retrieving class variables from outside a class (using class_eval); it turns out that there are also methods designed to do this from inside a class
+class_variable_get (this takes a symbol argument representing the variable name and it returns the variable’s value) and class_variable_set (this takes a symbol argument representing a variable name and a second argument which is the value to be assigned to the variable)
+
+class X
+	@@abc = 100	
+	
+	def self.addvar( aSymbol, aValue )
+		class_variable_set( aSymbol, aValue )
+	end
+	
+	def self.getvar( aSymbol )
+		return class_variable_get( aSymbol )
+	end
+end
+
+puts( X.class_eval( '@@abc' ) ) --- 100
+X.class_eval( '@@abc=500' )   
+puts( X.class_eval( '@@abc' ) ) --- 500
+
+ob = X.new
+X.class_eval( 'def hi;puts("hello");end' )
+ob.hi                           --- hello
+
+X.addvar( :@@newvar, 2000 )
+puts( X.getvar( :@@newvar ) )  --- 2000
+
+p( X.class_variables )   ---- [:@@abc, :@@newvar]
+
+You can also add/get instance variables to/from classes and objects after they have been created using instance_variable_set this:
+ob = X.new 
+ob.instance_variable_set("@aname", "Bert")
+ob.instance_variable_get('@name') --> 'Bert'
+But this breaks the encapsulation of data principle of OOP
+
+A dynamic program using send method & define_method :-
+------------------------------------------------------
+class X
+	def a
+		puts("method a")
+	end
+	
+	def addMethod( m, &block )
+		self.class.send( :define_method, m , &block )
+	end
+end
+
+
+
+ob = X.new
+ob.instance_variable_set("@aname", "Bert")
+ob.addMethod( :xyz ) { puts("My name is #{@aname}") } 
+ob.xyz  ----> My name is Bert
+
+ob2 = X.new
+ob2.instance_variable_set("@aname", "Mary")
+ob2.xyz ----> My name is Mary  
+puts( ob2.instance_variable_get( :@aname ) )  ---> Mary
+
+Getting and setting constants
+X::const_set( :NUM, 500 )
+puts( X::const_get( :NUM ) )  ---> 500
+
+
+If you don’t care about the encapsulation of data in your objects you can also retrieve the value of instance variables using the instance_variable_get method: 
+ob2.instance_variable_get( :@aname )
+
+As const_get returns the value of a constant, you could use this method to get the value of a class name and then append the new method to create a new object from that class. This could even give you a way of creating objects at runtime by prompting the user to enter class names and method names.
+
+class X
+	def y
+		puts( "ymethod" )
+	end
+end
+
+
+print( "Enter a class name: ")
+cname = gets().chomp
+ob = Object.const_get(cname).new
+p( ob )
+print( "Enter a method to be called: " )
+mname = gets().chomp
+ob.method(mname).call
+
+-------------------------------------------------------------------------------
+
+
+BINDINGS :-
+-----------
+Entities like local variables, instance variables, self are basically names bound to objects. We call them bindings.
+
+The eval method may take an optional ‘binding’ argument which, if provided, causes the evaluation to be done within a specific scope or ‘context’.
+
+def getBinding(str)
+	return binding()
+end
+str = "hello"
+puts( eval( "str + ' Fred'" )   )                  #=> "hello Fred"
+puts( eval( "str + ' Fred'", getBinding("bye") ) ) #=> "bye Fred"
+
+Here binding is a private method of Kernel. The getBinding method is able to call binding method within the current context and return the current value of str.
+The context may also be defined by a class.
+Ex:-
+
+class MyClass
+	@@x = " x"
+	def initialize(s)
+		@mystr = s
+	end
+	def getBinding
+		return binding()
+	end
+end
+
+class MyOtherClass 
+	@@x = " y"
+	def initialize(s)
+		@mystr = s
+	end
+	def getBinding
+		return binding()
+	end
+end
+
+@mystr = self.inspect
+@@x = " some other value"
+
+ob1 = MyClass.new("ob1 string")
+ob2 = MyClass.new("ob2 string")
+ob3 = MyOtherClass.new("ob3 string")
+
+puts(eval("@mystr << @@x", ob1.getBinding))  -----> ob1 string some other value
+puts(eval("@mystr << @@x", ob2.getBinding))  -----> ob2 string some other value
+puts(eval("@mystr << @@x", ob3.getBinding))  -----> ob3 string some other value
+puts(eval("@mystr << @@x", binding))         -----> main some other value
+
+
+SEND :-
+-------
+send( ) is an instance method of the Object class. The first argument to send( ) is the message that you're sending to the object - that is, the name of a method. You can use a string or a symbol, but symbols are preferred. Any remaining arguments are simply passed on to the method.
+
+The send method is used to call a method or variable with the same name as the specified symbol or string.
+Ex :-
+name = "Fred"
+puts(name.send(:upcase))   ---> FRED
+puts(name.send('upcase'))  ---> FRED
+
+class Rubyist
+  def welcome(*args)
+    "Welcome " + args.join(' ')
+  end
+end
+obj = Rubyist.new
+puts(obj.send(:welcome, "Pune", "Rubyists"))   # => Welcome Pune Rubyists
+
+Recall how we used send earlier (dynamic.rb) to create a new method by calling define_method and passing to it the name, m, of the method to be created and a block, &block, containing the code of the new method
+Ex:
+def addMethod( m, &block )
+  self.class.send( :define_method, m , &block ) 
+end
+
+IMP :-
+------
+send method can access private & protected methods of a class from outsie
+Ex:
+class Thing
+    def hello
+     puts "Hello, world!"
+   end
+   private
+     def private_hello
+       puts "Hello, privately."
+     end
+end
+>> t = Thing.new
+>> t.hello
+Hello, world!
+=> nil
+>> t.private_hello
+NoMethodError: private method 'private_hello' called for ...
+>> t.send(:private_hello)
+Hello, privately.
+=> nil
+
+Unlike send(), public_send() calls public methods only.
+
+HANDLING MISSING METHODS :-
+---------------------------
+When Ruby tries to execute an undefined method (or, in OOP terms, when an object is sent a message which it cannot handle), the error causes the program to exit. You may prefer your program to recover from such an error. You can do this by writing a method named method_missing, with an argument to which the missing method’s name is assigned. This will execute when a non-existent method is called.
+
+It's a private instance method of BasicObject that every object inherits. The BasicObject#method_missing( ) responds by raising a NoMethodError. Overriding method_missing( ) allows you to call methods that don't really exist.
+
+Ex:
+def method_missing( methodname ) 
+	puts( "#{methodname} does not exist" )
+end	
+
+abc ----> abc does not exist
+
+Runs on 1.8.7 but goes into infinite loop on 1.9.3
+http://it.dbline.net/questions/8960685/ruby-why-does-puts-call-to-ary
+
+With multiple args :-
+class A	
+	def method_missing( methodname, *args )
+		puts ("Class #{self.class} does not understand: #{methodname}(#{args.to_s[1..-2]})")
+	end	
+end
+
+irb(main):182:0> A.new.anything
+Class A does not understand: anything()
+=> nil
+irb(main):183:0> A.new.anything(1,2)
+Class A does not understand: anything(1, 2)
+=> nil
+irb(main):184:0> A.new.anything(1,2,[4,5,6])
+Class A does not understand: anything(1, 2, [4, 5, 6])
+=> nil
+irb(main):185:0> A.new.anything(1,2,[4,5,6],'aaa')
+Class A does not understand: anything(1, 2, [4, 5, 6], "aaa")
+=> nil
+
+When to use method_missing :-
+http://www.alfajango.com/blog/method_missing-a-rubyists-beautiful-mistress/
+
+REMOVE METHODS :-
+-----------------
+To remove existing methods, you can use the remove_method within the scope of a given class. If a method with the same name is defined for an ancestor of that class, the ancestor class method is not removed.
+
+puts( "hello".reverse )
+
+class String
+	remove_method( :reverse )
+end
+
+puts( "hello".reverse )   ---> undefined method? error!
+
+If a method with the same name is defined for an ancestor of that class, if its removed from that class but is not removed from the ancestor class method, then ancestor's class method will be called.
+
+undef_method :-
+---------------
+The undef_method prevents the specified class from responding to a method call even if a method with the same name is defined in one of its ancestors.
+Ex:-
+class Y
+	def somemethod
+		puts("Y's somemethod")
+	end
+end
+
+class Z < Y
+	def somemethod
+		puts("Z's somemethod")
+	end	
+end
+
+zob = Z.new
+zob.somemethod   ---> Z's somemethod
+
+class Z
+ remove_method :somemethod
+end
+
+zob.somemethod   ---> Y's somemethod
+
+class Z
+	undef_method( :somemethod )	
+end
+
+zob.somemethod   ---> undef_methods.rb:22:in `<main>': undefined method `somemethod' for #<Z:0x2061810> (NoMethodError)
+
+
+--------------------------------------------------------------------------------------------------------------------
+Example containing method_missing, remove_method, undef_method :-
+
+class Rubyist
+  def method_missing(m, *args, &block)
+    puts "Method Missing: Called #{m} with #{args} #{block}"
+  end
+
+  def hello
+    puts "Hello from class Rubyist"
+  end
+end
+
+class IndianRubyist < Rubyist
+  def hello
+    puts "Hello from class IndianRubyist"
+  end
+end
+
+obj = IndianRubyist.new
+obj.hello # => Hello from class IndianRubyist
+
+class IndianRubyist
+  remove_method :hello  # removed from IndianRubyist, but still in Rubyist
+end
+obj.hello # => Hello from class Rubyist
+
+class IndianRubyist
+  undef_method :hello   # prevent any calls to 'hello'
+end
+obj.hello # => Method Missing: Called hello with []
+
+--------------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------
+A dynamic program writing code :
+
+puts( "Write a program interactively." )
+puts( "Enter a blank line to evaluate." )
+puts( "Enter 'q' to quit." )
+
+program = ""
+input = ""
+line = ""
+
+until line.strip() == "q"
+	print( "?- " )
+	line = gets()
+	case( line.strip() )
+	when '' 
+		puts( "Evaluating..." )
+		eval( input )
+		program += input
+		input = ""		
+	when 'l'
+		puts( "Program Listing..." )
+		puts( program )
+	else
+		input += line
+	end
+end
+
+puts( "Goodbye" )
+
+
+FREEZING OBJECTS :-
+-------------------
+With all these ways of modifying objects at your disposal, you may be concerned that objects are at risk of being modified unintentionally. In fact, you can specifi-cally fix the state of an object by ‘freezing’ it (using the freeze method). Once frozen, the data contained by an object cannot be modified and, if an attempt is made to do so, a TypeError exception will be raised. Take care when freezing an object, however, as, once frozen, it cannot be ‘unfrozen’.
+
+Ex:
+
+a = [1,2,3]
+a.freeze
+if !(a.frozen?) then
+	a << [4,5,6]
+end
+
+p(a)  ----> [1, 2, 3]
+			freeze.rb:14:in `<main>': can't modify frozen String (RuntimeError)
+
+State of a object or a class can be checked with the help of .frozen? method
+			
+Similarily, we can also freeze a class
+
+class X
+	def a
+		puts("method a")
+	end
+	
+	def addMethod( m, &block )
+		self.class.send( :define_method, m , &block )
+	end
+end
+
+
+ob = X.new
+ob.instance_variable_set("@aname", "Bert")
+ob.addMethod( :xyz ) { puts("My name is #{@aname}") }     -------> My name is Bert
+ob.xyz
+X.freeze
+
+if not( X.frozen? ) then
+	ob.def
+else
+	puts( "Can't call ob.def as the X class is frozen" )  ------> Can't call ob.def as the X class is frozen
+end
+
+# The following does no checking and results in an error
+ob.addMethod( :abc ) { puts("This is the abc method") } 
+ob.abc  		----> 	freeze_class.rb:9:in `define_method': can't modify frozen Class (RuntimeError)
+						from freeze_class.rb:9:in `addMethod'
+						from freeze_class.rb:29:in `<main>'
+						
+-----------------------------------------------------------------------------------------------------------------------------
+
+My Example :-
+
+class Person
+ ('a'..'z').each do |x|
+	 define_method(:"#{x}") do
+	   Person.all.collect{|a| a.name if a.name.downcase[0].chr == x}.compact
+	 end
+ end
+end
+
+Class Person 
+ def method_missing(method_name)
+   puts "There is no method named #{method_name}"
+ end
+end 						

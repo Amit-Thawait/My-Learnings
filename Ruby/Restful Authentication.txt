@@ -1,0 +1,320 @@
+User Authentication :-
+======================
+
+We'll extend the application developed in 5.1 RSpec Refactor as a starting point.
+
+Lets use twitter-bootstrap-rails for a prettier UI and add shoulda-matchers to DRY up the specs.
+
+------------------------------
+gem "twitter-bootstrap-rails"
+
+group :development, :test do
+  gem "shoulda-matchers"
+end
+------------------------------
+
+Generate the Twitter bootstrap layout.
+-------------------------
+rails g bootstrap:install
+-------------------------
+
+User Model :-
+=============
+
+A basic model to store user's information.
+--------------------------------------------------
+rails generate model User name:string email:string
+--------------------------------------------------
+
+With validators. The regular expression to validate the e-mail was found on the Internet.
+---------------------------------------------------------------------------------
+class User
+  attr_accessible :name, :email
+  validates_uniqueness_of :email
+  validates_presence_of :email
+  validates :email, :format => { :with => /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i }
+  validates_presence_of :name
+end
+----------------------------------------------------------------------------------
+
+Rails validators are useful to avoid malformed user data, but we also must enforce e-mail uniqueness in the database schema. Add a unique constraint to the users table in a database migration.
+---------------------------------------------------
+rails generate migration add_email_uniqueness_index
+---------------------------------------------------
+-------------------------------------------------------
+class AddEmailUniquenessIndex < ActiveRecord::Migration
+  def up
+    add_index :users, :email, :unique => true
+  end
+  def down
+    remove_index :users, :email
+  end
+end
+-------------------------------------------------------
+
+Create a basic form for a signing up a new user (copy from thing) and redirect signup to a new user action in config/routes.rb.
+------------------------------------
+match '/signup',  :to => 'users#new'
+------------------------------------
+
+Password :-
+===========
+
+Enforce a minimum and a maximum length with confirmation, but don't store the password in the database.
+----------------------------------------------------------------------------------------------
+validates :password, :presence => true, :confirmation => true, :length => { :within => 6..40 }
+
+attr_accessible :encrypted_password
+attr_accessor :password, :password_confirmation
+----------------------------------------------------------------------------------------------
+
+The encrypted password will be the only one stored.
+------------------------------------------------------------------------
+rails generate migration add_password_to_users encrypted_password:string
+------------------------------------------------------------------------
+
+Before a user is saved, generate an encrypted password.
+
+before_save :encrypt_password
+------------------------------------------------------------
+private
+
+  def encrypt_password
+    self.encrypted_password = ::User.encrypt(self.password)
+  end
+
+  def self.encrypt(string)
+    Digest::SHA2.hexdigest(string)
+  end
+------------------------------------------------------------
+
+We can also write a method that checks whether the password is correct.
+------------------------------------------------
+def has_password?(pwd)
+  self.encrypted_password == ::User.encrypt(pwd)
+end
+------------------------------------------------
+
+Add the password field to the signup form in views/users/_form.html.haml.
+--------------------------------------------
+= simple_form_for @user do |f|
+  = render 'shared/error_msg', model: @user
+  = f.input :name
+  = f.input :email
+  = f.input :password
+  = f.input :password_confirmation
+  = f.button :submit
+--------------------------------------------
+
+RESTful Session :-
+==================
+
+We can think of a login as a resource. After a user enters a valid e-mail and password, the application will create a new session and will destroy it to logout.
+
+Lets start with a view to enter an e-mail and password in app/views/sessions/new.html.haml. We don't have a session yet, so we can use a :session symbol. The form will be posted to the :create action of the SessionsController.
+--------------------------------------------------------
+= simple_form_for :session, :url => sessions_path do |f|
+  = f.input :email
+  = f.input :password
+  = f.button :submit, :value => "Sign In"
+--------------------------------------------------------
+
+The controller.
+------------------------------------------------
+class SessionsController < ApplicationController
+
+  def new
+    # sign-in form
+  end
+
+  def create
+    # sign-in form posted, log-in
+  end
+
+  def destroy
+    # user loging out
+  end
+
+end
+------------------------------------------------
+
+Sessions routes. We can create more readable routes as well.
+-------------------------------------------------------
+resources :sessions, :only => [:new, :create, :destroy]
+
+match '/signup',  :to => 'users#new'
+match '/signin',  :to => 'sessions#new'
+match '/signout', :to => 'sessions#destroy'
+-------------------------------------------------------
+
+We'll want to access session information in multiple controllers, therefore we will create app/helpers/session_helper.rb.
+------------------------------
+module SessionsHelper
+
+  def sign_in(user)
+    # log-in an existing user
+  end
+
+  def sign_out
+    # logout current user
+  end
+
+  def signed_in?
+    # true if signed in
+  end
+
+  def current_user
+    # current user, if any
+  end
+
+end
+------------------------------
+
+Redirect to Login :-
+=====================
+
+An unauthenticated user will be redirected to login.
+----------------------------------------------------
+class ApplicationController < ActionController::Base
+  include SessionsHelper
+
+  before_filter :authenticate
+
+  def authenticate
+    redirect_to :signin unless signed_in?
+  end
+
+end
+-----------------------------------------------------
+We're redirecting to the SessionsController, which shouldn't try to authenticate users.
+
+Remove the Last Static Page :-
+==============================
+
+Add a HomeController and a view that shows the current user.
+-------------------
+%h1 Hello World
+
+You're logged in as
+=current_user
+-------------------
+
+Redirect the root of the application to this controller.
+----------------------------
+    root :to => "home#index"
+----------------------------
+
+Session Helper :-
+=================
+
+We would like to group session management functions, such as current_user, in a standalone module that can be tested independently and used from multiple controllers.
+------------------------------------------------------------------
+module SessionsHelper
+
+  def sign_in(user)
+    cookies.permanent.signed[:auth_token] = [user.id, user.cookie]
+    self.current_user = user
+  end
+
+  def sign_out
+    cookies.delete :auth_token
+    self.current_user = nil
+  end
+
+  def signed_in?
+    ! current_user.nil?
+  end
+
+  def current_user
+    @current_user ||= user_from_cookie
+  end
+
+  def current_user=(user)
+    @current_user = user
+  end
+
+  private
+
+    def user_from_cookie
+      User.authenticate_with_cookie(* remember_token)
+    end
+
+    def remember_token
+      cookies.signed[:auth_token] || [nil, nil]
+    end
+
+end
+------------------------------------------------------------------
+
+The cookies method belongs to ActionController and will provide one with an interface for persisting and manipulating cookies in a client's browser. For more information on the cookies interface, see here
+
+User :-
+=======
+
+Given an e-mail and a password, locate an existing User.
+----------------------------------------
+def self.authenticate(email, pwd)
+  user = find_by_email(email)
+  return nil  if user.nil?
+  return user if user.has_password?(pwd)
+end
+----------------------------------------
+
+Given a user ID and a cookie, locate an existing User.
+--------------------------------------------------------------------------
+def self.authenticate_with_cookie(id, cookie)
+  user = find_by_id(id)
+  (user && ::User.encrypt(user.encrypted_password) == cookie) ? user : nil
+end
+
+def cookie
+  ::User.encrypt(encrypted_password)
+end
+--------------------------------------------------------------------------
+
+User Controller :-
+==================
+
+Allow registering new users by disabling authentication on the :new and :create routes. Otherwise the browser would be redirected to a login page.
+-----------------------------------------------------
+skip_filter :authenticate, :only => [ :new, :create ]
+-----------------------------------------------------
+
+Sessions Controller w/ Login :-
+================================
+
+Allow logging in by disabling authentication on the :new and :create routes. Otherwise the browser would be redirected to a login page. A new session is established after looking up a user by e-mail and password.
+-----------------------------------------------------
+class SessionsController < ApplicationController
+  skip_filter :authenticate, only: [ :new, :create ]
+
+  def new
+    render 'new'
+  end
+
+  def create
+    user = User.authenticate(params[:session][:email], params[:session][:password])
+    if user.nil?
+      flash.now[:error] = "Invalid email/password combination."
+      render 'new'
+    else
+      sign_in user
+      redirect_to user
+    end
+  end
+
+  def destroy
+    sign_out
+    redirect_to root_path
+  end
+
+end
+-----------------------------------------------------
+
+Logout Link :-
+==============
+
+The logout link destroys the current session.
+-----------------------------------------------------
+=link_to "Sign Out", signout_path, :method => :delete
+-----------------------------------------------------

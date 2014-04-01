@@ -1,0 +1,93 @@
+<html>
+	<head>
+		<title>Space N Vaders Game</title>
+	</head>
+	
+	<body>
+		<h1>Space N Vaders</h1>
+
+		<canvas id="canvas-area" width="600" height="400"></canvas>
+		
+	</body>
+	
+<script language="JavaScript">
+var game = {
+    state: "start",
+};
+
+var overlay = {
+    counter: -1,
+    title: "foo",
+    subtitle: "bar",
+};
+
+var player = {
+	x:100,
+	y:350,
+	width: 20,
+	height: 50,
+	counter: 0,
+};
+var keyboard = { };
+
+var playerBullets = [];
+var enemies = [];
+var enemyBullets = [];
+
+
+// =========== game   ============
+function updateGame() {
+    if(game.state == "playing" && enemies.length == 0) {
+        game.state = "won";
+        overlay.title = "SWARM DEAD";
+        overlay.subtitle = "press space to play again";
+        overlay.counter = 0;
+    }
+    if(game.state == "over" && keyboard[32]) {
+        game.state = "start";
+        player.state = "alive";
+        overlay.counter = -1;
+    }
+    if(game.state == "won" && keyboard[32]) {
+        game.state = "start";
+        player.state = "alive";
+        overlay.counter = -1;
+    }
+    
+    if(overlay.counter >= 0) {
+        overlay.counter++;
+    }
+    
+}
+	
+function doSetup() {
+	attachEvent(document, "keydown", function(e) {
+		keyboard[e.keyCode] = true;
+	});
+	attachEvent(document, "keyup", function(e) {
+		keyboard[e.keyCode] = false;
+	});
+}
+
+function attachEvent(node,name,func) {
+    if(node.addEventListener) {
+        node.addEventListener(name,func,false);
+    } else if(node.attachEvent) {
+        node.attachEvent(name,func);
+    }
+};
+</script>
+	
+	<script language="JavaScript">
+		var can = document.getElementById("canvas-area");
+		var c = can.getContext('2d');
+		
+		function mainLoop() {
+			updateGame();
+			updateEnemies();
+		}
+		doSetup();
+		setInterval(mainLoop,1000/30);
+	</script>
+	
+</html>	

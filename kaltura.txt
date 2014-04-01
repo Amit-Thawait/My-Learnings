@@ -1,0 +1,4 @@
+red5.org --> free media hosting server
+kaltura
+register in akamai
+squid-cache.org --> intermediate proxy server

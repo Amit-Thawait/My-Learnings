@@ -1,0 +1,86 @@
+jQuery Tips :-
+--------------
+jQuery Mobile ---> vmouseover is a new "virtual" mouse event. Falls back to in-browser mouseover or phone's mouseover equivalent. 
+
+jQuery Mobile ---> in the same way, "vclick" will be treated as "tap" or fall back to regular "onclick" if a web browser is used.
+
+jQuery Mobile ---> a phone has no mouse, so forget onmouseover. New events are - tap, taphold, swipe, swipeleft, swiperight. 
+
+jQuery Mobile ---> jQuery Mobile's equivalent of $(document).ready() is $(document).bind('pageinit'); Keep that in mind. 
+
+jQuery Mobile ---> the advantage of jQuery Mobile is that it works across all types of phones and mobile devices same exact way. 
+
+jQuery Mobile ---> jQuery Mobile is different from regular jQuery-based code. It's mostly about building minimalist mobile UIs.
+
+jQuery Mobile ---> Add data-transition = "pop" attribute to your link, where effect is = pop,fade,flip,turn,flow,slide or none. 
+
+jQuery Mobile ---> This creates a button with a star icon <a href="#" data-role="button" data-icon="star">Star button</a>
+
+jQuery Mobile ---> This creates a slider: <input type="range" name="slider" id="slider-0" value="25" min="0" max="100" /> 
+
+jQuery Mobile ---> To start using jQuery Mobile, you will need jquery.mobile.css, jquery.mobile.js and jquery.js itself.
+
+jQuery Mobile ---> jQuery Mobile includes ready-to-use mobile UI elements: buttons, toolbars, icons and form elements. 
+
+jQuery Mobile ---> Each page of a jQuery Mobile app is loaded dynamically using Ajax. You can choose page transition animation. 
+
+jQuery Mobile ---> Applications created with jQuery Mobile automatically scale to the device screen resolution. You just build it. 
+
+jQuery Mobile ---> Mobiscroll is a pretty good Calendar scroller plugin for mobile apps - http://demo.mobiscroll.com
+
+jQuery Mobile ---> use $.mobile.changePage() to programmatically change from one page to another. 
+
+1) Make any HTML element draggable with jQuery UI -- $("#draggable").draggable(); -- <div id = "draggable"></div>
+
+2) $("form").serialize() will return a string of all elements inside the form -- name=value&amp;name2=value2 -- etc.
+
+3) $("div,p"); is the same as $("div").add("p");
+
+4) JSON.stringify( json_obj ) -- to convert an actual object back into a string, perhaps for sending over network. 
+
+5) JSON.parse(string) will parse a JSON in string format and return an object that was created from it. 
+
+6) JSON.parse appears to take strict JSON only. '{"a": "1"}' will work but not '{a: "1"}' (without the quotes.) 
+
+7) JSON is an actual object in JavaScript. -- alert(JSON.stringify( {a:1} )); this will resolve to value of "{a:1}" 
+
+8) var x = { "type": "palm tree" }.type -- this statement will result in x = "palm tree." 
+
+9) alert($("p").css("display")); returns "block" as default. 
+
+10)A string literal is not an object. It's internally cast to an object when a method of String.prototype is called on it. 
+
+11)eval(statement) is used to evaluate a JavaScript statement. It can even convert a string into function object.
+   But using eval() can create website security issues. That's why it's rarely used at all.
+
+12)The prototype is an object property that allows you to add properties and methods to an object. 
+
+13)Tutorial - jQuery UI effects library has a method called .switchClass( remove, add); -- for swapping two classes in an HTML element. 
+
+14)$("div") is nothing more than a JavaScript function named "$" which is also a valid variable name. -- var $ = 1; alert($);
+ 
+15)To find all HTML elements set the context to document.body so elements like head and script are left out. 
+
+16)The new HTML tag <egg> cannot be nested. Any HTML content inside <egg> tag can be scrambled. Effectively preventing others from reading your code.
+
+17) The power of the colon  (http://www.learnjquery.org/newsletter/Tutorial-2-jquery-css-selectors-walkthrough.html)
+	In this section I want to explore the colon (:) in jQuery selectors. The colon is like a mini helper tool that lets us converge to the element we are searching for with greater precision.
+
+	Below I list most of the cases in general when the colon is used:
+	Selector 	   Real-world Situation 		Description
+	:first 				$("p:first") 		The first p element
+	:last 				$("p:last") 		The last p element
+	:even 				$("tr:even") 		All even tr elements
+	:odd 				$("tr:odd") 		All odd tr elements
+	:eq(index) 			$("ul li:eq(3)") 	The fourth element in a list (index starts at 0)
+	:gt(N) 				$("ul li:gt(3)") 	List elements with an index greater than 3
+	:lt(N) 				$("ul li:lt(3)") 	List elements with an index less than 3
+	:not(selector) 		$("input:not(:empty)") 	All input elements that are not empty
+	:header 			$(":header") 		All header elements h1, h2 ...
+	:animated 			$(":animated") 		All animated elements
+	:contains(text)    	$(":contains('clockwork orange')") 	All elements containing text 'clockwork orange'
+	:empty 				$(":empty") 		All elements with no child (elements) nodes
+	:hidden 			$("p:hidden") 		All hidden p elements
+	:visible 			$("table:visible") 	All visible tables
+	
+18) #jquery Performance TIP 1 -- Use for instead of each(); whenever possible.

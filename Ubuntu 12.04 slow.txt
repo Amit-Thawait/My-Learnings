@@ -1,0 +1,43 @@
+Faster Ubuntu 12.04 :- 
+----------------------
+1) Install Preload
+
+Preload is a daemon – a background service, in other words – that monitors the applications you use on your computer. It learns the libraries and binaries you use and loads them into memory ahead of time so the applications start faster. For example, if you always open LibreOffice and Firefox after starting your computer, preload will automatically load each application’s files into memory when your computer starts. When you log in and launch the applications, they’re start faster.
+
+Preload isn’t installed by default on Ubuntu, although some distributions do include it by default. To install Preload, run the following command:
+
+    sudo apt-get install preload
+	
+	
+2) I can barely remember the other OS but this recent slowness has that old smell about it.
+
+It was suprising to see quite how much is started by default. So I figured I'd go through and disable or remove each of these services that I don't want.
+
+The easiest way to do this is to edit each file in /etc/xdg/autostart and change the line NoDisplay=true to NoDisplay=false. You can use sed to do this in one line
+
+sudo sed -i "s;NoDisplay=true;NoDisplay=false;g" /etc/xdg/autostart/*
+
+ 
+
+This stops these services being hidden in the "Startup Applications" settings. Then open the Startup Applications settings and untick the services you don't need.
+
+The list of things that were doing nothing more than wasting resources on my PC were:
+
+Backup Monitor,
+Bluetooth Manager,
+Chat,
+Check for new hardware drivers,
+Desktop sharing,
+Disk Notifications,
+Evolution Alarm Notify,
+Gwibber,
+Onboard,
+Orca Screen Reader,
+Screensaver,
+Ubuntu One,
+Update Notifier and
+User folders update.
+
+All of that was running in the background on my PC thanks to decisions made by Ubuntu and they even took the time to hide the ability to turn this off.
+
+Also bear in mind that if you have other user accounts on your PC and they are logged in, they may also have pointless processes running. You will have to untick the Startup Applications on their log in too.	

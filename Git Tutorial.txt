@@ -1,0 +1,8 @@
+Git Tutorial :-
+---------------
+
+1.) Adding a file
+>> git add file
+
+2.) On Ubuntu you can install the Git command line tool
+>> sudo apt-get install git-core

@@ -1,0 +1,5 @@
+Single Responsibility Principle (SRP) : An object should have only a single responsibility. 
+Open Closed Principle (OCP) : A module should be open for extension but closed for modification.
+Liskov Substitution Principle (LSP) : Subclasses should be substitutable for their base classes.
+Interface Segregation Principle (ISP) : Many client specific interfaces are better than one general purpose interface
+Dependency Inversion Principle (DIP) : Depend upon Abstractions. Do not depend upon concretions.

@@ -1,0 +1,17 @@
+OmniAuth is a Ruby authentication framework aimed to abstract away the difficulties of working with various types of authentication providers. It is meant to be hooked up to just about any system, from social networks to enterprise systems to simple username and password authentication.
+
+One strategy, called Developer, is included with OmniAuth and provides a completely insecure, non-production-usable strategy that directly prompts a user for authentication information and then passes it straight through. You can use it as a placeholder when you start development and easily swap in other strategies later.
+
+Each OmniAuth strategy is a Rack Middleware. That means that you can use it the same way that you use any other Rack middleware.
+
+Because OmniAuth is built for multi-provider authentication, I may want to leave room to run multiple strategies. For this, the built-in OmniAuth::Builder class gives you an easy way to specify multiple strategies. Note that there is no difference between the following code and using each strategy individually as middleware. This is an example that you might put into a Rails initializer at config/initializers/omniauth.rb:
+
+Rails.application.config.middleware.use OmniAuth::Builder do
+  provider :developer unless Rails.env.production?
+  provider :twitter, ENV['TWITTER_KEY'], ENV['TWITTER_SECRET']
+end
+
+
+Omniauth in General :-
+----------------------
+List of strategies :- https://github.com/intridea/omniauth/wiki/List-of-Strategies

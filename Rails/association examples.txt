@@ -1,0 +1,11 @@
+has_many :--  Accounts - User, Projects for Portfolio, Manager has many Employee
+
+One to One :- Employee has one Address
+
+One to many :--  Order has one Customer 
+
+Polymorphic :- Images for People, Product
+
+Habtm :- Programmers & Projects
+
+Has Many Through :- Programmer has many Projects through Assignment & vice versa.

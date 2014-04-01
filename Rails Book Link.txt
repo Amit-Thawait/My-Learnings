@@ -1,0 +1,1 @@
+http://ruby.railstutorial.org/ruby-on-rails-tutorial-book?version=3.2

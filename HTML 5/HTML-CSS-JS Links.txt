@@ -1,0 +1,17 @@
+HTML, CSS, JS Links :-
+----------------------
+
+http://dev.opera.com/articles/view/1-introduction-to-the-web-standards-cur/#toc
+
+http://code.google.com/edu/submissions/html-css-javascript/
+
+http://reference.sitepoint.com/css
+
+http://www.w3.org/wiki/HTML/Training
+
+http://www.w3.org/wiki/HTML/Elements
+
+https://developer.mozilla.org/en-US/docs
+
+https://developer.mozilla.org/en-US/docs/JavaScript
+

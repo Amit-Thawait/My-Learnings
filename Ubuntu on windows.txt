@@ -1,0 +1,143 @@
+For any kind of help go to :-
+
+https://help.ubuntu.com/12.04/ubuntu-help/index.html
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+Download ISO file for latest ubuntu (32-bit recommended)
+
+http://www.ubuntu.com/download/desktop
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+Download Vmware Player 
+
+https://my.vmware.com/web/vmware/evalcenter?p=player
+
+Just create an account and vmware player is a free product for non-commercial use
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+How To Run Ubuntu in Windows 7 with VMware Player
+
+http://www.howtogeek.com/howto/11287/how-to-run-ubuntu-in-windows-7-with-vmware-player/
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+if u have faced the error :-
+
+ERROR:  Loading command: install (LoadError)
+    no such file to load -- zlib
+ERROR:  While executing gem ... (NameError)
+    uninitialized constant Gem::Commands::InstallCommand
+
+
+rm -rf $rvm_path/usr
+
+rvm requirements
+
+from the result of the above query , just check the under Ruby: heading ,there is a set of libraries mentioned 
+
+sudo apt-get install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion
+
+
+rvm reinstall 1.9.3
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+sudo apt-get update
+
+sudo apt-get install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion
+
+curl -L get.rvm.io | bash -s stable
+
+Now just open a fresh terminal
+
+rvm install 1.9.3
+
+rvm list
+
+Till here everything is fine but 'rvm use .. ' will not work 
+so set the profile preference using the link below
+https://rvm.io/integration/gnome-terminal/
+
+then 
+rvm use 1.9.3
+
+Now everything is fine.
+
+rvm gemset create rails_3.2.2
+
+rvm gemset list
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+Install Mysql server on Ubuntu
+
+sudo apt-get install mysql-server
+During the installation process you will be prompted to enter a password for the MySQL root user. 
+
+If you would like to change the MySQL root password, in a terminal enter:
+
+sudo dpkg-reconfigure mysql-server-5.5
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Install MySql GUI Tool 
+
+sudo apt-get install mysql-admin mysql-query-browser
+
+u might get a message like
+E: Unable to locate package mysql-admin
+E: Unable to locate package mysql-query-browser
+
+OR
+
+workbench :-
+sudo apt-get install mysql-workbench
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Access windows 7 shared folders from ubuntu using vmware player
+
+From Virtual Machine settings , click Always enable
+
+and then add the folders u wat to share in Ubuntu
+
+then 
+
+Mount the shared folder using the link below :-
+
+http://defprogram.wordpress.com/2011/08/03/shared-folders-with-vmware-player-and-ubuntu-11-04/
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+Install Sublime Text 2 on Ubuntu 12.04 
+
+Goto http://www.sublimetext.com/2
+
+download the 32 bit version
+
+goto downloads directory
+
+then follow the steps from below link
+
+http://www.technoreply.com/how-to-install-sublime-text-2-on-ubuntu-12-04-unity/
+
+open a directory as a project by going to path /mnt/hgfs
+Open sublime text
+Drag the directory onto the sublime window , and it’ll be added to the project. You’ll then be able to browse using the sidebar, and search using Ctrl+P 
+Next time to add any new project just drag the directory onto the sidebar , and it’ll be added to the project.
+
+Share folders from windows to ubuntu from virtual machine settings
+
+One important thing is that whenever u update ur project folder in windows then u need to go to Project menu and do Refresh Folders to get updated files on sublime.
+
+Sublime Test 2 FAQ's
+http://www.sublimetext.com/blog/articles/2011/01
+
+
+For some tips & tricks on ubuntu refer the link below -
+http://net.tutsplus.com/tutorials/tools-and-tips/sublime-text-2-tips-and-tricks/
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+

@@ -1,0 +1,68 @@
+101 things Ruby can do :-
+--------------------------
+1) @name = 'Amit' 
+   "=======#@name"  --> works
+   
+2) [[1,2,3],[4,5,6]].each do |num, _, _|
+	p num
+   end	
+   To ignore the other two elements
+
+3) params = {:var => 42} or params = {var: 42}
+   Always use fetch method to retrive the variable values from params, because it throws error(Error : Key not found) if its not there instead of giving o/p as nil.
+   params.fetch(:var) or params.fetch(:var)
+   params.fetch(:var,42) or params.fetch(:var){40 + 2}
+   
+4) Enable GC to avoid memory leak :-
+   GC::Profiler.enable
+   10.times do
+	  array = Array.new(1_000_000){|i| i.to_s}
+   end
+   puts GC::Profiler.result
+
+5) Aborting thread on exception (set the below parameter)
+   Thread.abort_on_exception = true
+
+6) 2.between?(1, 10) --> true  
+   'cat'.between?('bat', 'rat') --> false
+   
+7) Now in-built daemon to run background jobs
+   Process.daemon
+	loop do
+	  sleep
+	end
+
+8) spawn method (will o/p a pid file)
+   Look out for spawn method :- with the help of this method we can do a lot of things(like show/hide file extns , change permission xxx, change env variable values, change working dir etc)	
+   
+9) SecureRandom : Generates a secure random number
+
+   require 'securerandom'
+   p SecureRandom.random_number
+   p SecureRandom.random_number(100)
+   p SecureRandom.hex(20)
+   p SecureRandom.base64(20)
+   p SecureRandom.urlsafe_base64(20)
+   p SecureRandom.random_bytes(20)
+   p SecureRandom.uuid
+   
+ 10)U can use irb instead of pry for debugging purpose
+	
+	irb(main):030:0> irb 'amit'
+	irb#1(amit):001:0> capitalize
+	=> "Amit"
+	irb#1(amit):002:0> exit
+	=> #<IRB::Irb: @scanner=#<RubyLex:0x3edaf80>, @context=#<IRB::Context:0x3edb388>
+	, @signal_status=:IN_EVAL>
+	irb(main):031:0>
+	
+	U can even switch between threads
+
+	irb#1(amit):004:0> fg 0
+	=> #<IRB::Irb: @scanner=#<RubyLex:0x3edaf80>, @context=#<IRB::Context:0x3edb388>
+	, @signal_status=:IN_EVAL>
+	irb(main):033:0> fg 1
+	=> #<IRB::Irb: @scanner=#<RubyLex:0x18d8f0>, @context=#<IRB::Context:0x18e490>,
+	@signal_status=:IN_EVAL>
+	
+11) Use prettify_json.rb to preetify ur json object	

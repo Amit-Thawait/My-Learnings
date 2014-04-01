@@ -1,0 +1,25 @@
+Sorting an Array of Object basing on more than one attribute :-
+--------------------------------------------------------------
+Method 1 :-
+-----------
+sorted_arr = new_arr.sort do |a,b|
+  last_two_year = (a.year_4 + a.year_3).to_i <=> (b.year_4 + b.year_3).to_i
+  last_two_year.nonzero? || (
+							 (a.year_2).to_i <=> (b.year_2).to_i.nonzero? ||
+								(
+								 (a.year_1).to_i <=> (b.year_1).to_i.nonzero? ||
+								   (b.charge_code <=> a.charge_code)
+								)
+							)
+end
+
+
+Method 2 :-
+-----------
+   sorted_charge_codes = new_arr.sort{|a,b| ((b.year_4 + b.year_3) == (a.year_4 + a.year_3)) ?  (b.year_2 == a.year_2) ? ((b.year_1 == a.year_1) ? (a.charge_code <=> b.charge_code) : (b.year_1 <=> a.year_1)) : (b.year_2  <=> a.year_2) : ((b.year_4 + b.year_3) <=> (a.year_4 + a.year_3))}
+
+   
+Method 3 :-
+-----------
+      sorted_consultants = consultants.sort{|a,b| (a.sort_order <=> b.sort_order).nonzero? || (((b.year_4 + b.year_3 + b.year_2 + b.year_1) <=> (a.year_4 + a.year_3 + a.year_2 + a.year_1)).nonzero? || (a.last_name <=> b.last_name))}
+   

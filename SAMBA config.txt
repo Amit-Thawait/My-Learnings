@@ -1,0 +1,18 @@
+Config changes for SAMBA :-
+---------------------------
+In smb.conf file
+
+mangled names = No
+dos charset = CP850
+unix charset = ISO8859-1
+display charset = LOCALE
+
+
+We googled a bit and found below links which might help.
+
+1. http://lists.samba.org/archive/samba/2004-April/084288.html
+2. http://superuser.com/questions/183780/what-do-i-need-to-do-to-rsync-on-windows-to-make-it-keep-special-characters-in-f
+
+For more details-
+1. http://oreilly.com/openbook/samba/book/ch05_04.html
+2. http://www.samba.org/samba/docs/using_samba/ch08.html

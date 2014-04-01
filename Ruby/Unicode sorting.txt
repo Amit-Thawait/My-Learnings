@@ -1,0 +1,1 @@
+Person.find(:all, :order => "position_code,lower(nlssort(display_name, 'NLS_SORT=GENERIC_M'))")

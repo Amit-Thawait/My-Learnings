@@ -1,0 +1,35 @@
+Lambda vs Proc
+http://www.loudthinking.org/2009/10/block-vs-lambda-vs-proc.html
+
+Detailed Explanation :- 
+http://www.robertsosinski.com/2008/12/21/understanding-ruby-blocks-procs-and-lambdas/
+
+Proc is a callable object in ruby and this is not executed unless called explicitly where as Lambda is a function in ruby
+
+
+For example
+-------------
+
+def myproc
+p = Proc.new {return "This is proc"}
+p.call # here, control leaves
+return "Message after calling the proc"
+end
+
+def foo
+l = lambda {return "This is lambda"}
+l.call # here, control doesn't leaves
+return "Message after calling lambda"
+end
+
+puts myproc
+
+#Output
+This is proc
+
+
+puts foo
+#Output
+Message after calling lambda
+
+

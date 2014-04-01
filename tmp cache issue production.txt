@@ -1,0 +1,37 @@
+Deployment issue :- 
+-------------------
+
+*** [err :: server_name] ** Invoke tmp:cache:clear (first_time)
+*** [err :: server_name] 
+*** [err :: server_name] ** Execute tmp:cache:clear
+*** [err :: server_name] 
+*** [err :: server_name] ** Execute assets:precompile:primary
+*** [err :: server_name] 
+*** [err :: server_name] ** Invoke tmp:cache:clear (first_time)
+*** [err :: server_name] 
+*** [err :: server_name] ** Execute tmp:cache:clear
+*** [err :: server_name] 
+*** [err :: server_name] ** Execute assets:precompile:primary
+*** [err :: server_name] 
+*** [err :: server_name] rake aborted!
+*** [err :: server_name] 
+*** [err :: server_name] No such file or directory - /path_to_app/releases/20130111142643/tmp/cache/assets/sprockets%2F561e2a64597c60ba159f8554202bab5620130111-10729-1eusk4o.lock
+*** [err :: server_name] 
+
+
+
+There were actually 2 problems. First the permissions were wrong. and secondly like Nerian said, you have to clear your tmp folder.
+
+To set the correct permissions
+
+chown apache.root yourapp -R
+chmod 755 yourapp -R
+
+To clear you tmp folder
+
+rake tmp:pids:clear             
+rake tmp:sessions:clear
+rake tmp:sockets:clear
+rake tmp:cache:clear
+
+

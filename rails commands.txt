@@ -1,0 +1,31 @@
+commands :-
+-----------
+1.) Server start -> bundle exec rails s
+
+2.) Scaffold -> rails generate scaffold User name:string age:integer role:string
+
+3.) bundle -> bundle install or bundle
+    Example of bundle is :-
+    If u dont have mysql gem installed then just write
+    gem 'mysql' in the GEMFILE
+    and run bundle install from cmd, it will install the mysql gem automatically from rubygems website.
+
+4.) run a spec file -> bundle exec rake spec=D:/Amit/Store/Store_app/spec/models/item_spec.rb
+
+5.) create test DB -> rake environment RAILS_ENV=test db:migrate
+
+6.) For generating spec files :-
+
+	Add the beloe lines in the GemFile
+	----------------------------------
+	group :test, :development do
+	  gem "rspec-rails", "~> 2.6"
+	end
+
+	then run 
+	--------
+	rails generate rspec:install
+	
+	To run spec files
+	-----------------
+	rake spec = spec/models/person_spec.rb

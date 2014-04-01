@@ -1,0 +1,47 @@
+Handling Foreign Characters in DB as well as web page :-
+========================================================
+
+Check in the database where the result of the below query 
+
+SELECT VALUE FROM nls_database_parameters WHERE parameter = 'NLS_NCHAR_CHARACTERSET';
+
+is
+AL16UTF16
+1.) Ur DB should be configured to accept UTF-8 characters
+2.) encodeing should be set in Rails Database.yml
+3.) NLS_LANG environment variable should be set to 'AMERICAN_AMERICA.UTF8' 
+
+set encoding in database.yml :
+
+encoding: utf8
+
+
+in config/application.rb 
+------------------------
+add the below line
+
+ENV['NLS_LANG'] = 'AMERICAN_AMERICA.UTF8'
+
+or u can create preinitializer.rb file in the config folder.
+By default, this file does not exist, if you want to put the above line in preinitializer then u have to make a file with the same name.
+
+
+My Customized Method :-
+-----------------------
+
+  def encoding_to_utf_8(str)
+    Iconv.iconv('Windows-1252', 'UTF-8', str) rescue begin
+      str
+    end
+  end
+  
+  
+  ISO-8859-1
+  
+Iconv is a wrapper class in Ruby, which translates string between various encoding systems. 
+
+Iconv.iconv(to, from, str)  
+
+Reference Link :-
+-----------------
+http://oldwiki.rubyonrails.org/rails/pages/HowToUseUnicodeStrings

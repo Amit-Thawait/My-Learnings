@@ -1,0 +1,127 @@
+Angular JS Links :-
+-------------------
+http://mgcrea.github.com/angular-strap/
+
+http://ddeloy.com/#/
+
+http://ddeloy.com/AngularMySQL_1/index.html#/teams
+
+http://ngmodules.org/
+
+https://github.com/btford/ngmin
+
+https://github.com/angular/angular-seed
+
+http://blog.angularjs.org/2012/09/yeoman-and-angularjs.html
+
+http://egghead.io/
+
+http://briantford.com/blog/angular-phonegap.html
+
+http://www.alexrothenberg.com/2013/02/11/the-magic-behind-angularjs-dependency-injection.html
+
+A bit lengthy but worth reading. #79 onwards has some good questions answered by Misko, testing and stuff.
+http://riagora.com/appliness/Appliness-February2013.pdf
+
+http://angular-ui.github.com/bootstrap/   ---- ANgular with bootstrap
+
+http://www.fullscale.co/dangle/
+
+https://github.com/angular/angular.js/wiki/JsFiddle-Examples
+
+http://blog.angularjs.org/2013/04/angularjs-106-universal-irreversibility.html
+
+http://goodfil.ms/blog/posts/2012/08/13/angularjs-and-the-goodfilms-mobile-site-part-1/
+
+http://www.blogeek.com.ar/2013/04/09/restangular-new-angular-framework-to-handle-restful-resources-properly-and-easily/
+
+http://www.infoq.com/presentations/AngularJS-Demo?utm_source=javascriptweekly&utm_medium=email
+
+http://briantford.com/blog/angular-bower.html
+
+http://it-ebooks.info/book/2076/
+
+http://oscarvillarreal.com/2013/05/07/5-reasons-to-use-angularjs-in-the-corporate-app-world/?utm_source=waywework&utm_medium=referral
+
+http://www.youtube.com/angularjs  OR  http://goo.gl/bl9Lw
+{
+* ng-Animate
+  - supported in routes
+  - ngRepeat
+* ng-If
+  - takes care of no-show and ng-hide
+  - it actually gets removed from the DOM not the show hide with CSS
+* Mobile
+  - ng-Touch (ng-Mobile) will automatically enable ngClick as touch
+  - ng-Swipe
+* Security
+  - CSP auto-detection
+    - Allows you to control what your application is allowed to do
+* Error messages
+  - Better error messages for the uncompressed verion
+  - Compressed version will have a link to the error description
+    - Its best to develop using the uncompressed version and for prod release just use the minified version
+* Documentation Improvements
+  - Better tutorial with out having to leave angularJS
+  - Better search
+  - More organized and standardized descriptions
+* NEXT STEPS for versions > 1.2
+  - Evolve according to standards
+    - Object.observe()
+    - DOM Mutation Observers
+    - Shadow DOM
+    - Web Components
+    - Model Drive Views
+    - Forward polyfills and transpires for legacy browsers
+  - Breaking out the Core
+    - separate pieces for $location, $http, $parse etc.
+      - Allows you to have only what you need
+      - Basically same concept of micro libraries that play well together
+      - You can still have the whole thing as well
+    - Ent-to-end Testing with Protractor
+      - Based on top of WebDriver
+      - AngularJS is working together with polymer in order to use all the cool polyfills that polymer has
+    - Brian Ford joins the team next week so
+      - Better integration with Yeoman
+      - Better Batarang
+}
+
+https://github.com/pablojim/highcharts-ng
+
+http://www.youtube.com/watch?v=i9MHigUZKEM
+
+http://www.virgentech.com/blog/2013/07/angularjs-and-processingjs-integration.html
+
+http://entwicklertagebuch.com/blog/2013/10/how-to-structure-large-angularjs-applications/
+
+http://textangular.com/
+
+http://blog.scalyr.com/2013/10/31/angularjs-1200ms-to-35ms/
+
+http://codetunes.com/2013/little-known-angular-directives/?utm_source=javascriptweekly&utm_medium=email
+
+https://www.honeybadger.io/blog/2013/12/11/beginners-guide-to-angular-js-rails
+
+http://www.sitepoint.com/unit-and-e2e-testing-in-angularjs/
+
+http://engineering.nulogy.com/posts/code-organization-in-angular/
+
+http://www.youtube.com/watch?v=i9MHigUZKEM
+
+http://nathanleclaire.com/blog/2014/01/04/5-smooth-angularjs-application-tips
+
+http://stickies.github.io/2014/01/19/rails-form-enhancement-with-angular-js.html
+
+http://stickies.github.io/2014/02/17/rails-form-enhancement-with-angular-part-two.html
+
+http://www.toptal.com/angular-js/a-step-by-step-guide-to-your-first-angularjs-app
+
+http://blog.testdouble.com/posts/2013-12-06-angular-onramp.html
+
+http://toddmotto.com/ultimate-guide-to-learning-angular-js-in-one-day
+
+http://tutorialzine.com/2013/08/learn-angularjs-5-examples
+
+http://www.thinkster.io/
+
+http://www.ng-newsletter.com/posts/angular-translate.html

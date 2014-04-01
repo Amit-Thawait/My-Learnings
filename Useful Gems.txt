@@ -1,0 +1,53 @@
+Useful Gems :-
+--------------
+
+1) Brakeman gem - exposes security vulnerabilities in your Rails app
+
+2) rails_xss gem
+
+3) writeexcel - The Spreadsheet::WriteExcel module can be used to create a cross-platform Excel binary file. Multiple worksheets can be added to a
+				 workbook and formatting can be applied to cells. Text, numbers,formulas, hyperlinks, images and charts can be written to the cells.
+				 
+4) tabs_on_rails (For creating tabs : http://www.simonecarletti.com/code/tabs_on_rails/)
+
+5) "rack-protection" and "secure_headers" as they both provide more protection.
+
+6) Run "rails_best_practices" gem, as picks up a lot of the points mentioned automatically.
+
+7) Run "cane" gem as a general code quality analyser.
+
+8) Run "brakeman" to find security holes is software.
+
+9) locale_setter for setting locale (https://github.com/jcasimir/locale_setter/)
+
+10)state_machine for creating different state rather than just true/false or -1,0,1 etc (https://github.com/pluginaweek/state_machine/)
+
+11)Turbo Sprockets for Rails 3.2.x (no repeatitive relaoding of JS & CSS) (https://github.com/ndbroadbent/turbo-sprockets-rails3)
+
+12)Hamster - Efficient, Immutable, Thread-Safe Collection classes for Ruby
+
+13)hirb gem is used to display the array of records (say for Product.all) in a nice table format 
+
+14)searchlogic :- Searchlogic makes searching models(DB objects) easier than ever with its assortment of named scopes. 
+  (Diadvantage : some security issues since it creates a url containing all the searched strings even which is not mentioned in the form. Advised only for admin pages.)
+
+15) Nokogiri :- (Used to parse the content in the page, Using the CSS Selector pluggin 'SelectorGadget' - also available for firefox) 
+   (Recommended for single page)
+
+16) Mechanize :- (Used for Screen Scraping for multiple pages and even if first u have to Log-in) 
+    (It uses nokogiri under the hood but with some extra features like clicking the links and submitting the form)
+
+17) rails-api :- Gem for writing api's in rails (light-weight framework compared to rails just for API's).
+	https://github.com/rails-api/rails-api#why-use-rails-for-json-apis
+	
+18) rest-client :- Gem to interact with any API (https://github.com/rest-client/rest-client)
+
+19) www.ruby-toolbox.com ---> Tells gems available for a given task and even compares the options available.
+
+20) Spring Gem (Spring is a Rails application preloader. It's trying to solve the same problem as spork, zeus and commands.)
+
+21) web-console :- Rails Console on the Browser.
+
+22) gretel :- Flexible Ruby on Rails breadcrumbs plugin.
+
+23) remotipart :- Remotipart is a Ruby on Rails gem enabling remote multipart forms (AJAX style file uploads) with jquery-rails. This gem augments the native Rails 3 jQuery-UJS remote form function enabling asynchronous file uploads with little to no modification to your application.

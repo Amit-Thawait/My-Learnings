@@ -1,0 +1,273 @@
+Threads in Ruby :- 
+------------------
+
+words = ["hello", "world", "goodbye", "mars" ]
+numbers = [1,2,3,4,5,6,7,8,9,10]
+
+startTime = Time.new
+puts( "Start: %10.9f" % startTime )
+
+Thread.new{ 
+	words.each{ |word| puts( word ) }
+}
+
+Thread.new{ 
+	numbers.each{ |number| puts( number ) }
+}
+
+endTime = Time.new
+puts( "End: %10.9f" % endTime.to_f )
+totalTime = endTime-startTime
+puts( "Total Time: %10.9f" % totalTime.to_f )
+
+Doesnot run the thread at all.
+
+----------------------------------------------------------------------------------
+
+words = ["hello", "world", "goodbye", "mars" ]
+numbers = [1,2,3,4,5,6,7,8,9,10]
+
+startTime = Time.new
+puts( "Start: %10.9f" % startTime )
+
+Thread.new{ 
+	words.each{ |word| puts( word ) }
+}
+
+Thread.new{ 
+	numbers.each{ |number| puts( number ) }
+}
+
+sleep( 5 ) 
+
+endTime = Time.new
+puts( "End: %10.9f" % endTime.to_f )
+totalTime = endTime-startTime
+puts( "Total Time: %10.9f" % totalTime.to_f )
+
+Runs the thread, but with a sleep of 5 secs
+
+----------------------------------------------------------------------------------
+
+p( Thread.main )
+
+#<Thread:0x28955c8 run>
+
+----------------------------------------------------------------------------------
+Each thread has a status which may be one of the following: 
+run  -  when thread is executing 
+sleep  -  when thread is sleeping or waiting on I/O 
+aborting  -  when thread is aborting
+false  -  when thread terminated normally 
+nil  -  when thread terminated with an exception
+
+puts( "\n--- Compare Thread status and Thread inspect ---" )
+thread1 = Thread.new{ }
+puts( "thread1.status: #{thread1.status}, thread1.inspect #{thread1.inspect}" )
+=> false , dead
+
+thread2 = Thread.new{ raise( "Exception raised!" ) }
+puts( "thread2.status: #{thread2.status.inspect}, thread2.inspect #{thread2.inspect}" )
+=> nil, dead
+
+thread3 = Thread.new{ sleep }.kill
+puts( "thread3.status: #{thread3.status}, thread3.inspect #{thread3.inspect}" )
+=> false, dead
+
+-------------------------------------------------------------------------------------
+ENSURING THAT A THREAD EXECUTES :-
+----------------------------------
+
+join method :-
+--------------
+
+words = ["hello", "world", "goodbye", "mars" ]
+numbers = [1,2,3,4,5,6,7,8,9,10]
+
+Thread.new{ 
+	words.each{ |word| puts( word ) }
+}.join
+
+Thread.new{ 
+	numbers.each{ |number| puts( number ) }
+}.join
+
+Runs thread sequentially
+
+---------------------------------------------------------------------------------------
+
+words = ["hello", "world", "goodbye", "mars" ]
+numbers = [1,2,3,4,5,6,7,8,9,10]
+
+startTime = Time.new
+puts( "Start: %10.9f" % startTime )
+
+wordsThread = Thread.new{ 
+	words.each{ |word| puts( word ) }
+}
+
+numbersThread = Thread.new{ 
+	numbers.each{ |number| puts( number ) }
+}
+
+[wordsThread, numbersThread].each{ |t| t.join }
+
+endTime = Time.new
+puts( "End: %10.9f" % endTime.to_f )
+totalTime = endTime-startTime
+puts( "Total Time: %10.9f" % totalTime.to_f )
+
+runs thread giving priority to any one 
+
+----------------------------------------------------------------------------------------
+THREAD PRIORITIES :-
+--------------------
+pass method :-
+--------------
+
+Thread Priority :-
+------------------
+
+def fac(n)
+	n == 1 ? 1 : n * fac(n-1)
+end
+
+
+
+startTime = Time.new
+puts( "Start: %10.5f" % startTime )
+
+t1 = Thread.new{ 
+	0.upto(50) {fac(50); print( "t1\n" )}
+}
+
+t2 = Thread.new{ 
+	0.upto(50) {fac(50); print( "t2\n" )}
+}
+
+t3 = Thread.new{ 
+	0.upto(50) {fac(50); print( "t3\n" )}
+}
+
+# ==== TRY CHANGING THESE PRIORITIES ====
+t1.priority = -1
+t2.priority = -1
+t3.priority = -2
+# =======================================
+
+[t1,t2,t3].each{ |t| t.join }
+
+endTime = Time.new
+puts( "End: %10.5f" % endTime.to_f )
+totalTime = endTime-startTime
+puts( "Total Time: %10.5f" % totalTime.to_f )
+
+
+====> t1, t2 has the same priority whereas t3 has less priority
+But actually doesn't runs according to priority
+--------------------------------------------------------------------------------------------
+
+Main thread has 0 priority, so 0 should bot be assigned to nay thread
+
+puts( Thread.main.priority ) #===========> 0
+
+--------------------------------------------------------------------------------------------
+
+Each of the threads tries to start running as soon as it is created and t1 may get its own slice of the action before the priorities of the other threads are ‘upgraded’. In order to prevent this, we can specifically suspend the thread at the time of creation using Thread.stop like this:
+
+----------------------------------------------------------------------------------------------
+
+startTime = Time.new
+puts( "Start: %10.5f" % startTime )
+
+t1 = Thread.new{ 
+	Thread.stop
+	0.upto(50){print( "t1\n" )}	
+}
+
+t2 = Thread.new{ 
+	Thread.stop
+	0.upto(50){print( "t2\n" )}
+}
+
+t3 = Thread.new{ 
+	Thread.stop
+	0.upto(50){print( "t3\n" )}
+}
+
+#set main thread to have a high priority
+Thread.main.priority = 200
+t1.priority = 0
+t2.priority = 1
+t3.priority = 1
+
+t1.run
+t2.run
+t3.run
+
+[t1,t2,t3].each{ |t| t.join }
+
+endTime = Time.new
+puts( "End: %10.5f" % endTime.to_f )
+totalTime = endTime-startTime
+puts( "Total Time: %10.5f" % totalTime.to_f )
+puts( Thread.main.priority )
+
+===========> Output
+t2
+t2
+t2 ... 50 times
+stop_run.rb:31:in `join': deadlock detected (fatal)
+        from stop_run.rb:31:in `block in <main>'
+        from stop_run.rb:31:in `each'
+        from stop_run.rb:31:in `<main>'
+		
+------------------------------------------------------------------------------------------------------
+
+MUTEXES :-
+----------
+Sometimes two or more threads may each need to access some kind of global resource. This has the potential of producing erroneous results due to the fact that the current state of the global resource may be modified by one thread and this modified value may be unpredictable when used by some other thread.
+
+To deal with this problem, we need to ensure that, when one thread has access to a global resource, it blocks the access of other threads. This is another way of saying that the access to global resources granted to multiple threads should be ‘mutually exclusive’. You can implement this using Ruby’s Mutex class, which uses a semaphore to indicate whether or not a resource is currently being ac-cessed, and provides the synchronize method to prevent access to resources inside a block. Note that you must require ‘thread’ to use the Mutex class.
+
+-----------------------------------------------------------------------------------------------------------
+
+PASSING EXECUTION TO OTHER THREADS :-
+-------------------------------------
+
+a = Thread.new { print "a"; Thread.pass;
+				 print "b"; Thread.pass;
+                 print "c" }
+b = Thread.new { print "x"; Thread.pass;
+                 print "y"; Thread.pass;
+				 print "z" }
+a.join
+b.join
+
+C:\Amit\Book Of Ruby\ch17>ruby pass0.rb
+axbycz
+C:\Amit\Book Of Ruby\ch17>ruby pass0.rb
+xabycz
+
+by calling Thread.pass after each call to print, these threads pass execution to another thread which is why the output from the two threads alternates.
+
+a = Thread.new { print "a"; 
+				 print "b"; 
+                 print "c" }
+b = Thread.new { print "x"; 
+                 print "y"; 
+				 print "z" }
+a.join
+b.join
+
+C:\Amit\Book Of Ruby\ch17>ruby pass1.rb
+abcxyz
+C:\Amit\Book Of Ruby\ch17>ruby pass1.rb
+xyzabc
+
+--------------------------------------------------------------------------------------------------------------------
+
+It is quite possible that different results will be seen on other operating systems. This is because the implementation of the Ruby scheduler – which controls the amount of time allocated to threads – is different on Windows and other operating systems. On Unix the scheduler runs once every 10 milliseconds but on Windows the time sharing is controlled by decrementing a counter when certain operations occur, so that the precise interval is indeterminate.
+
+
+

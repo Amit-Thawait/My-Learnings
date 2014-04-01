@@ -1,0 +1,94 @@
+http://developers.facebook.com/docs/getting-started/graphapi/
+
+https://graph.facebook.com/amit.thawait?metadata=1
+
+https://graph.facebook.com/100000003334572?access_token=user_access_token&fields=id,name,first_name,link,username,picture,location,work
+
+
+
+--- !ruby/hash:OmniAuth::AuthHash
+provider: facebook
+uid: '100000003334572'
+info: !ruby/hash:OmniAuth::AuthHash::InfoHash
+  nickname: amit.thawait
+  email: amit17thawait@gmail.com
+  name: Amit Thawait
+  first_name: Amit
+  last_name: Thawait
+  image: http://graph.facebook.com/100000003334572/picture?type=square
+  description: I do, what I feel is right.
+  urls: !ruby/hash:Hashie::Mash
+    Facebook: http://www.facebook.com/amit.thawait
+  location: Mumbai, Maharashtra, India
+  verified: true
+credentials: !ruby/hash:Hashie::Mash
+  token: BAABxTjZCB4e8BAAgSGOoZAmpcDaWjaPM3muL0ZCyEJuLMZAkj5RBnlKy8USptBk4FDSlVyjSszAz1spo5J3K5lUrd6jkU87ZAvv37FJqzATLpV048UxjvhZBDaMZAVJKn9hUFfpJfuikRs4rHIkfvf6kPqNJw2BK8QOIObiBvopQfy0hGbJWBegjomnc9DY4IwZD
+  expires_at: 1371899187
+  expires: true
+extra: !ruby/hash:Hashie::Mash
+  raw_info: !ruby/hash:Hashie::Mash
+    id: '100000003334572'
+    name: Amit Thawait
+    first_name: Amit
+    last_name: Thawait
+    link: http://www.facebook.com/amit.thawait
+    username: amit.thawait
+    hometown: !ruby/hash:Hashie::Mash
+      id: '108844689143285'
+      name: Korba, Chhattisgarh, India
+    location: !ruby/hash:Hashie::Mash
+      id: '114759761873412'
+      name: Mumbai, Maharashtra, India
+    bio: I do, what I feel is right.
+    work:
+    - !ruby/hash:Hashie::Mash
+      employer: !ruby/hash:Hashie::Mash
+        id: '108134792547341'
+        name: Tata Consultancy Services
+      location: !ruby/hash:Hashie::Mash
+        id: '114759761873412'
+        name: Mumbai, Maharashtra, India
+      position: !ruby/hash:Hashie::Mash
+        id: '149467135066791'
+        name: Systems Engineer
+      start_date: 2010-01
+    education:
+    - !ruby/hash:Hashie::Mash
+      school: !ruby/hash:Hashie::Mash
+        id: '115059778505995'
+        name: KENDRIYA VIDYALAYA KSTPS KORBA
+      year: !ruby/hash:Hashie::Mash
+        id: '194878617211512'
+        name: '2002'
+      type: High School
+    - !ruby/hash:Hashie::Mash
+      school: !ruby/hash:Hashie::Mash
+        id: '110549502306553'
+        name: Vikas Airport Campus, Vishakhapatnam (A.P)
+      year: !ruby/hash:Hashie::Mash
+        id: '113125125403208'
+        name: '2004'
+      type: High School
+    - !ruby/hash:Hashie::Mash
+      school: !ruby/hash:Hashie::Mash
+        id: '209094152551215'
+        name: Bhilai Institute of Technology, Durg (C.G.)
+      year: !ruby/hash:Hashie::Mash
+        id: '136328419721520'
+        name: '2009'
+      type: College
+    - !ruby/hash:Hashie::Mash
+      school: !ruby/hash:Hashie::Mash
+        id: '129487623787373'
+        name: Vikas Airport Campus,Vishakhapatnam
+      type: College
+      with:
+      - !ruby/hash:Hashie::Mash
+        id: '100000414638041'
+        name: Surjit Basu
+    gender: male
+    email: amit17thawait@gmail.com
+    timezone: 5.5
+    locale: en_US
+    verified: true
+    updated_time: '2013-04-18T17:22:04+0000'

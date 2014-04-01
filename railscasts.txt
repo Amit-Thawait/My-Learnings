@@ -1,0 +1,615 @@
+Episode 1 :- Caching with Instance Variables
+
+Episode 2 :- Dynamic find_by methods
+
+Episode 3 :- using find with associations
+
+Episode 4 :- Moving find into model
+
+Episode 5 :- with_scope allows your custom find methods
+
+Episode 6 :- Shortcut Blocks with Symbol to_proc
+
+Episode 7 :- All about layouts
+
+Episode 8 :- Layouts and content_for (to load css dynamically)
+
+Episode 9 :- Filtering Sensitive Logs (like password)
+
+Episode 10 :- Refactoring User Name (Removing duplicate code from views)
+
+Episode 11 :- Refactoring User Name (writing short method in model)
+
+Episode 12 :- Refactoring User Name (removing duplicate code from tests)
+
+Episode 13 :- Dangers of Model in Session (should not save objects inside session)
+
+Episode 14 :- Performing Calculations on Models (sql functions)
+
+Episode 15 :- Fun with Find Conditions (conditions in string & hash format)
+
+Episode 16 :- Virtual Attributes (Using full_name in view as a sum of first_name & last_name) [REVISED EPISODE -- Done]
+
+Episode 17 :- HABTM Checkboxes (using check_box_tag method) [REVISED EPISODE -- Done]
+
+Episode 18 :- Looping Through Flash (using flash.each for flash[:notice] & flash[:error])
+
+Episode 19 :- Where Administration Goes (Adding admin features to a website part-1)
+
+Episode 20 :- Restricting Access (Admin feature part-2)
+
+Episode 21 :- Super Simple Authentication (Admin feature part-3)
+
+Episode 22 :- Eager Loading (In :include --> name of the association should be used) [REVISED EPISODE -- Done]
+
+Episode 23 :- Counter Cache Column (http://josh.the-owens.com/archives/2007/11/03/rails-edge-change-how-to-add-a-counter-cache-to-an-existing-db-table/)
+
+Episode 24 :- The Stack Trace (Use textmate footnotes plugin for Mac to directly go to the file from error trace through links)
+
+Episode 25 :- SQL Injection
+
+Episode 26 :- Hackers Love Mass Assignment (using attr_accessible) [REVISED EPISODE -- Done]
+
+Episode 27 :- Cross Site Scripting (Using h method & we can also use CGI::escapeHTML(...) in controller to reject html content)
+
+Episode 28 :- in_groups_of (Array's method)
+
+Episode 29 :- group_by Month (Enumerable's method)
+
+Episode 30 :- Pretty Page Title (Using content_for in the helper to display dynamic page title)
+
+Episode 31 :- Formatting Time (using strftime and creating our own time formatter in environment.rb file)
+
+Episode 32 :- Time in Text Field (Use chronic gem for parsing time(string format))
+
+Episode 33 :- Making a Plugin (Similar to gem creation)
+
+Episode 34 :- Named Routes
+
+Episode 35 :- Custom REST Actions (Adding other actions besides the 7 basic actions)
+
+Episode 36 :- Subversion on Rails
+
+Episode 37 :- Simple Search Form
+
+Episode 38 :- Multibutton Form (with form_remote_for & submit_tag)
+
+Episode 39 :- Customize Error Field
+
+Episode 40 :- Blocks in View (Using concat & capture methods in helper to accept block & pass it to view)
+
+Episode 41 :- Conditional Validations (condition validation in models using if & custom methods)
+
+Episode 42 :- with_options (used to remove duplication from model validation or routes)
+
+Episode 43 :- AJAX with RJS
+
+Episode 44 :- Debugging RJS
+
+Episode 45 :- RJS Tips (Javascript tricks with RJS)
+
+Episode 46 :- Catch-all Route (capturing URL with thw help of routes)
+
+Episode 47 :- Two Many-to-Many (HABTM, has_many :through association)
+
+Episode 48 :- Console Tricks [REVISED EPISODE -- Done]
+
+Episode 49 :- Reading the API
+
+Episode 50 :- Contributing to Rails
+
+Episode 51 :- will_paginate [REVISED EPISODE -- Done]
+
+Episode 52 :- Update through Checkboxes (Updatind mutiple records through checkboxes)
+
+Episode 53 :- Handling Exceptions (for default error pages in rails) [REVISED EPISODE -- Done](Oveerriding rails exception pages with our own custom exception pages : http://rubydoc.info/github/rack/rack/master/Rack/Utils --> Contains details of error codes)
+
+Episode 54 :- Debugging with ruby-debug [REVISED EPISODE -- Done]
+
+Episode 55 :- Cleaning Up the View
+
+Episode 56 :- The Logger (Looging techniques for development, production env & rails console) [REVISED EPISODE -- Done]
+
+Episode 57 :- Create Model Through Text Field (Creating a category in DB dynamically for a product)
+
+Episode 58 :- How to Make a Generator (Check the links in show comments section)
+
+Episode 59 :- Optimistic Locking (Adding a column named lock_version in table) [REVISED EPISODE -- Done]
+
+Episode 60 :- Testing without Fixtures ( Unit Testing and testing with mocha )
+
+Episode 61 :- Sending Email [REVISED EPISODE -- Done]
+
+Episode 62 :- Hacking ActiveRecord (Overriding ActiveRecord method with alias_method_chain. Ex : Disabling validations)
+
+Episode 63 :- Model(DB object) Name in URL [REVISED EPISODE -- Done]
+
+Episode 64 :- Custom Helper Modules
+
+Episode 65 :- Stopping Spam with Akismet
+
+Episode 66 :- Custom Rake Tasks
+
+Episode 67 :- restful_authentication
+
+Episode 68 :- OpenID Authentication
+
+Episode 69 :- Markaby in Helper (To make code cleaner in helper (for html content))
+
+Episode 70 :- Custom Routes (Adding more parameters in URL)
+
+Episode 71 :- Testing Controllers with RSpec
+
+Episode 72 :- Adding an Environment (in database.yml and adding environment specific file in environments folder in config) [REVISED EPISODE -- Done]
+
+Episode 73 :- Complex Forms Part 1 (Adding add_more/remove text fields)
+
+Episode 74 :- Complex Forms Part 2
+
+Episode 75 :- Complex Forms Part 3
+
+Episode 76 :- scope_out (Rails 2 pluggin (outdated))
+
+Episode 77 :- Destroy Without JavaScript (Destroy link functionality with Javascript disabled)[REVISED EPISODE -- Done]
+
+Episode 78 :- Generating PDF Documents (PDF writer gem for rails , not fast but easy & good documentation)
+
+Episode 79 :- Generate Named Routes (Creating method in routes file to generate dynamic routes)
+
+Episode 80 :- Simplify Views with Rails 2.0 (Simplifing CRUD view files)
+
+Episode 81 :- Fixtures in Rails 2.0
+
+Episode 82 :- HTTP Basic Authentication
+
+Episode 83 :- Migrations in Rails 2.0
+
+Episode 84 :- Cookie Based Session Store
+
+Episode 85 :- YAML Configuration File (Using constants stored in yaml file) [REVISED EPISODE -- Done]
+
+Episode 86 :- Logging Variables (Addition custom logger method)
+
+Episode 87 :- Generating RSS Feeds (Using new format named rss) [REVISED EPISODE -- Done]
+
+Episode 88 :- Dynamic Select Menus (not using ajax, using javascript) [REVISED EPISODE -- Done]
+
+Episode 89 :- Page Caching [REVISED EPISODE -- Done]
+
+Episode 90 :- Fragment Caching (Caching a portion of the page) [REVISED EPISODE -- Done]
+
+Episode 91 :- Refactoring Long Methods
+
+Episode 92 :- make_resourceful (Rails 2 pluggin to generate 7 custom actions)
+
+Episode 93 :- Action Caching
+
+Episode 94 :- ActiveResource Basics (A way communicate with other rails application.(Another application instead of DB as backend))
+
+Episode 95 :- More on ActiveResource
+
+Episode 96 :- Git on Rails
+
+Episode 97 :- Analyzing the Production Log (For performance optimization)
+
+Episode 98 :- Request Profiling (For performance optimization)
+
+Episode 99 :- Complex Partials
+
+Episode 100 :- View Tips
+
+Episode 101 :- Refactoring Out Helper Object
+
+Episode 102 :- Auto-Complete Association (using auto_complete rails pluggin for rails 2) [REVISED EPISODE -- Done]
+
+Episode 103 :- Site Wide Announcements (Displaying a announcement message to all the users at the top of the page & a link to hide it) [REVISED EPISODE -- Done]
+
+Episode 104 :- Exception Notifications (Using Exception notification plugin & Exception logger pluggin) [REVISED EPISODE -- Done]
+
+Episode 105 :- Gitting Rails 2.1 RC1
+
+Episode 106 :- Time Zones in Rails 2.1 [REVISED EPISODE -- Done]
+
+Episode 107 :- Migrations in Rails 2.1
+
+Episode 108 :- named_scope (Using scopes, chaining them and using it along with active_record queries and using lambdas)
+
+Episode 109 :- Tracking Attribute Changes (Checking whether attributes of an object are changed or not)
+
+Episode 110 :- Gem Dependencies [REVISED EPISODE]
+
+Episode 111 :- Advanced Search Form (Very good technique to create advance search form) [REVISED EPISODE -- Done]
+
+Episode 112 :- Anonymous Scopes (Chaining of several scopes say, for find method)
+
+Episode 113 :- Contributing to Rails with Git (Get added to Rails core mailing list & check the new patches that are coming to get started)
+
+Episode 114 :- Endless Page (Using Javascript & Ajax) (Pagination on scroll down) [REVISED EPISODE -- Done]
+
+Episode 115 :- Caching in Rails 2.1 (New Caching techniques , also refer the links given in show notes section) [REVISED EPISODE -- Done]
+
+Episode 116 :- Selenium
+
+Episode 117 :- Semi-Static Pages (Creating static pages dynamically for a rails app) [REVISED EPISODE -- Done]
+
+Episode 118 :- Liquid (Binds dynamic content inside static pages)
+
+Episode 119 :- Session Based Model (Giving user edit permission by creating a user_session model and which uses session data)
+
+Episode 120 :- Thinking Sphinx (Text search engine) [REVISED EPISODE -- Done]
+
+Episode 121 :- Non Active Record Model (Connecting a non active_record model with a active_record model)
+
+Episode 122 :- Passenger in Development
+
+Episode 123 :- Subdomains (Using subdomains with subdomain-fu gem) [REVISED EPISODE -- Done]
+
+Episode 124 :- Beta Invitations (Very Good example)
+
+Episode 125 :- Dynamic Layouts (Using seperate layout for seperate pages)
+
+Episode 126 :- Populating a Database (Populating DB with large no. of random data using gem : populator & faker)
+
+Episode 127 :- Rake in Background (Running rake task as background process through syste command for delivering mail)
+
+Episode 128 :- Starling and Workling (Used for sending mails in background seperately without affecting rails server)
+
+Episode 129 :- Custom Daemon (Creating custom daemons to deliver mail at a specific time)
+
+Episode 130 :- Monitoring with God (Monitoring the background process with God, a monitoring tool with daemons, starling, workling)
+
+Episode 131 :- Going Back (Going back to a page along with keeping track of items added bu user to cart. Good Ex of shopping cart)
+
+Episode 132 :- Helpers Outside Views (Using rails helper methods in models controllers)
+
+Episode 133 :- Capistrano Tasks [REVISED EPISODE -- Done]
+
+Episode 134 :- Paperclip (Ex: Photo upload)
+
+Episode 135 :- Making a Gem
+
+Episode 136 :- jQuery (Good Example to updating mutiple elements in a page using jQuery) [REVISED EPISODE -- Done]
+
+Episode 137 :- Memoization (Very nice alternative of caching instance variable) [REVISED EPISODE -- Done]
+
+Episode 138 :- I18n (Internationalization to support multiple languages) [REVISED EPISODE -- Done]
+
+Episode 139 :- Nested Resources (Ex with has_many relationship)
+
+Episode 140 :- Rails 2.2 Extras (Some Tips)
+
+Episode 141 :- PayPal Basics
+
+Episode 142 :- PayPal Notifications
+
+Episode 143 :- PayPal Security
+
+Episode 144 :- Active Merchant Basics (Simple Ruby app with paypal)
+
+Episode 145 :- Integrating Active Merchant (Rails app with Paypal)
+
+Episode 146 :- PayPal Express Checkout (Using Paypal Account for checkout, not credit card)
+
+Episode 147 :- Sortable Lists (Drag & Drop list of items, using acts_as_list pluggin) [REVISED EPISODE -- Done]
+
+Episode 148 :- App Templates in Rails 2.3 (Using set of commands that will run every time after creating a new rails app) [REVISED EPISODE -- Done]
+
+Episode 149 :- Rails Engines (Embedding one rails app into another in Rails 2.3)
+
+Episode 150 :- Rails Metal (Bypassing rails routing and serving the requests through metal pluggin provided by rails 2.3) [REVISED EPISODE -- Done]
+
+Episode 151 :- Rack Middleware
+
+Episode 152 :- Rails 2.3 Extras (New features of Rails 2.3)
+
+Episode 153 :- PDFs with Prawn (PDF Generation using prawn gem and prawnto pluggin) [REVISED EPISODE -- Done]
+
+Episode 154 :- Polymorphic Association [REVISED EPISODE -- Done]
+
+Episode 155 :- Beginning with Cucumber
+
+Episode 156 :- Webrat (Writing integration tests in pure Ruby as opposed to plain english used in cucumber)
+
+Episode 157 :- RSpec Matchers & Macros (Reusable cutom matchers & macros to avoid duplication in tests)
+
+Episode 158 :- Factories not Fixtures [REVISED EPISODE -- Done] (machinist is a gem similar to factory girl)
+
+Episode 159 :- More on Cucumber
+
+Episode 160 :- Authlogic (Simple Authentication for Rails app)
+
+Episode 161 :- Three Profiling Tools (New Relic RPM Developer Mode, FiveRuns TuneUp, Rack::Bug)
+
+Episode 162 :- Tree-Based Navigation (For CMS where pages have a parent child relationship)[REVISED EPISODE -- Done]
+
+Episode 163 :- Self-Referential Association (Direct & Inverse relationship (friends of a user) using a join model)
+
+Episode 164 :- Cron in Ruby (Scheduling of jobs/tasks) (Similar stuffs : Resque, Rufus Scheduler, Clockwork gem) [REVISED EPISODE -- Done]
+
+Episode 165 :- Edit Multiple (Editing mutiple similar types of records) [REVISED EPISODE -- Done]
+
+Episode 166 :- Metric Fu(Collection of various tools like RCov,Flay,Flog etc to check test coverage, code complexity, code duplication etc)
+
+Episode 167 :- More on Virtual Attributes (Example of many to many relationship with Article & Tag model)
+
+Episode 168 :- Feed Parsing (Using Feedzirra gem , storing feeds in feeds table by parsing the url using feedzirra gem)
+
+Episode 169 :- Dynamic Page Caching (Page caching + displaying dynamic content through javascript) [REVISED EPISODE -- Done]
+
+Episode 170 :- OpenID with Authlogic (Adding authlogic to OpenID)
+
+Episode 171 :- Delayed Job [REVISED EPISODE -- Done]
+
+Episode 172 :- Touch and Cache (New option touch that can be used with fragment caching to auto-expire the cache)
+
+Episode 173 :- Screen Scraping with ScrAPI (Used to read the source code of a page - Same as nokogiri)
+
+Episode 174 :- Pagination with AJAX
+
+Episode 175 :- AJAX History and Bookmarks (Pagination with ajax + restful url through js)
+
+Episode 176 :- Searchlogic (Searchlogic makes searching models(DB Objects) easier than ever with its assortment of named scopes.)
+
+Episode 177 :- Model Versioning (Versioning of the pages like wiki pages using the gem vestal_versions)
+
+Episode 178 :- 7 Security Tips (Some basic security tips)
+
+Episode 179 :- Seed Data
+
+Episode 180 :- Finding Unused CSS (Using deadweight gem to find unsed css)
+
+Episode 181 :- Include vs Joins
+
+Episode 182 :- Cropping Images (Using jQuery pluggin : JCrop) [REVISED EPISODE -- Done]
+
+Episode 183 :- Gemcutter & Jeweler (Gemcutter is a server to host ruby gems & Jeweler provides an automated way to release versions of a gem)
+
+Episode 184 :- Formtastic Part 1 (Using formtastic gem)
+
+Episode 185 :- Formtastic Part 2
+
+Episode 186 :- Pickle with Cucumber (Pickle adds many convenient Cucumber steps for generating models.)
+
+Episode 187 :- Testing Exceptions (Writing test cases for exceptions we get through exception notifier before fixing it)
+
+Episode 188 :- Declarative Authorization (gem for role based authorization just like cancan)
+
+Episode 189 :- Embedded Association (Alternative of serialization - bitmask index explained)
+
+Episode 190 :- Screen Scraping with Nokogiri (Using the CSS Selector pluggin 'SelectorGadget' - also available for firefox) (Recommended for single page)
+
+Episode 191 :- Mechanize (Used for Screen Scraping for multiple pages and even if first u have to Log-in) (It uses nokogiri under the hood but with some extra features like clicking the links and submitting the form)
+
+Episode 192 :- Authorization with CanCan (Light-weight compared to Declarative Authorization gem - Railscast 188)
+
+Episode 193 :- Tableless Model (Creating a model with a form without a backend database to support it)
+
+Episode 194 :- MongoDB and MongoMapper
+
+Episode 195 :- My Favorite Web Apps in 2009 (Github, Ruby-Toolbox, New Relic etc)
+
+Episode 196 :- Nested Model Form Part 1 [REVISED EPISODE -- Done] (Dymaically adding Questions & Answers using javascript)
+
+Episode 197 :- Nested Model Form Part 2 (Dymaically adding Questions & Answers using javascript)
+
+Episode 198 :- Edit Multiple Individually (Editing mutiple items in a single page with validation errors for each of them)
+
+Episode 199 :- Mobile Devices (Creating custom pages for mobile devices using format as mobile --> Accessing a website on mobile device)
+
+Episode 200 :- Rails 3 Beta and RVM
+
+Episode 201 :- Bundler [REVISED EPISODE -- Done]
+
+Episode 202 :- Active Record Queries in Rails 3
+
+Episode 203 :- Routing in Rails 3
+
+Episode 204 :- XSS Protection in Rails 3
+
+Episode 205 :- Unobtrusive Javascript (a way to seperate out javascript from html document to avoid inline JS)
+
+Episode 206 :- Action Mailer in Rails 3 (Sending mails in Rails 3 application)
+
+Episode 207 :- Syntax Highlighting (Using Coderay gem & RedCloth gem for syntax highlighting of code present in a content) 
+			   [REVISED EPISODE -- Done](Using pygments.rb gem and Redcarpet gem)
+			   
+Episode 208 :- ERB Blocks in Rails 3
+			   
+Episode 209 :- Introducing Devise [REVISED EPISODE -- Done]
+
+Episode 210 :- Customizing Devise
+
+Episode 211 :- Validations in Rails 3
+
+Episode 212 :- Refactoring & Dynamic Delegator (Creating a delegator class and chaining conditions for ActivsRecord model)
+
+Episode 213 :- Calendars [REVISED EPISODE -- Done]  (Implementing calender in Rails app using jquery datepicker pluggin)
+
+Episode 214 :- A/B Testing with A/Bingo (A/B Testing (or Split Testing) is a way to experiment with variations in an application to see the most effective option.)
+
+Episode 215 :- Advanced Queries in Rails 3 (advanced techniques regarding named scopes and get an introduction to Arel in this episode)
+
+Episode 216 :- Generators in Rails 3
+
+Episode 217 :- Multistep Forms (Creating a multi-step form - Shipping, Billing, Confirmation)
+
+Episode 218 :- Making Generators in Rails 3 (Generators in Rails 3 have been rewritten to use Thor which means the code used to create a generator is quite different. Here you will learn the new way to make generators in Rails 3.)
+
+Episode 219 :- ActiveModel (The non-database functionality of Active Record is extracted out into Active Model)
+
+Episode 220 :- PDFKit (Generating PDF in Rails app with least effort but has less controls as compared to Prawn)
+
+Episode 221 :- Subdomains in Rails 3
+
+Episode 222 :- Rack in Rails 3 (Advanced routing and creating a Rack Application)
+
+Episode 223 :- Charting in Rails Application(HighCharts)
+
+Episode 224 :- Controllers in Rails 3 (New stuffs in Rails 3 controller)
+
+Episode 225 :- Upgrading to Rails 3 Part 1 (Upgrading Rails2 App to Rails3)
+
+Episode 226 :- Upgrading to Rails 3 Part 2
+
+Episode 227 :- Upgrading to Rails 3 Part 3
+
+Episode 228 :- Sortable Table Columns
+
+Episode 229 :- Polling for Changes (Ajax request with setTimeout to fetch comments) [REVISED EPISODE -- Done]
+
+Episode 230 :- Inherited Resources (simplifies RESTful controllers by providing default actions which can be customized through inheritance.)
+
+Episode 231 :- Routing Walkthrough Part 1
+
+Episode 232 :- Routing Walkthrough Part 2
+
+Episode 233 :- Engage with Devise (Devise with Janrain Engage service (aka RPX) to enable login with differnt provisers just like oauth)
+
+Episode 234 :- Simple Form [REVISED EPISODE -- Done]
+
+Episode 235 :- OmniAuth Part 1 [REVISED EPISODE -- Done] (Revised - Overriding some devise actions)
+
+Episode 236 :- OmniAuth Part 2 (Omniauth + Devise) (Overriding some devise actions)
+
+Episode 237 :- Dynamic attr_accessible (Restricting some attributes for normal users while admins can access to all)
+
+Episode 238 :- Mongoid [REVISED EPISODE -- Done]
+
+Episode 239 :-  ActiveRecord::Relation Walkthrough (Internals of ActiveRecord Relation)
+
+Episode 240 :- Search, Sort, Paginate with AJAX
+
+Episode 241 :- Simple OmniAuth [REVISED EPISODE -- Done]
+
+Episode 242 :- Thor (Gem to create powerful command line tasks)
+
+Episode 243 :- Beanstalkd and Stalker (Beanstalk is a fast and easy way to queue background tasks. Stalker provides a nice wrapper interface for creating these jobs.)
+
+Episode 244 :- Gravatar (Gravatar is a service for providing user avatars)
+
+Episode 245 :- New Gem with Bundler (Creating new gems is easy with the `bundle gem` command.)
+
+Episode 246 :- AJAX History State (Github like page rendering - Ajax + URL updation)
+
+Episode 247 :- Offline Apps Part 1 (Using rack-offline gem)
+
+Episode 248 :- Offline Apps Part 2
+
+Episode 249 :- Notifications in Rails 3 (Rails 3 comes with instrument support through the ActiveSupport::Notifications class. Call "subscribe" to listen to notifications, and "instrument" to send them.)
+
+Episode 250 :- Authentication from Scratch (Using password_hash & password_salt)
+
+Episode 251 :- MetaWhere & MetaSearch (MetaWhere provides a way to do complex find conditions without SQL in Active Record. MetaSearch makes it easy to create search forms with many find options.)
+
+Episode 252 :- Metrics Metrics Metrics (Metric Fu, Metrical, SimpleCov, Rails Best Practices)
+
+Episode 253 :- CarrierWave File Uploads
+
+Episode 254 :- Pagination with Kaminari
+
+Episode 255 :- Undo with Paper Trail (Undo and redo behavior is easy to add with a versioning gem such as Paper Trail. Learn how to add an undo link to any model's flash message.)
+
+Episode 256 :- I18n Backends
+
+Episode 257 :- Request Specs and Capybara
+
+Episode 258 :- Token Fields [REVISED EPISODE -- Done] (jQuery Token Input)
+
+Episode 259 :- Decent Exposure (The decent_exposure gem makes it convenient to share controller data with the view through methods instead of instance variables)
+
+Episode 260 :- Messaging with Faye (Faye is a subscription/publishing server which makes it easy to do push notifications within a Rails app)
+
+Episode 261 :- Testing JavaScript with Jasmine [REVISED EPISODE -- Done]
+
+Episode 262 :- Trees with Ancestry (The Ancestry gem works like a tree but also allows us to fetch deeply nested messages in a single query. It provides a method to arrange them after fetching.)
+
+Episode 263 :- Client Side Validations (Showing validation errors inline as the user is filling out the form can lead to a better use experience using Client Side Validations gem)
+
+Episode 264 :- Guard (Guard watches files and runs a command after a file is modified. This allows you to automatically run tests in the background, restart your development server, reload the browser, and more.)
+
+Episode 265 :- Rails 3.1 Overview
+
+Episode 266 :- HTTP Streaming (HTTP Streaming allows the browser to start processing the HTML response while the Rails app is still processing the rest of the request.)
+
+Episode 267 :- CoffeeScript Basics
+
+Episode 268 :- Sass Basics (Sass extends CSS with variables, nesting, mixins and more)
+
+Episode 269 :- Template Inheritance
+
+Episode 270 :- Authentication in Rails 3.1
+
+Episode 271 :- Resque (Resque creates background jobs using Redis. It supports multiple queue and comes with an administration interface for monitoring and managing the queues)
+
+Episode 272 :- Markdown with Redcarpet (Redcarpet is an easy-to-use gem which interprets Markdown, we can add syntax highlighting through Pygments and Albino) (This Episode is outdated) [REVISED EPISODE -- Done] (Revised Episode : 207)
+
+Episode 273 :- Geocoder (If you need to work with geographic data, Geocoder is an excellent gem for converting addresses and coordinates, finding nearby locations, determining distances, and more!)
+
+Episode 274 :- Remember Me & Reset Password
+
+Episode 275 :- How I Test (RSpec, Capybara, Factory Girl, and Guard to make request, model, and mailer specs)
+
+Episode 276 :- Testing Time & Web Requests (using the Timecop and FakeWeb gem)
+
+
+
+
+Episode 416 :- Form Objects
+
+Episode 415 :- Upgrading to Rails 4 (Upgrading a Rails 3 app to Rails 4)
+
+Episode 413 :- Batch API Requests (Making batch requests through rack middleware with Mustache JS)
+
+Episode 412 :- Fast Rails Commands (Using gems like zeus, spring & spork)
+
+Episode 411 :- Performance Testing (with rails-perftest)
+
+Episode 409 :- Active Model Serializers (Creating a json API)
+
+Episode 406 :- Public Activity (Recent Activity / News Feed)
+
+Episode 405 :- Angular JS
+
+Episode 396 :- Importing CSV and Excel
+
+Episode 393 :- Guest User Record
+
+Episode 390 :- Turbolinks (similar to pjax)
+
+Episode 387 :- Cache Digests (Doesn't load js for 2nd time)
+
+Episode 384 :- RubyGems
+
+Episode 382 :- Tagging
+
+Episode 374 :- Image Manipulation (Stamp creation using ImageMagick)
+
+Episode 372 :- Bullet (Tells about query optimization, but don't follow it blindly)
+
+Episode 370 :- Ransack (For building complex search forms)
+
+Episode 368 :- Miniprofiler (Tells page load time along with time taken by different components)
+
+Episode 366 :- Sidekiq (Background jobs)
+
+Episode 364 :- ActiveRecord Reputation (Up/Down voting system)
+
+Episode 362 :- CSV & Excel Import (Using CSV gem & xml template)
+
+Episode 360 :- Facebook Authentication (Using Omniauth-facebook gem)
+
+Episode 358 :- Brakeman (Security Warnings)
+
+Episode 356 :- Session Hijacking (Using Firesheep)
+
+Episode 354 :- Squeel (Active Record plugin to write queries easily)
+
+Episode 348 :- Rails API Gem (Gem to write API's in Rails to get output in json/xml format)
+
+Episode 350 :- REST API Versioning (Maintaining API Version v1,v2 etc)
+
+Episode 352 :- not seen the video
+
+Episode 402 :- Better Errors & Rails Panel
+
+Episode 328 :- Twitter Bootstrap Basics

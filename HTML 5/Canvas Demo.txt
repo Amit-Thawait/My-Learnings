@@ -1,0 +1,6 @@
+Canvas demo links :-
+--------------------
+
+http://projects.joshy.org/presentations/HTML/CanvasDeepDive/presentation.html
+http://projects.joshy.org/presentations/HTML/CanvasDeepDive/handson2/handson2.html
+http://projects.joshy.org/presentations/HTML/CanvasDeepDive/handson2/game1.html
