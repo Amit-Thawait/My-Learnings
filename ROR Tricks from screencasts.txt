@@ -2403,3 +2403,8 @@ The non-database functionality of Active Record is extracted out into Active Mod
 	IRB Output:
 
 	=> [["Death", 10], ["The Lady", 3], ["Fate", 2]]
+
+229) We can run our rake tasks parallely by running it with -m option. m stands for multitasking.
+	 rake -m
+	 To see how much time the rake task has taken run
+	 time rake -m
