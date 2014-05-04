@@ -2408,3 +2408,13 @@ The non-database functionality of Active Record is extracted out into Active Mod
 	 rake -m
 	 To see how much time the rake task has taken run
 	 time rake -m
+
+230) Array([1,2,3])
+	 # => [1,2,3]
+
+	 Array(nil)
+	 # => []
+	 Notice in the second example that when we pass nil it creates an empty array. (This avoids issues like undefined method each for nil class)
+	 Array(params[:ids]).each do |id|
+	   # ...
+	 end
