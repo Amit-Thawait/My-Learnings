@@ -2418,3 +2418,9 @@ The non-database functionality of Active Record is extracted out into Active Mod
 	 Array(params[:ids]).each do |id|
 	   # ...
 	 end
+	 
+231) Offline Browsing inside Google Chrome
+
+	While inside Chrome, type chrome://flags/#enable-offline-mode in the address bar, click “Enable” and restart your browser. Your Chrome will no longer serve the “not connected to the Internet” error if the page you are trying to access is available in the local cache.
+
+	Google Chrome caches the HTML content, images, JavaScript and the CSS stylesheets associated with a page so your offline copy should not look very different from the original. However, if there are resources that require an active Internet connection, like JavaScript widgets or videos, they’ll be replaced with placeholder images.
