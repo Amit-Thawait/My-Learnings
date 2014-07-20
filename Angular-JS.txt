@@ -127,3 +127,5 @@ http://www.thinkster.io/
 http://www.ng-newsletter.com/posts/angular-translate.html
 
 https://medium.com/@dickeyxxx/best-practices-for-building-angular-js-apps-266c1a4a6917
+
+http://www.thoughtworks.com/insights/blog/good-practices-build-your-angularjs-application
