@@ -18,20 +18,33 @@ Full Blog Link : http://ubuntuhirek.wordpress.com/2012/11/22/11-tips-to-speed-up
 
    sudo apt-get autoclean
 
-4) Disabling Unnecessary Startup Applications
+4) Removing temporary packages stored in your HDD :
+   When you install packages in Ubuntu using the Software Center or the 'apt-get', 'Synaptic' … they all first download these packages and store then in your HDD (caching). As time goes on, this cache can get a lot bigger. Though other than the 'wasted' HDD space, it won’t have a big impact on your system’s performance.
+   However, removing these packages should help to improve the performance of these package managers (including update manager) because they no longer have to deal with (compare, search etc) the long list of applications in the cache.
+   So from time to time, make sure to run the below command to clean this package cache.
+
+   sudo apt-get clean
+
+5) Remove unused dependencies :
+   When you install some packages, they also installs other packages with them (known as 'dependencies'). However, when you remove those, some of those dependency packages don’t get removed automatically due to many reasons.
+   So from time to time, you can use the below command to safely get rid of some of those dependency packages that are no longer required.
+
+   sudo apt-get autoremove
+
+6) Disabling Unnecessary Startup Applications
    There are many applications that are configured to start automatically as the system starts. You can manage these applications by opening Startup Application from the Unity dash
 
-5) check cat /proc/sys/vm/swappiness  # Default value is 60
+7) check cat /proc/sys/vm/swappiness  # Default value is 60
 
    sudo gedit /etc/sysctl.conf  # Edit this file and add vm.swappiness=10 if not present
 
-6) You can optimize it using ZRAM, which will create on your system a compressed block device that mimics a swap disk to reduce disk thrashing (aka paging)
+8) You can optimize it using ZRAM, which will create on your system a compressed block device that mimics a swap disk to reduce disk thrashing (aka paging)
 
    sudo add-apt-repository ppa:shnatsel/zram
    sudo apt-get update
    sudo apt-get install zramswap-enabler
 
-7) If your computer is equipped with a multi-core CPU, you can configure your system to use all available cores during startup by following these instructions:\
+9) If your computer is equipped with a multi-core CPU, you can configure your system to use all available cores during startup by following these instructions:\
 
    sudo gedit /etc/init.d/rc
    - Search now for the first instance of this line:
@@ -42,7 +55,7 @@ Full Blog Link : http://ubuntuhirek.wordpress.com/2012/11/22/11-tips-to-speed-up
 
    Save your file and exit.
 
-8) Use TMPFS To Reduce Disk I/O
+10) Use TMPFS To Reduce Disk I/O
    The /tmp folder receives a lot of hard disk read/write operations. You can simply use your system RAM instead of your hard disk to speed up read/write operations for the /tmp folder. To do this, you can follow these instructions:
 
    - Open the terminal and edit the /etc/fstab file with this command:
@@ -52,7 +65,7 @@ Full Blog Link : http://ubuntuhirek.wordpress.com/2012/11/22/11-tips-to-speed-up
    # Move /tmp to RAM
    tmpfs /tmp tmpfs defaults,noexec,nosuid 0 0
 
-9) Reduce overheating:
+11) Reduce overheating:
    Overheating is a common problem in computers these days. An overheated computer runs quite slow. It takes ages to open a program when your CPU fan is running like Usain Bolt. There are two tools which you can use to reduce overheating and thus get a better system performance in Ubuntu, TLP and CPUFREQ.
 
    To install and use TLP, use the following commands in a terminal:
