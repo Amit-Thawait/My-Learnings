@@ -1,0 +1,250 @@
+1)  to get the kernal information :-
+	uname -a
+
+	sudo apt-get update
+
+	sudo apt-get upgrade
+	Or (to be on the safer side use the below command)
+	sudo apt-get safe-upgrade
+	
+	Not necessary (optional)
+	 [
+		sudo apt-get install aptitude
+
+		-- aptitude is a package manager which will update more things as compared to other package managers.
+		-- apt-get is also a package manager.
+		
+		--through aptitude we are upgrading our ubuntu
+		(see the difference first with sudo apt-get update then do sudo aptitude update)
+
+		sudo aptitude update
+		--the above command will tell the updates available
+	 	ex: Current Status: 9 updates
+
+	 	sudo aptitude upgrade
+	 ]
+
+2)  Install UFW (Ubuntu Firewall) from Ubuntu software center.
+
+3)  sudo -i 
+    For giving sudo permission for all commands
+	Then u need not type sudo for any installation purpose ,for ex for installation of package abc  instaed of : sudo apt-get install abc
+	u need to enter only : apt-get install abc
+
+4)  Instead of installing softwares from Ubuntu Software center ,u should install a package manager named synaptic by command
+	sudo apt-get install synaptic
+	Synaptic package manager contains many more free softwares than Ubuntu Software center. It doesnot contain any paid softwares.
+	For paid softwares u should use Ubuntu Software center only.
+	After installing synaptic package manager , to open it just type synaptic in terminal which will open a window listing all the softwares based on their category.
+	
+	Useful categories are :
+	Cross Platform
+	Development
+	Databases
+	Editor
+
+5)  To remove a software(package manager) u should use the command 
+    sudo apt-get remove <package-name>
+
+6)	To get the full information about any command just type
+	man <command-name>
+	for ex: man ls
+	It will show the command purpose along with all options available.
+
+7)	touch command is used to ceate a empty file.
+	touch abc.txt
+	The above command will create a empty file named abc.txt in the current location.
+	
+	vim.tiny is similar to touch means it will create a file with the same name if it doesnot exists and in addition it will open the file in the terminal.
+	vim.tiny abc1.txt
+	press i to go into insert mode means to write something to the file.
+
+8)	nano is also a editor like vim.tiny which can be used to edit a file in terminal with different set of options.
+	nano abc2.txt
+	The above command will create a file with the same name if it doesnot exists and in addition it will open the file in the terminal. Press ctrl + 0 to save it and ctrl + x to exit.
+
+9)	cat command is used to see the content of a text file.
+	cat <filename>
+	ex: cat abc.txt
+	
+10)	If the permission starts with d then it signifies that its the permission related to a directory
+	ex: drwxr-xr-x
+	r - read
+	w - write
+	x - execute
+	first 3 character after d is for the owner
+	next 3 is for user group which thw owner belongs to
+	last 3 is for everyone else
+	
+	File permission starts with -
+	ex: -rw-r--r--
+	
+	To change the permission of a file or folder just fire the below command
+	chmod <permission> <filename or dir name>
+	ex: chmod 755 abc
+	where abc is a folder
+	
+	To check the permission use
+	ls -l
+	or
+	ls -la
+	
+11) To give permisiion to say all the sub-directories inside a directory which contains many files and folders use the command :
+	find . -type d -exec chmod 777 {} \;
+	All the sub-directories inside the sub-dir's of the dir will get the same permission.
+	
+	for files just replace d with f in the above command.
+	
+	. - current directory
+	experiment the above command by removing -type and d or f 
+	
+12) ls -a
+    Lists hidden files as well
+	
+13) ~ (tilde) ---> home directory
+    ~ = /home/ubuntu
+	
+14) less <file_name>
+    Press the [space-bar] if you want to see another page, and type [q] if you want to quit reading. less is used in preference to cat for long files.
+	
+15) head <file_name> or head <file_name1> <file_name2> ...
+    The head command writes the first ten lines of a file to the screen. 
+	To print certain no of lines pass a number with - after the head keyword
+	Ex: head -5 <file_name> [<file_name2> ....]
+	
+16) As opposed to head, there is a tail command with similar functionality
+    The tail command writes the last ten lines of a file to the screen.
+
+17) Simple searching using less :-
+    Using less, you can search though a text file for a keyword (pattern). For example, to search through science.txt for the word 'science', type
+	> less science.txt
+
+    then, still in less, type a forward slash [/] followed by the word to search
+
+	/science
+
+	As you can see, less finds and highlights the keyword. Type [n] to search for the next occurrence of the word.
+	
+18) grep :- grep is one of many standard UNIX utilities. It searches files for specified words or patterns.
+
+    > grep ruby science.txt
+	
+	Prints all the lines which contains word ruby in the file science.txt
+	
+	The grep command is case sensitive, it distinguishes between ruby & Ruby	
+	To ignore upper/lower case distinctions, use the -i option, i.e. type 
+	
+	> grep -i ruby science.txt
+	
+	To search for a phrase or pattern, you must enclose it in single quotes (the apostrophe symbol). For example to search for spinning top, type
+	> grep -i 'spinning top' science.txt
+	
+19) See http://www.ee.surrey.ac.uk/Teaching/Unix/unix3.html
+
+20) Redirecting the output :-
+	-------------------------
+    We use the > symbol to redirect the output of a command. For example, to create a file called list1 containing a list of fruit, type  
+
+	% cat > list1
+
+	Then type in the names of some fruit. Press [Return] after each one.
+
+	pear
+	banana
+	apple
+	^D {this means press [Ctrl] and [d] to stop}
+
+	What happens is the cat command reads the standard input (the keyboard) and the > redirects the output, which normally goes to the screen, into a file called list1
+
+	To read the contents of the file, type
+
+	% cat list1
+
+21) Apending to a file :-
+	---------------------
+	The form >> appends standard output to a file. So to add more items to the file list1, type
+
+	% cat >> list1
+
+	Then type in the names of more fruit
+
+	peach
+	grape
+	orange
+	^D (Control D to stop)
+
+	To read the contents of the file, type
+
+	% cat list1
+
+	You should now have two files. One contains six fruit, the other contains four fruit.
+
+	We will now use the cat command to join (concatenate) list1 and list2 into a new file called biglist. Type
+
+	% cat list1 list2 > biglist
+
+	What this is doing is reading the contents of list1 and list2 in turn, then outputing the text to the file biglist
+
+	To read the contents of the new file, type
+
+	% cat biglist
+	
+22) Redirecting the input :-
+	------------------------
+	We use the < symbol to redirect the input of a command.
+
+	The command sort alphabetically or numerically sorts a list. Type
+
+	% sort
+
+	Then type in the names of some animals. Press [Return] after each one.
+
+	dog
+	cat
+	bird
+	ape
+	^D (control d to stop)
+
+	The output will be
+
+	ape
+	bird
+	cat
+	dog
+
+	Using < you can redirect the input to come from a file rather than the keyboard. For example, to sort the list of fruit, type
+
+	% sort < biglist
+
+	and the sorted list will be output to the screen.
+
+	To output the sorted list to a file, type,
+
+	% sort < biglist > slist
+
+	Use cat to read the contents of the file slist
+	
+23) Pipes :-
+    --------
+	To see who is on the system with you, type
+
+	% who
+
+	One method to get a sorted list of names is to type,
+
+	% who > names.txt
+	% sort < names.txt
+
+	This is a bit slow and you have to remember to remove the temporary file called names when you have finished. What you really want to do is connect the output of the who command directly to the input of the sort command. This is exactly what pipes do. The symbol for a pipe is the vertical bar |
+
+	For example, typing
+
+	% who | sort
+
+	will give the same result as above, but quicker and cleaner.
+
+	To find out how many users are logged on, type
+
+	% who | wc -l
+
+24) 

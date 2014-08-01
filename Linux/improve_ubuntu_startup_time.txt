@@ -1,0 +1,45 @@
+Full Blog Link : http://ubuntuhirek.wordpress.com/2012/11/22/11-tips-to-speed-up-computers-running-ubuntu-12-1012-04linux-mint-13-maya/
+
+1) Install Preload
+   Preload is a daemon that runs in the background (invisible) that detects most used applications and store them in cache so that they can be called quickly, which will result in quick system load time
+
+   sudo apt-get install preload
+
+2) Clean Up APT Cache:
+   You need to clean up not needed apt sources from time to time with this command:
+
+   sudo apt-get autoclean
+
+3) Disabling Unnecessary Startup Applications
+   There are many applications that are configured to start automatically as the system starts. You can manage these applications by opening Startup Application from the Unity dash
+
+4) check cat /proc/sys/vm/swappiness  # Default value is 60
+
+   sudo gedit /etc/sysctl.conf  # Edit this file and add vm.swappiness=10 if not present
+
+5) You can optimize it using ZRAM, which will create on your system a compressed block device that mimics a swap disk to reduce disk thrashing (aka paging)
+
+   sudo add-apt-repository ppa:shnatsel/zram
+   sudo apt-get update
+   sudo apt-get install zramswap-enabler
+
+6) If your computer is equipped with a multi-core CPU, you can configure your system to use all available cores during startup by following these instructions:\
+
+   sudo gedit /etc/init.d/rc
+   - Search now for the first instance of this line:
+   CONCURRENCY=none
+
+   - And replace it with this one if needed:
+   CONCURRENCY=makefile
+
+   Save your file and exit.
+
+7) Use TMPFS To Reduce Disk I/O
+   The /tmp folder receives a lot of hard disk read/write operations. You can simply use your system RAM instead of your hard disk to speed up read/write operations for the /tmp folder. To do this, you can follow these instructions:
+
+   - Open the terminal and edit the /etc/fstab file with this command:
+   sudo gedit /etc/fstab 
+
+   - At the end of the file, add these two lines:
+   # Move /tmp to RAM
+   tmpfs /tmp tmpfs defaults,noexec,nosuid 0 0
