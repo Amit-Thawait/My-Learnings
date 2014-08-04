@@ -2436,3 +2436,21 @@ The non-database functionality of Active Record is extracted out into Active Mod
         Float("17.11") => 17.11
 
     str =~ /\D/ ? nil : str.to_i   => To convert only postive integers, others nil.
+
+233) When eager loading fires IN query & when it JOINS :
+     When you load an author with all associated books Active Record will make multiple queries like this:
+
+    Author.includes(:books).where(:name => ['bell hooks', 'Homer').to_a
+
+    => SELECT `authors`.* FROM `authors` WHERE `name` IN ('bell hooks', 'Homer')
+    => SELECT `books`.* FROM `books` WHERE `author_id` IN (2, 5)
+
+    Active Record saves the ids of the records from the first query to use in the second. Depending on the number of associations involved there can be arbitrarily many SQL queries made.
+
+    However, if there is a WHERE clause that spans across tables Active Record will fall back to a slightly more resource-intensive single query:
+
+      SELECT * FROM `authors`
+      LEFT OUTER JOIN `books` ON `authors`.`id` =  `books`.`author_id`
+      WHERE `authors`.`name` IN ('bell hooks', 'Homer')
+
+    This could result in many rows that contain redundant data and it performs poorly at scale and is therefore only used when necessary.
