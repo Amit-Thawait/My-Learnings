@@ -2424,3 +2424,15 @@ The non-database functionality of Active Record is extracted out into Active Mod
 	While inside Chrome, type chrome://flags/#enable-offline-mode in the address bar, click “Enable” and restart your browser. Your Chrome will no longer serve the “not connected to the Internet” error if the page you are trying to access is available in the local cache.
 
 	Google Chrome caches the HTML content, images, JavaScript and the CSS stylesheets associated with a page so your offline copy should not look very different from the original. However, if there are resources that require an active Internet connection, like JavaScript widgets or videos, they’ll be replaced with placeholder images.
+
+232) Converting numbers in string to actual numeric object
+    Ex : "12" to 12
+         "17.11" to 17.11
+
+    Integer(str) rescue return false  ==> Converts both positives & negatives integers
+    Float(str) rescue return false  ==> Converts both positives & negatives floats
+    Ex: Integer("12") => 12
+		Interger("-10") => -10
+        Float("17.11") => 17.11
+
+    str =~ /\D/ ? nil : str.to_i   => To convert only postive integers, others nil.
