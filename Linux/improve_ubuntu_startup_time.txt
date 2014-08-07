@@ -1,0 +1,82 @@
+Full Blog Link : http://ubuntuhirek.wordpress.com/2012/11/22/11-tips-to-speed-up-computers-running-ubuntu-12-1012-04linux-mint-13-maya/
+                 http://itsfoss.com/speed-up-ubuntu-1310/
+
+1) Install Preload
+   Preload is a daemon that runs in the background (invisible) that detects most used applications and store them in cache so that they can be called quickly, which will result in quick system load time
+
+   sudo apt-get install preload
+
+2) Reduce the default grub load time:
+   The grub gives you 10 seconds to change between dual boot OS or to go in recovery etc. This is too much. It also means you will have to sit beside your computer and press the enter key to boot in to Ubuntu as soon as possible. A little time taking, ain’t it? Second trick would be to change this boot time
+
+   Change GRUB_TIMEOUT=10 to GRUB_TIMEOUT=2. This will change the boot time to 2 seconds. Prefer not to put 0 here as you will lost the privilege to change between OS and recovery options. Once you have changed the grub configuration, use the following command to make the change count:
+
+   sudo update-grub
+
+3) Clean Up APT Cache:
+   You need to clean up not needed apt sources from time to time with this command:
+
+   sudo apt-get autoclean
+
+4) Removing temporary packages stored in your HDD :
+   When you install packages in Ubuntu using the Software Center or the 'apt-get', 'Synaptic' … they all first download these packages and store then in your HDD (caching). As time goes on, this cache can get a lot bigger. Though other than the 'wasted' HDD space, it won’t have a big impact on your system’s performance.
+   However, removing these packages should help to improve the performance of these package managers (including update manager) because they no longer have to deal with (compare, search etc) the long list of applications in the cache.
+   So from time to time, make sure to run the below command to clean this package cache.
+
+   sudo apt-get clean
+
+5) Remove unused dependencies :
+   When you install some packages, they also installs other packages with them (known as 'dependencies'). However, when you remove those, some of those dependency packages don’t get removed automatically due to many reasons.
+   So from time to time, you can use the below command to safely get rid of some of those dependency packages that are no longer required.
+
+   sudo apt-get autoremove
+
+6) Disabling Unnecessary Startup Applications
+   There are many applications that are configured to start automatically as the system starts. You can manage these applications by opening Startup Application from the Unity dash
+
+7) check cat /proc/sys/vm/swappiness  # Default value is 60
+
+   sudo gedit /etc/sysctl.conf  # Edit this file and add vm.swappiness=10 if not present
+
+8) You can optimize it using ZRAM, which will create on your system a compressed block device that mimics a swap disk to reduce disk thrashing (aka paging)
+
+   sudo add-apt-repository ppa:shnatsel/zram
+   sudo apt-get update
+   sudo apt-get install zramswap-enabler
+
+9) If your computer is equipped with a multi-core CPU, you can configure your system to use all available cores during startup by following these instructions:\
+
+   sudo gedit /etc/init.d/rc
+   - Search now for the first instance of this line:
+   CONCURRENCY=none
+
+   - And replace it with this one if needed:
+   CONCURRENCY=makefile
+
+   Save your file and exit.
+
+10) Use TMPFS To Reduce Disk I/O
+   The /tmp folder receives a lot of hard disk read/write operations. You can simply use your system RAM instead of your hard disk to speed up read/write operations for the /tmp folder. To do this, you can follow these instructions:
+
+   - Open the terminal and edit the /etc/fstab file with this command:
+   sudo gedit /etc/fstab 
+
+   - At the end of the file, add these two lines:
+   # Move /tmp to RAM
+   tmpfs /tmp tmpfs defaults,noexec,nosuid 0 0
+
+11) Reduce overheating:
+   Overheating is a common problem in computers these days. An overheated computer runs quite slow. It takes ages to open a program when your CPU fan is running like Usain Bolt. There are two tools which you can use to reduce overheating and thus get a better system performance in Ubuntu, TLP and CPUFREQ.
+
+   To install and use TLP, use the following commands in a terminal:
+
+   sudo add-apt-repository ppa:linrunner/tlp
+   sudo apt-get update
+   sudo apt-get install tlp tlp-rdw
+   sudo tlp start
+
+   You don’t need to do anything after installing TLP. It works in background. To install CPUFREQ indicator use the following command:
+
+   sudo apt-get install indicator-cpufreq
+
+   Restart your computer and use the Powersave mode in it
