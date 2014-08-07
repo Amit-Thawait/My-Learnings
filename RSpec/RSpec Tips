@@ -1,3 +1,9 @@
 RSpec Tips :-
 -------------
 1) Tips for writing better RSpec tests : http://blog.joshsoftware.com/2013/11/23/pro-tips-for-writing-better-rspec-tests/
+
+2) https://github.com/rspec/rspec-expectations
+
+3) https://github.com/thoughtbot/factory_girl/blob/master/GETTING_STARTED.md
+
+4) http://myronmars.to/n/dev-blog/2012/06/rspecs-new-expectation-syntax
