@@ -2454,3 +2454,6 @@ The non-database functionality of Active Record is extracted out into Active Mod
       WHERE `authors`.`name` IN ('bell hooks', 'Homer')
 
     This could result in many rows that contain redundant data and it performs poorly at scale and is therefore only used when necessary.
+
+234) Ruby calls the methods that are unique to an object singleton methods.
+	 Immutable objects:- instances of Fixnum, for example will not cooperate with attempts to add singleton methods to them.
