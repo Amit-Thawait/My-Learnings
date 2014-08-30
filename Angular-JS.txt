@@ -129,3 +129,7 @@ http://www.ng-newsletter.com/posts/angular-translate.html
 https://medium.com/@dickeyxxx/best-practices-for-building-angular-js-apps-266c1a4a6917
 
 http://www.thoughtworks.com/insights/blog/good-practices-build-your-angularjs-application
+
+http://www.angularonrails.com/ruby-on-rails-angularjs-single-page-application/
+
+https://www.digitalocean.com/community/tutorials/how-to-set-up-zero-downtime-rails-deploys-using-puma-and-foreman
