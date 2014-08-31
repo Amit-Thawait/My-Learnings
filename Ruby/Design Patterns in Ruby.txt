@@ -1,0 +1,197 @@
+Design Patterns in Ruby :-
+==========================
+1) Seperate out the code for stuffs which will remain constant & the one which will change
+
+2) Template method pattern ---> Based on Inheritance
+
+3) Strategy Pattern   --> Implementation a seprate strategy only the thing which will change & combining it in a parent class using composition
+
+   report = Report.new(HTMLFormatter.new)    
+   report.output_report
+
+   report.formatter = PlainTextFormatter.new
+   report.output_report
+   
+   The Strategy pattern does have one thing in common with the Template Method pattern: Both patterns allow us to concentrate the decision about which variation we are using in one or a few places. With the Template Method pattern, we make our decision when we pick our concrete subclass. In the Strategy pattern, we make our decision by selecting a strategy class at runtime.
+
+4) For strategy pattern we need to keep in mind that we are not passing complex data to the starategy class from context class. Instaed we should pass the context class itself.
+
+  class PlainTextFormatter < Formatter
+    def output_report(title, text)
+
+  class Report
+    def output_report
+	  @formatter.output_report( @title, @text )
+
+   should be
+   @formatter.output_report(self)
+   
+5) The above shows a interface type implementation but actually beacause Ruby's Duck Typing we actually don't need any Formatter class and the classes HTMLFormatter & PlainTextFormatter can exist on their own.
+
+6) Observer Pattern:-
+
+   class Employee
+     attr_reader :name, :title
+	 attr_reader :salary
+	 
+	 def initialize( name, title, salary, payroll)
+	   @name = name
+	   @title = title
+	   @salary = salary
+	   @payroll = payroll
+	 end
+	 
+	 def salary=(new_salary)
+	   @salary = new_salary
+	   @payroll.update(self)
+	 end
+   end
+
+   The GoF called this idea of building a clean interface between the source of the news that some object has changed and the consumers of that news the Observer pattern (Figure 5-1). The GoF called the class with the news the subject class. In our example, the subject is the Employee class. The observers are the objects that are interested in getting the news. In our employee example, we have two observers: Payroll and TaxMan. When an object is interested in being informed of the state of the subject, it registers as an observer on that subject.
+
+   class Employee
+     attr_reader :name, :title
+	 attr_reader :salary
+	 
+	 def initialize( name, title, salary, payroll)
+	   @name = name
+	   @title = title
+	   @salary = salary
+	   @observers = []
+	 end
+	 
+	 def salary=(new_salary)
+	   @salary = new_salary
+	   notify_observers
+	 end
+
+	 def notify_observers
+	   @observers.each do |observer|
+	     observer.update(self)
+	   end
+	 end
+
+   end
+   
+   class TaxMan
+     def update( changed_employee )
+	   puts("Send #{changed_employee.name} a new tax bill!")
+	 end
+   end
+
+   tax_man = TaxMan.new
+   fred.add_observer(tax_man)
+   
+   With Ruby's Observable module we can re-write the whole code as
+   
+   module Subject
+     def initialize
+	   @observers=[]
+	 end
+
+	 def add_observer(&observer)
+	   @observers << observer
+	 end
+
+	 def delete_observer(observer)
+	   @observers.delete(observer)
+	 end
+
+	 def notify_observers
+	   @observers.each do |observer|
+	     observer.call(self)
+	   end
+	 end
+
+   end
+
+	class Employee
+	  include Subject
+	  
+	  attr_accessor :name, :title, :salary
+
+	  def initialize( name, title, salary )
+	    super()
+		@name = name
+		@title = title
+		@salary = salary
+	  end
+
+	  def salary=(new_salary)
+	    @salary = new_salary
+		notify_observers
+	  end
+	end
+
+	fred = Employee.new('Fred', 'Crane Operator', 30000)
+
+	fred.add_observer do |changed_employee|
+	  puts("Cut a new check for #{changed_employee.name}!")
+	  puts("His salary is now #{changed_employee.salary}!")
+	end
+
+	The key decisions that you need to make when implementing the Observer pattern all center on the interface between the subject and the observer. At the simple end of the spectrum, you might do what we did in the example above: Just have a single method in the observer whose only argument is the subject. The GoF term for this strategy is the pull method, because the observers have to pull whatever details about the change that they need out of the subject. The other possibility—logically enough termed the push method—has the subject send the observers a lot of details about the change:
+
+7)  The Observer pattern allows you to build components that know about the activities of other components without having to tightly couple everything together in an unmanageable mess of code-flavored spaghetti. By creating a clean interface between the source of the news (the observable object) and the consumer of that news (the observers), the Observer pattern moves the news without tangling things up. 
+
+	Most of the work in implementing the Observer pattern occurs in the subject or observable class. In Ruby, we can factor that mechanism out into either a superclass or (more likely) a module. The interface between observer and observable can be a complex as you like, but if you are building a simple observer, code blocks work well. 
+	
+	As pointed out in Chapter 4, the Observer pattern and the Strategy pattern look a bit alike: Both feature an object (called the observable in the Observer pattern and the context in the Strategy pattern) that makes calls out to some other object (either the observer or the strategy). The difference is mostly one of intent. In the case of the observer, we are informing the other object of the events occurring back at the observable. In the case of the strategy, we are getting the strategy object to do some computing. 
+	
+	The Observer pattern also serves more or less the same function as hook methods in the Template Method pattern; both are there to keep some object informed of current events. The difference is, of course, that the Template Method pattern will only talk to its relatives: If you are not a subclass, you will not get any news from a Template Method pattern hook.
+
+8) Composite Pattern
+
+9) Iterator Pattern
+	The GoF tell us that the Iterator pattern will do the following: 
+	Provide a way to access the elements of an aggregate object sequentially without exposing its underlying representation 
+	
+	In other words, an Iterator provides the outside world with a sort of movable pointer into the objects stored inside an otherwise opaque aggregate object.
+
+    External Iterator
+	Internal Iterator
+
+10) Command Pattern
+    Set of commands that can be done or undone at any step.
+	
+	ActiveRecord Migrations
+
+11) Adapter Pattern
+    An adapter is an object that crosses the chasm between the interface that you have and the interface that you need.
+
+	The client knows about some target class—as a client, I have a reference to my target object. The client expects the target to have a certain interface. But unknown to the client, the target object is really an adapter, and buried inside of the adapter is a reference to a second object, the adaptee, which actually performs the work. Perhaps in a perfect world all interfaces would line up perfectly and the client would talk directly to the adaptee. In the real world, however, we need to build adapters because the interface that the client is expecting is not the interface that the adaptee is offering.
+
+	Encrypter is our client object—it is looking for a reference to its target, which in our case is an IO instance. As shown in Figure 9-2, what the client actually has is a reference to the adapter, StringIOAdapter.
+    The StringIOAdapter class looks like an ordinary IO object on the outside, but secretly it gets its characters from a string, which is the adaptee.
+
+	ActiveRecord Database Adapters
+
+12) Proxy Pattern
+	Protecting an object from unauthorized access, hiding the fact that this object really lives somewhere else on the network, and delaying the creation of an expensive object until the last possible instant. Remarkably, all of these problems find a common solution in the Proxy pattern. Proxies are the con artists of the programming world: They pretend to be some other object when they are not, in fact, that object. Inside the proxy is hidden a reference to the other, real object—an object that the GoF referred to as the subject. 
+	
+	Nevertheless, the proxy does not just act as a method call conduit for the subject. Instead, it serves as a pinch point between the client and the subject. “Is this operation authorized?” asks the protection proxy. “Does the subject actually live on this other machine?” asks the remote proxy. “Have I actually created the subject yet?” asks the virtual proxy. In short, the proxy controls access to the subject. We also saw in this chapter how using the method_missing technique can substantially reduce the coding burden of building proxies.
+	
+	The Proxy pattern is the second pattern we have encountered in which one object stands in for another. In Chapter 9, we considered the adapter, which wraps one object with another to transform the interface of the first object. Superficially, the proxy is very similar to the adapter: One object stands in for another. But the proxy does not change the interface; the interface of the proxy is exactly the same as the interface of its subject. Instead of trying to transform the interface of that inner object in the same way that an adapter does, the proxy tries to control access to it.
+
+13) Difference between Patterns
+	Among the most basic questions of software engineering is this: How do you add features to your program without turning the whole thing into a huge, unmanageable mess? So far, you have seen how to split the internal workings of your objects up among a family of classes with the Template Method pattern and how to use the Strategy pattern to split off whole chunks of algorithms. You have also seen how to react to requests coming into your objects with the Command pattern and how to keep up with changes made to other objects with the Observer pattern. Composites and iterators each help in their own way in dealing with collections of objects.
+	
+	But what if you simply need to vary the responsibilities of an object? What do you do when sometimes your object needs to do a little more, but sometimes a little less? In this chapter we will look at the Decorator pattern, which enables you to easily add an enhancement to an existing object. The Decorator pattern also allows you to layer features atop one another so that you can construct objects that have exactly the right set of capabilities that you need for any given situation.
+
+14) Singleton Pattern
+	The motivation behind the Singleton pattern is very simple: There are some things that are unique. Programs frequently have a single configuration file. It is not unusual for a program to let you know how it is doing via a single log file. GUI applications frequently have a one main window, and they typically take input from exactly one keyboard. Many applications need to talk to exactly one database. If you only ever have one instance of a class and a lot of code that needs access to that instance, it seems silly to pass the object from one method to another. In this kind of situation, the GoF suggest that you build a singleton—a class that can have only one instance and that provides global access to that one instance.
+	
+	Logger example : Restricting creation of new object of logger class from outside.
+	
+	class SimpleLogger
+	  # Lots of code deleted...
+	  @@instance = SimpleLogger.new
+	  
+	  def self.instance
+	    return @@instance
+	  end
+	  
+	  private_class_method :new
+	end
+	
+	Ex in Rails - Inflections
