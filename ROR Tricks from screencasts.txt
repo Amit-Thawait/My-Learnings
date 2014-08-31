@@ -2457,3 +2457,5 @@ The non-database functionality of Active Record is extracted out into Active Mod
 
 234) Ruby calls the methods that are unique to an object singleton methods.
 	 Immutable objects:- instances of Fixnum, for example will not cooperate with attempts to add singleton methods to them.
+
+	 Singleton class is actually the first place where Ruby looks when you call a method, so any method defined in the singleton class will override the methods in the regular class.
