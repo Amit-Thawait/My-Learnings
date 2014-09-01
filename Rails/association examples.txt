@@ -2,7 +2,9 @@ has_many :--  Accounts - User, Projects for Portfolio, Manager has many Employee
 
 One to One :- Employee has one Address
 
-One to many :--  Order has one Customer 
+One to many :-  Order has one Customer 
+
+Many to Many :- Product has many categories , Category has many products
 
 Polymorphic :- Images for People, Product
 
