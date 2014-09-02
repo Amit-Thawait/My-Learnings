@@ -9,7 +9,7 @@ http://railscasts.com/episodes/239-activerecord-relation-walkthrough
 
 The ability to treat data as executable code is called meta-programming.
 
-Every time you embed an expression inside a double-quoted string you are doing meta-programming. After all, the embedded expression is not really program code – it is a string – and yet Ruby clearly has to ‘turn it into’ program code in order to be able to evaluate it.
+Every time you embed an expression inside a double-quoted string you are doing meta-programming. After all, the embedded expression is not really program code â€“ it is a string â€“ and yet Ruby clearly has to â€˜turn it intoâ€™ program code in order to be able to evaluate it.
 
 the Rails framework makes extensive use of meta-programming.
 
@@ -97,6 +97,18 @@ ob = MyClass.new
 p( ob.instance_eval { @aVar } )			#=> "Hello world"
 p( ob.instance_eval( "@aVar" ) )		#=> "Hello world"
 # p( ob.eval( "@aVar" )  )				#=> error: eval is a private method  
+
+confusing = "This Is Confusing"
+confusing.instance_eval do
+  def lowercase
+    self.downcase
+  end
+end   
+
+confusing.lowercase
+=> "this is confusing"
+"The Smiths on Charlie's Bus".lowercase
+NoMethodError: undefined method â€˜lowercaseâ€™ for "The Smiths on Charlie's Bus":String
 
 public :eval
 
@@ -202,7 +214,7 @@ The module_eval and class_eval methods can also be used to retrieve the values o
 Y.class_eval( "@@x" )
 
 Returning to the earlier example of adding and retrieving class variables from outside a class (using class_eval); it turns out that there are also methods designed to do this from inside a class
-class_variable_get (this takes a symbol argument representing the variable name and it returns the variable’s value) and class_variable_set (this takes a symbol argument representing a variable name and a second argument which is the value to be assigned to the variable)
+class_variable_get (this takes a symbol argument representing the variable name and it returns the variableâ€™s value) and class_variable_set (this takes a symbol argument representing a variable name and a second argument which is the value to be assigned to the variable)
 
 class X
 	@@abc = 100	
@@ -264,7 +276,7 @@ X::const_set( :NUM, 500 )
 puts( X::const_get( :NUM ) )  ---> 500
 
 
-If you don’t care about the encapsulation of data in your objects you can also retrieve the value of instance variables using the instance_variable_get method: 
+If you donâ€™t care about the encapsulation of data in your objects you can also retrieve the value of instance variables using the instance_variable_get method: 
 ob2.instance_variable_get( :@aname )
 
 As const_get returns the value of a constant, you could use this method to get the value of a class name and then append the new method to create a new object from that class. This could even give you a way of creating objects at runtime by prompting the user to enter class names and method names.
@@ -291,7 +303,7 @@ BINDINGS :-
 -----------
 Entities like local variables, instance variables, self are basically names bound to objects. We call them bindings.
 
-The eval method may take an optional ‘binding’ argument which, if provided, causes the evaluation to be done within a specific scope or ‘context’.
+The eval method may take an optional â€˜bindingâ€™ argument which, if provided, causes the evaluation to be done within a specific scope or â€˜contextâ€™.
 
 def getBinding(str)
 	return binding()
@@ -388,7 +400,7 @@ Unlike send(), public_send() calls public methods only.
 
 HANDLING MISSING METHODS :-
 ---------------------------
-When Ruby tries to execute an undefined method (or, in OOP terms, when an object is sent a message which it cannot handle), the error causes the program to exit. You may prefer your program to recover from such an error. You can do this by writing a method named method_missing, with an argument to which the missing method’s name is assigned. This will execute when a non-existent method is called.
+When Ruby tries to execute an undefined method (or, in OOP terms, when an object is sent a message which it cannot handle), the error causes the program to exit. You may prefer your program to recover from such an error. You can do this by writing a method named method_missing, with an argument to which the missing methodâ€™s name is assigned. This will execute when a non-existent method is called.
 
 It's a private instance method of BasicObject that every object inherits. The BasicObject#method_missing( ) responds by raising a NoMethodError. Overriding method_missing( ) allows you to call methods that don't really exist.
 
@@ -538,7 +550,7 @@ puts( "Goodbye" )
 
 FREEZING OBJECTS :-
 -------------------
-With all these ways of modifying objects at your disposal, you may be concerned that objects are at risk of being modified unintentionally. In fact, you can specifi-cally fix the state of an object by ‘freezing’ it (using the freeze method). Once frozen, the data contained by an object cannot be modified and, if an attempt is made to do so, a TypeError exception will be raised. Take care when freezing an object, however, as, once frozen, it cannot be ‘unfrozen’.
+With all these ways of modifying objects at your disposal, you may be concerned that objects are at risk of being modified unintentionally. In fact, you can specifi-cally fix the state of an object by â€˜freezingâ€™ it (using the freeze method). Once frozen, the data contained by an object cannot be modified and, if an attempt is made to do so, a TypeError exception will be raised. Take care when freezing an object, however, as, once frozen, it cannot be â€˜unfrozenâ€™.
 
 Ex:
 
