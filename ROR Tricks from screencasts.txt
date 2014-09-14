@@ -2471,3 +2471,10 @@ The non-database functionality of Active Record is extracted out into Active Mod
     $* - alias of ARGV, read-only
     $$ - PID of current process
     $? - exit status of the last terminated process
+
+	http://www.tutorialspoint.com/ruby/ruby_predefined_variables.htm
+
+236) How to create a password prompt:
+	 require 'io/console'
+	 print 'Password: '
+	 password = ((STDIN.tty? ? STDIN.noecho(&:gets) : gets) || '').chop
