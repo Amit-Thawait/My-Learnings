@@ -2459,3 +2459,10 @@ The non-database functionality of Active Record is extracted out into Active Mod
 	 Immutable objects:- instances of Fixnum, for example will not cooperate with attempts to add singleton methods to them.
 
 	 Singleton class is actually the first place where Ruby looks when you call a method, so any method defined in the singleton class will override the methods in the regular class.
+
+235) Variables related to regular expressions matching, example:
+
+    $& - text matched by regex
+    $` - text preceding the match
+    $' - text following the match
+    $1, $2, $3 ... $n - text matched by nth group
