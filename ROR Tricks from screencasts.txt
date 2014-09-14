@@ -2466,3 +2466,8 @@ The non-database functionality of Active Record is extracted out into Active Mod
     $` - text preceding the match
     $' - text following the match
     $1, $2, $3 ... $n - text matched by nth group
+
+	Some other useful variables :
+    $* - alias of ARGV, read-only
+    $$ - PID of current process
+    $? - exit status of the last terminated process
