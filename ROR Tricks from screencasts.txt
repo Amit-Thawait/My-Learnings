@@ -2478,3 +2478,6 @@ The non-database functionality of Active Record is extracted out into Active Mod
 	 require 'io/console'
 	 print 'Password: '
 	 password = ((STDIN.tty? ? STDIN.noecho(&:gets) : gets) || '').chop
+
+237) To concat a common strinh to a attribute
+     select concat_ws('', '@', mention) from users;
