@@ -133,3 +133,7 @@ http://www.thoughtworks.com/insights/blog/good-practices-build-your-angularjs-ap
 http://www.angularonrails.com/ruby-on-rails-angularjs-single-page-application/
 
 https://www.digitalocean.com/community/tutorials/how-to-set-up-zero-downtime-rails-deploys-using-puma-and-foreman
+
+http://www.thinkful.com/learn/angularjs-tutorial-build-a-gmail-clone/
+
+http://brewhouse.io/blog/2014/09/23/writing-rails-flavored-angularjs.html
