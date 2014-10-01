@@ -1957,7 +1957,7 @@ Then the URL becomes : http://localhost:3000/projects?search=yard
 	end
 	
 	In the above example,
-	Calendar class inherits from a new Struct which is a convenient way do define accessors for the various attributes. The first attribute here is the view and it’s important to pass this in as we don’t have access to the helper methods in our class. We can easily delegate to the view for any helper methods we want to access in the calendar or maybe override method_missing in here.
+	Calendar class inherits from a new Struct which is a convenient way do define accessors for the various attributes. The first attribute here is the view and itÂ’s important to pass this in as we donÂ’t have access to the helper methods in our class. We can easily delegate to the view for any helper methods we want to access in the calendar or maybe override method_missing in here.
 
 184) To check whether a robot is hitting your server :-
      request.user_agent =~ /\b(Baidu|Gigabot|Googlebot|libwww-perl|lwp-trivial|msnbot|SiteUptime|Slurp|WordPress|ZIBB|ZyBorg)\b/i
@@ -2000,7 +2000,7 @@ Then the URL becomes : http://localhost:3000/projects?search=yard
 
 188) Arel :-
 	 Arel drives ActiveRecord queries under the bonnet.
-	 To access Arel directly in Rails 3 we can access an arel_table so we’ll get the arel_table for the Product model in the console and assign it to a variable.
+	 To access Arel directly in Rails 3 we can access an arel_table so weÂ’ll get the arel_table for the Product model in the console and assign it to a variable.
 	 > t = Product.arel_table
 	 t[:price]
 	 => <Attribute price>
@@ -2012,7 +2012,7 @@ Then the URL becomes : http://localhost:3000/projects?search=yard
 	 > t[:price].eq(2.99).or(t[:name].matches('%lore')).to_sql
 	 => "(\"products\".\"price\" = 2.99 OR \"products\".\"name\" LIKE '%lore')"
 	 
-	 We can pass predicates as arguments to an ActiveRecord where call. This means that we can pass the predicate we’ve created to Product.where to return all of the products whose price is £2.99 or whose name ends in ‘lore’.
+	 We can pass predicates as arguments to an ActiveRecord where call. This means that we can pass the predicate weÂ’ve created to Product.where to return all of the products whose price is Â£2.99 or whose name ends in Â‘loreÂ’.
 	 Product.where(t[:price].eq(2.99).or(t[:name].matches('%lore')))
 	 
 	 There are a number of plugins now available that take the power of Arel and put it into a more convenient interface such as MetaWhere. This allows you to access Arel methods such as matches and eq inside the conditions hash like this:
@@ -2209,17 +2209,17 @@ The non-database functionality of Active Record is extracted out into Active Mod
 	  u && u.salt == stored_salt ? u : nil
 	end
 
-	And when the user checks “Remember me” box, make sure the following gets run :
+	And when the user checks Â“Remember meÂ” box, make sure the following gets run :
 
 	cookies.permanent.signed[:remember_me] = [current_user.id, current_user.salt]
 
-	This will set a permanent and signed cookie using the secret specified in ActionController::Base.cookie_verifier_secret. If you don’t have the cookie_verifier_secret defined, you might want to do that in one of the initializers.
+	This will set a permanent and signed cookie using the secret specified in ActionController::Base.cookie_verifier_secret. If you donÂ’t have the cookie_verifier_secret defined, you might want to do that in one of the initializers.
 
 	Now when you want to login using the cookie :
 
 	user = User.authenticated_with_token(*cookies.signed[:remember_me])
 
-	In this specific case, it’s very important to use the salt in the cookie value. That makes sure the cookie gets invalidated if the user changes his password.
+	In this specific case, itÂ’s very important to use the salt in the cookie value. That makes sure the cookie gets invalidated if the user changes his password.
 	
 205) Shortcut for respond_to   ---> (Railscast - 224) -- See for detailed usage
     class Product
@@ -2421,9 +2421,9 @@ The non-database functionality of Active Record is extracted out into Active Mod
 	 
 231) Offline Browsing inside Google Chrome
 
-	While inside Chrome, type chrome://flags/#enable-offline-mode in the address bar, click “Enable” and restart your browser. Your Chrome will no longer serve the “not connected to the Internet” error if the page you are trying to access is available in the local cache.
+	While inside Chrome, type chrome://flags/#enable-offline-mode in the address bar, click Â“EnableÂ” and restart your browser. Your Chrome will no longer serve the Â“not connected to the InternetÂ” error if the page you are trying to access is available in the local cache.
 
-	Google Chrome caches the HTML content, images, JavaScript and the CSS stylesheets associated with a page so your offline copy should not look very different from the original. However, if there are resources that require an active Internet connection, like JavaScript widgets or videos, they’ll be replaced with placeholder images.
+	Google Chrome caches the HTML content, images, JavaScript and the CSS stylesheets associated with a page so your offline copy should not look very different from the original. However, if there are resources that require an active Internet connection, like JavaScript widgets or videos, theyÂ’ll be replaced with placeholder images.
 
 232) Converting numbers in string to actual numeric object
     Ex : "12" to 12
@@ -2481,3 +2481,5 @@ The non-database functionality of Active Record is extracted out into Active Mod
 
 237) To concat a common strinh to a attribute
      select concat_ws('', '@', mention) from users;
+
+238) $rails_rake_task can be used to determine if the action is invoked from a rake task.
