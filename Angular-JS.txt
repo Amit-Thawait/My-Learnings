@@ -137,3 +137,5 @@ https://www.digitalocean.com/community/tutorials/how-to-set-up-zero-downtime-rai
 http://www.thinkful.com/learn/angularjs-tutorial-build-a-gmail-clone/
 
 http://brewhouse.io/blog/2014/09/23/writing-rails-flavored-angularjs.html
+
+http://www.airpair.com/angularjs
