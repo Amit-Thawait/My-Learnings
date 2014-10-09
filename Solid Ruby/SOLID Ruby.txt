@@ -1,3 +1,10 @@
+Single Responsibility Principle states that every object should only have one reason to change, i.e. every object should perform one thing only.
+Open-Closed Principle states that classes should be open for extension and closed for modification.
+Liskov Substitution Principle states that you should be able to use a derived class in place of a parent class and it must behave in the same manner.
+Interface Segregation Principle states that clients should not be forced to depend on interfaces they do not use.
+Dependency Inversion Principle helps to decouple your code by ensuring that you depend on abstractions rather than concrete implementations.
+
+
 Single Responsibility Principle (SRP) : An object should have only a single responsibility. 
 Open Closed Principle (OCP) : A module should be open for extension but closed for modification.
 Liskov Substitution Principle (LSP) : Subclasses should be substitutable for their base classes.
