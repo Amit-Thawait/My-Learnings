@@ -2483,3 +2483,6 @@ The non-database functionality of Active Record is extracted out into Active Mod
      select concat_ws('', '@', mention) from users;
 
 238) $rails_rake_task can be used to determine if the action is invoked from a rake task.
+
+239) MySQL conditional update query : (Single update for different rows)
+     http://www.karlrixon.co.uk/writing/update-multiple-rows-with-different-values-and-a-single-sql-query/
