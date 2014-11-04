@@ -247,4 +247,6 @@
 
 	% who | wc -l
 
-24) 
+24) Command to write output of a given command to a file :
+    Example:
+    rake db:migrate --trace &>> "rake_output_`date +%Y-%m-%d_%H:%M:%S`.txt"
