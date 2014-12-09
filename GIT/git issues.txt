@@ -10,8 +10,8 @@ GIT issues :-
     The agent has no identities.
     amit@amit-OptiPlex-9010:~/my_vm/rails-dev-box$ ssh-add ~/.ssh/github/id_rsa
     Enter passphrase for /home/amit/.ssh/github/id_rsa: 
-	Identity added: /home/amit/.ssh/github/id_rsa (/home/amit/.ssh/github/id_rsa)
-	amit@amit-OptiPlex-9010:~/my_vm/rails-dev-box$ ssh-add -l
-	2048 f3:f9:0f:2e:69:6e:53:a9:33:9a:cf:e0:80:01:21:a2 /home/amit/.ssh/github/id_rsa (RSA)
+    Identity added: /home/amit/.ssh/github/id_rsa (/home/amit/.ssh/github/id_rsa)
+    amit@amit-OptiPlex-9010:~/my_vm/rails-dev-box$ ssh-add -l
+    2048 f3:f9:0f:2e:69:6e:53:a9:33:9a:cf:e0:80:01:21:a2 /home/amit/.ssh/github/id_rsa (RSA)
 
 
