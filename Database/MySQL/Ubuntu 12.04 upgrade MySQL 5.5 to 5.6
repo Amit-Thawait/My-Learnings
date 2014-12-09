@@ -1,0 +1,67 @@
+Ubuntu 12.04 upgrade MySQL to v5.6 :-
+=====================================
+
+1)  Before beginning the upgrade, have your database backed up.
+    mysqldump -u<user> -p<password> -A --events > alldb.sql
+     
+2)  Stop MySql service
+    sudo service mysql stop
+     
+3)  Remove Existing server, client and common package
+    sudo apt-get remove mysql-server mysql-client mysql-common
+    sudo apt-get autoremove
+    sudo apt-get autoclean (Read more on autoremove, autoclean http://askubuntu.com/a/3168/328077)
+     
+4)  Install dependencies
+    sudo apt-get install libaio1
+     
+5)  Add the repository ppa to source list and update
+    sudo apt-add-repository ppa:ondrej/mysql-5.6
+    sudo apt-get update
+     
+
+6)  Validate package version
+    sudo apt-cache policy mysql-server
+    Should output to something similar to
+    mysql-server:
+     Installed: 5.6.20+dfsg-1+deb.sury.org~precise+1
+     Candidate: 5.6.20+dfsg-1+deb.sury.org~precise+1
+
+    Candiate should be 5.6.x ignore the rest
+     
+7)  Install mysql-server and client
+    sudo apt-get install mysql-server
+    sudo apt-get install mysql-client
+     
+8)  That's it... verify the installed version : 
+    mysql --version
+
+ 
+Rails users, it doesn't stop yet.
+
+Rails application would need to know the new version of mysql(that is 5.6)
+
+1)  Install the `dev` dependency:
+    sudo apt-get install libmysqlclient-dev
+     
+2)  Re-install mysql gem
+    gem uninstall mysql2
+    gem install mysql2
+
+     
+P.S : Unfortunately this may not work for ubuntu 13.x
+
+        Ubuntu 14.x comes with mysql 5.6 in its source list. Just uninstall your current 5.5 version and update repository then re-install mysql-server, you'll have mysql 5.6 installed.
+
+
+After successful installation of MySQL 5.6, on running rake db:migrate , if you get an error related to FULLTEXT index like :
+
+Mysql2::Error: Row size too large (> 8126). Changing some columns to TEXT or BLOB or using ROW_FORMAT=DYNAMIC or ROW_FORMAT=COMPRESSED may help. In current row format, BLOB prefix of 768 bytes is stored inline.: ALTER TABLE wikis ADD FULLTEXT(description)
+
+then just increase the inno_db_log_file_size in /etc/mysql/my.cnf to 256 MB. (Default is 5 MB)
+
+> sudo vim /etc/mysql/my.cnf
+
+Add the below line in the above config file : (innodb_log_file_size config may not be present in this file, you have to add it)
+
+innodb_log_file_size    = 256M
