@@ -6,3 +6,16 @@ https://github.com/rails/rails/issues/3727
 http://mathiasbynens.be/notes/mysql-utf8mb4
 
 http://dev.mysql.com/doc/refman/5.5/en/charset-unicode-upgrading.html
+
+https://github.com/rails/rails/issues/9855
+
+Change ROW_FORMAT to DYNAMIC to solve add_index issue : index size too long (767 byts)
+http://bugs.mysql.com/bug.php?id=68453 
+
+https://mathiasbynens.be/notes/mysql-utf8mb4
+
+http://stackoverflow.com/questions/15824956/saving-utf8mb4-strings-to-mysql
+
+http://apps.timwhitlock.info/emoji/tables/unicode#block-6c-other-missing-symbols
+
+http://nhw.pl/wp/2008/09/16/mysql-collate-setting-in-rails-application
