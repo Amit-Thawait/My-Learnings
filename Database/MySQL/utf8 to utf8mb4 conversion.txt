@@ -19,3 +19,54 @@ http://stackoverflow.com/questions/15824956/saving-utf8mb4-strings-to-mysql
 http://apps.timwhitlock.info/emoji/tables/unicode#block-6c-other-missing-symbols
 
 http://nhw.pl/wp/2008/09/16/mysql-collate-setting-in-rails-application
+
+
+Read utf8mb4 emoji's stored in the Database :-
+----------------------------------------------
+
+http://mathiasbynens.be/notes/mysql-utf8mb4#utf8-to-utf8mb4
+
+1) Needs DB connection with encoding
+database.yml
+encoding: utf8mb4
+
+2) gemfile -> gem 'mysql2', '0.3.12b6':git => "https://github.com/brianmario/mysql2.git"
+
+3) JSON escape : Monkey patch to json to not to skip utf8mb4 characters. 
+
+module ActiveSupport::JSON::Encoding
+  class << self
+    def escape(string)
+      if string.respond_to?(:force_encoding)
+        string = string.encode(::Encoding::UTF_8, :undef => :replace).force_encoding(::Encoding::BINARY)
+      end
+      json = string.gsub(escape_regex) { |s| ESCAPED_CHARS[s] }
+      json = %("#{json}")
+      json.force_encoding(::Encoding::UTF_8) if json.respond_to?(:force_encoding)
+      json
+    end
+  end
+end
+
+
+/etc/init.d/mysql restart --character-set-server=utf8mb4 --collation-
+server=utf8mb4_unicode_ci
+
+#this is to start mysql server
+mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+#emoji chars
+http://apps.timwhitlock.info/emoji/tables/unicode
+http://www.unicode.org/charts/PDF/U1F600.pdf
+http://getemoji.com/
+
+===============================================
+
+SELECT default_character_set_name FROM information_schema.SCHEMATA S WHERE schema_name = "<schema_name>";
+
+SELECT CCSA.character_set_name FROM information_schema.`TABLES` T, information_schema.`COLLATION_CHARACTER_SET_APPLICABILITY` CCSA WHERE CCSA.collation_name = T.table_collation AND T.table_schema = "<schema_name>" AND T.table_name = "<table_name>";
+
+SELECT character_set_name FROM information_schema.`COLUMNS` C WHERE table_schema = "<schema_name>" AND table_name = "<table_name>" AND column_name = "<column_name>";
+
+SELECT COLUMN_NAME, CHARACTER_SET_NAME, COLUMN_TYPE COLLATION_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '<schema_name>' and TABLE_NAME = '<table_name>';
+
+SHOW VARIABLES WHERE Variable_name LIKE 'character\_set\_%' OR Variable_name LIKE 'collation%';
