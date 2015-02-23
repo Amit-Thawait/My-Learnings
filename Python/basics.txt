@@ -1,0 +1,94 @@
+1) Python Identifiers:
+A Python identifier is a name used to identify a variable, function, class, module or other object. An identifier starts with a letter A to Z or a to z or an underscore (_) followed by zero or more letters, underscores and digits (0 to 9).
+
+Python does not allow punctuation characters such as @, $ and % within identifiers. Python is a case sensitive programming language. Thus, Manpower and manpower are two different identifiers in Python.
+
+Here are following identifier naming convention for Python:
+
+Class names start with an uppercase letter and all other identifiers with a lowercase letter.
+
+Starting an identifier with a single leading underscore indicates by convention that the identifier is meant to be private.
+
+Starting an identifier with two leading underscores indicates a strongly private identifier.
+
+If the identifier also ends with two trailing underscores, the identifier is a language-defined special name.
+
+2) In python2.x
+   print "some string" --> correct
+   print("some string") --> correct
+   print ("some string") --> correct
+   
+   In python3.x
+   print "some string" --> syntax error
+   print("some string") --> correct
+   print ("some string") --> correct
+ 
+
+3) One of the first caveats programmers encounter when learning Python is the fact that there are no braces to indicate blocks of code for class and function definitions or flow control. Blocks of code are denoted by line indentation, which is rigidly enforced.
+
+The number of spaces in the indentation is variable, but all statements within the block must be indented the same amount. Both blocks in this example are fine:
+
+if True:
+    print("True")
+else:
+  print("False")
+
+However, the second block in this example will generate an error:
+
+if True:
+    print("Answer")
+    print("True")
+else:
+    print("Answer")
+  print("False")
+
+4) Multi-line statements :-
+Statements in Python typically end with a new line. Python does, however, allow the use of the line continuation character (\) to denote that the line should continue.
+Statements contained within the [], {} or () brackets do not need to use the line continuation character
+
+5) Quotation in Python:
+Python accepts single ('), double (") and triple (''' or """) quotes to denote string literals, as long as the same type of quote starts and ends the string.
+
+The triple quotes can be used to span the string across multiple lines. For example, all the following are legal:
+
+word = 'word'
+
+sentence = "This is a sentence."
+
+paragraph = """This is a paragraph. It is
+made up of multiple lines and sentences."""
+
+6) Comments in Python:
+A hash sign (#) that is not inside a string literal begins a comment. All characters after the # and up to the physical line end are part of the comment and the Python interpreter ignores them.
+
+7) To accept user input from cmd :
+   python 2.x --> x = raw_input("Please enter input : ")
+   python 3.x --> x = input("Please enter input : ")
+
+8) Multiple Statements on a Single Line:
+The semicolon ( ; ) allows multiple statements on the single line given that neither statement starts a new code block. Here is a sample snip using the semicolon:
+
+import sys; x = 'foo'; sys.stdout.write(x + '\n')
+
+9) Multiple Statement Groups as Suites:
+A group of individual statements, which make a single code block are called suites in Python. Compound or complex statements, such as if, while, def, and class, are those which require a header line and a suite.
+
+Header lines begin the statement (with the keyword) and terminate with a colon ( : ) and are followed by one or more lines which make up the suite. For example:
+
+if expression : 
+   suite
+elif expression : 
+   suite 
+else : 
+   suite
+
+10) Variable assignment :-
+    use = 
+    Ex : counter = 0
+
+11) Multiple Assignment:
+Python allows you to assign a single value to several variables simultaneously. 
+For example: a = b = c = 1
+
+Here, an integer object is created with the value 1, and all three variables are assigned to the same memory location. You can also assign multiple objects to multiple variables. 
+For example: a, b, c = 1, 2, "john"
