@@ -1,0 +1,99 @@
+1) Python language supports the following types of operators.
+
+Arithmetic Operators
+
+Comparison (i.e., Relational) Operators
+
+Assignment Operators
+
+Logical Operators
+
+Bitwise Operators
+
+Membership Operators
+
+Identity Operators
+
+2) Python Arithmetic Operators:
++ , -, *, /
+
+20/3 => 6.666666666666667
+
+% -> remainder
+
+* -> exponent
+
+// -> modulo (quotient)
+
+3) Python Comparison Operators:
+==, !=, <>, >, <, >=, <=
+
+<> -> not equal to same as !=
+
+4) Python Assignment Operators:
+=, +=, -=, *=, /=, %=, **=, //=
+
+5) Python Bitwise Operators:
+Bitwise operator works on bits and perform bit by bit operation. Assume if a = 60; and b = 13; Now in binary format they will be as follows:
+
+a = 0011 1100
+
+b = 0000 1101
+
+-----------------
+
+a&b = 0000 1100
+
+a|b = 0011 1101
+
+a^b = 0011 0001
+
+~a  = 1100 0011
+
+<< - Binary Left Shift Operator. The left operands value is moved left by the number of bits specified by the right operand.
+Ex: a << 2 will give 240 which is 1111 0000
+
+>> - Binary Right Shift Operator. The left operands value is moved right by the number of bits specified by the right operand.
+Ex: a >> 2 will give 15 which is 0000 1111
+
+6) Python Logical Operators: and, or, not
+
+7) Python Membership Operators:
+In addition to the operators discussed previously, Python has membership operators, which test for membership in a sequence, such as strings, lists, or tuples.
+
+in :- Evaluates to true if it finds a variable in the specified sequence and false otherwise.
+not in :- Evaluates to true if it does not finds a variable in the specified sequence and false otherwise.
+
+Ex :-
+a = 10
+b = 2
+list = [1, 2, 3, 4, 5 ]
+
+a in list => False
+a not in list => True
+b in list => True
+
+8) Python Identity Operators:
+is :- Evaluates to true if the variables on either side of the operator point to the same object and false otherwise.
+Ex: x is y, here is results in 1 if id(x) equals id(y)
+
+is not :- Evaluates to false if the variables on either side of the operator point to the same object.
+
+9) Python Operators Precedence:
+The following table lists all operators from highest precedence to lowest.
+
+Operator	Description
+**         Exponentiation (raise to the power)
+~ + -      complement, unary plus and minus (method names for the last two are +@ and -@)
+* / % //   Multiply, divide, modulo and floor division
++ -        Addition and subtraction
+>> <<      Right and left bitwise shift
+&          Bitwise 'AND'
+^ |        Bitwise exclusive `OR' and regular `OR'
+<= < > >=  Comparison operators
+<> == !=   Equality operators
+= %= /= //= -= += *= **=  Assignment operators
+is is not    Identity operators
+in not in    Membership operators
+not or and   Logical operators
+
