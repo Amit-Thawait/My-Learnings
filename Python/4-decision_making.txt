@@ -1,0 +1,72 @@
+1) Python programming language assumes any non-zero and non-null values as true, and if it is either zero or null, then it is assumed as false value.
+
+2) Python IF statements :-
+Syntax :
+
+if expression:
+   statement(s)
+
+Ex :
+var1 = 100
+if var1:
+   print "1 - Got a true expression value"
+   print var1
+=>
+1 - Got a true expression value
+100
+
+3) Python IF...ELIF...ELSE Statements :-
+Syntax :
+if expression:
+   statement(s)
+else:
+   statement(s)
+
+Ex:
+var2 = 0
+if var2:
+   print "2 - Got a true expression value"
+   print var2
+else:
+   print "2 - Got a false expression value"
+   print var2
+=>
+2 - Got a false expression value
+0
+
+4) The elif Statement :-
+Syntax :
+if expression1:
+   statement(s)
+elif expression2:
+   statement(s)
+elif expression3:
+   statement(s)
+else:
+   statement(s)
+
+5) Python nested IF statements :-
+Syntax:
+if expression1:
+   statement(s)
+   if expression2:
+      statement(s)
+   elif expression3:
+      statement(s)
+   else:
+      statement(s)
+elif expression4:
+   statement(s)
+else:
+   statement(s)
+
+6) Single Statement Suites:
+If the suite of an if clause consists only of a single line, it may go on the same line as the header statement.
+
+Here is an example of a one-line if clause:
+var = 100
+if ( var  == 100 ) : print "Value of expression is 100"
+print "Good bye!"
+=>
+Value of expression is 100
+Good bye!
