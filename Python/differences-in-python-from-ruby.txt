@@ -1,0 +1,4 @@
+1) Range :
+   range(5) => (0,5) => list(0,5) => 0,1,2,3,4
+
+2) There is else statement for loops.
