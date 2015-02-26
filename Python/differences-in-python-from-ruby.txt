@@ -2,3 +2,5 @@
    range(5) => (0,5) => list(0,5) => 0,1,2,3,4
 
 2) There is else statement for loops.
+
+3) There is pass statement as one of the control flow statements besides break and continue.
