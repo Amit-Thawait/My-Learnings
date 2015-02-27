@@ -50,8 +50,14 @@ Python allows you to use a lowercase L with long, but it is recommended that you
 
 A complex number consists of an ordered pair of real floating-point numbers denoted by a + bj, where a is the real part and b is the imaginary part of the complex number.
 
+More details on numbers : http://www.tutorialspoint.com/python/python_numbers.htm
+
 3) Python Strings:
 Strings in Python are identified as a contiguous set of characters in between quotation marks. Python allows for either pairs of single or double quotes. Subsets of strings can be taken using the slice operator ( [ ] and [ : ] ) with indexes starting at 0 in the beginning of the string and working their way from -1 at the end.
+
+Python does not support a character type; these are treated as strings of length one, thus also considered a substring.
+
+An escape character gets interpreted; in a singlequoted as well as doublequoted strings.
 
 The plus ( + ) sign is the string concatenation operator and the asterisk ( * ) is the repetition operator. For example:
 
@@ -65,6 +71,34 @@ print(str[2:5])     # Prints characters starting from 3rd to 5th  ==> llo
 print(str[2:])      # Prints string starting from 3rd character  ==> llo World!
 print(str * 2)      # Prints string two times  ==>  Hello World!Hello World!
 print(str + "TEST") # Prints concatenated string  ==>  Hello World!TEST
+
+String Formatting Operator:
+One of Python's coolest features is the string format operator %. This operator is unique to strings and makes up for the pack of having functions from C's printf() family. Following is a simple example:
+
+#!/usr/bin/python
+print("My name is %s and weight is %d kg!" % ('Zara', 21))
+
+=> My name is Zara and weight is 21 kg!
+
+Raw string:
+Syntax :  r'expression'
+
+print('C:\\nowhere')
+=> C:\nowhere
+
+Now let's make use of raw string. We would put expression in r'expression' as follows:
+
+print(r'C:\\nowhere')
+=> C:\\nowhere
+
+Unicode String:
+Normal strings in Python are stored internally as 8-bit ASCII, while Unicode strings are stored as 16-bit Unicode. This allows for a more varied set of characters,	including special characters from most languages in the world. I'll restrict my treatment of Unicode strings to the following:
+
+print(u'Hello, world!')
+=> Hello, world!
+As you can see, Unicode strings use the prefix u, just as raw strings use the prefix r.
+
+More details on strings : http://www.tutorialspoint.com/python/python_strings.htm
 
 4) Python Lists:
 Lists are the most versatile of Python's compound data types. A list contains items separated by commas and enclosed within square brackets ([]). To some extent, lists are similar to arrays in C. One difference between them is that all the items belonging to a list can be of different data type.

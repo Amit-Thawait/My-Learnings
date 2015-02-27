@@ -4,3 +4,7 @@
 2) There is else statement for loops.
 
 3) There is pass statement as one of the control flow statements besides break and continue.
+
+4) Treats single & double quoted string the same.
+
+5) Python does not support a character type; these are treated as strings of length one, thus also considered a substring.
