@@ -1,0 +1,331 @@
+1 Introduction :-
+------------------
+
+Ruby on Rails allows applications to be written as if their code was preloaded.
+
+In a normal Ruby program classes need to load their dependencies:
+
+require 'application_controller'
+require 'post'
+ 
+class PostsController < ApplicationController
+  def index
+    @posts = Post.all
+  end
+end
+
+Moreover, Kernel#require loads files once, but development is much more smooth if code gets refreshed when it changes without restarting the server. It would be nice to be able to use Kernel#load in development, and Kernel#require in production.
+
+Indeed, those features are provided by Ruby on Rails, where we just write
+
+class PostsController < ApplicationController
+  def index
+    @posts = Post.all
+  end
+end
+
+2) Constants Refresher :-
+-------------------------
+
+2.1 Nesting
+Class and module definitions can be nested to create namespaces:
+
+module XML
+  class SAXParser
+    # (1)
+  end
+end
+The nesting at any given place is the collection of enclosing nested class and module objects outwards. For example, in the previous example, the nesting at (1) is
+
+[XML::SAXParser, XML]
+
+For instance, while this definition is similar to the previous one:
+
+class XML::SAXParser
+  # (2)
+end
+the nesting in (2) is different:
+
+[XML::SAXParser]
+XML does not belong to it.
+
+We can see in this example that the name of a class or module that belongs to a certain nesting does not necessarily correlate with the namespaces at the spot.
+
+Even more, they are totally independent, take for instance
+
+module X::Y
+  module A::B
+    # (3)
+  end
+end
+The nesting in (3) consists of two module objects:
+
+[A::B, X::Y]
+So, it not only doesn't end in A, which does not even belong to the nesting, but it also contains X::Y, which is independent from A::B.
+
+The nesting at any given place can be inspected with Module.nesting
+Ex:
+module X::Y
+  module A::B
+    p Module.nesting
+  end
+end
+
+2.2 Class and Module Definitions are Constant Assignments :-
+-------------------------------------------------------------
+Let's suppose the following snippet creates a class (rather than reopening it):
+
+class C
+end
+Ruby creates a constant C in Object and stores in that constant a class object. The name of the class instance is "C", a string, named after the constant.
+
+That is,
+
+class Project < ActiveRecord::Base
+end
+performs a constant assignment equivalent to
+
+Project = Class.new(ActiveRecord::Base)
+including setting the name of the class as a side-effect:
+
+Project.name # => "Project"
+
+Ex:
+class Amit
+end
+
+> Amit.name
+
+> Object.constants.sort
+
+> Object.const_get(:Amit)
+
+> Object.const_get(:Amit).name
+
+Constant assignment has a special rule to make that happen: if the object being assigned is an anonymous class or module, Ruby sets its name to be the one the constant.
+
+From then on, what happens to the constant and the instance does not matter. For example, the constant could be deleted, the class object could be assigned to a different constant, be stored in no constant anymore, etc. Once the name is set, it doesn't change.
+
+Similarly, module creation using the module keyword as in
+
+module Admin
+end
+performs a constant assignment equivalent to
+
+Admin = Module.new
+including setting the name as a side-effect:
+
+Admin.name # => "Admin"
+The execution context of a block passed to Class.new or Module.new is not entirely equivalent to the one of the body of the definitions using the class and module keywords. But both idioms result in the same constant assignment.
+
+Thus, when one informally says "the String class", that really means: the class object stored in the constant called "String" in the class object stored in the Object constant. String is otherwise an ordinary Ruby constant and everything related to constants applies to it, resolution algorithms, etc.
+
+Likewise, in the controller
+
+class PostsController < ApplicationController
+  def index
+    @posts = Post.all
+  end
+end
+Post is not syntax for a class. Rather, Post is a regular Ruby constant. If all is good, the constant evaluates to an object that responds to all.
+
+That is why we talk about constant autoloading, Rails has the ability to load constants on the fly.
+
+2.3 Constants are Stored in Modules :-
+--------------------------------------
+Constants belong to modules in a very literal sense. Classes and modules have a constant table; think of it as a hash table.
+
+Let's analyze an example to really understand what that means. While common abuses of language like "the String class" are convenient, the exposition is going to be precise here for didactic purposes.
+
+Let's consider the following module definition:
+
+module Colors
+  RED = '0xff0000'
+end
+First, when the module keyword is processed the interpreter creates a new entry in the constant table of the class object stored in the Object constant. Said entry associates the name "Colors" to a newly created module object. Furthermore, the interpreter sets the name of the new module object to be the string "Colors".
+
+Later, when the body of the module definition is interpreted, a new entry is created in the constant table of the module object stored in the Colors constant. That entry maps the name "RED" to the string "0xff0000".
+
+In particular, Colors::RED is totally unrelated to any other RED constant that may live in any other class or module object. If there were any, they would have separate entries in their respective constant tables.
+
+Put special attention in the previous paragraphs to the distinction between class and module objects, constant names, and value objects associated to them in constant tables.
+
+2.4 Resolution Algorithms :-
+-----------------------------
+
+2.4.1 Resolution Algorithm for Relative Constants :-
+-----------------------------------------------------
+the resolution algorithm for relative constant references goes like this:
+
+If the nesting is not empty the constant is looked up in its elements and in order. The ancestors of those elements are ignored.
+
+If not found, then the algorithm walks up the ancestor chain of the cref.
+
+If not found, const_missing is invoked on the cref. The default implementation of const_missing raises NameError, but it can be overridden.
+
+2.4.2 Resolution Algorithm for Qualified Constants:-
+----------------------------------------------------
+Qualified constants look like this:
+
+Billing::Invoice
+Billing::Invoice is composed of two constants: Billing is relative and is resolved using the algorithm of the previous section.
+
+Leading colons would make the first segment absolute rather than relative: ::Billing::Invoice. That would force Billing to be looked up only as a top-level constant.
+
+Invoice on the other hand is qualified by Billing and we are going to see its resolution next. Let's call parent to that qualifying class or module object, that is, Billing in the example above. The algorithm for qualified constants goes like this:
+
+The constant is looked up in the parent and its ancestors.
+
+If the lookup fails, const_missing is invoked in the parent. The default implementation of const_missing raises NameError, but it can be overridden.
+
+As you see, this algorithm is simpler than the one for relative constants. In particular, the nesting plays no role here, and modules are not special-cased, if neither they nor their ancestors have the constants, Object is not checked.
+
+3 Vocabulary :-
+---------------
+3.1 Parent Namespaces :-
+------------------------
+Given a string with a constant path we define its parent namespace to be the string that results from removing its rightmost segment.
+
+For example, the parent namespace of the string "A::B::C" is the string "A::B", the parent namespace of "A::B" is "A", and the parent namespace of "A" is "".
+
+3.2 Loading Mechanism :-
+------------------------
+Rails autoloads files with Kernel#load when config.cache_classes is false, the default in development mode, and with Kernel#require otherwise, the default in production mode.
+
+Kernel#load allows Rails to execute files more than once if constant reloading is enabled.
+
+This guide uses the word "load" freely to mean a given file is interpreted, but the actual mechanism can be Kernel#load or Kernel#require depending on that flag.
+
+4 Autoloading Availability :-
+------------------------------
+Rails is always able to autoload provided its environment is in place. For example the runner command autoloads:
+
+$ bin/rails runner 'p User.column_names'
+["id", "email", "created_at", "updated_at"]
+The console autoloads, the test suite autoloads, and of course the application autoloads.
+
+By default, Rails eager loads the application files when it boots in production mode, so most of the autoloading going on in development does not happen. But autoloading may still be triggered during eager loading.
+
+For example, given
+
+class BeachHouse < House
+end
+if House is still unknown when app/models/beach_house.rb is being eager loaded, Rails autoloads it.
+
+5 autoload_paths :-
+-------------------
+As you probably know, when require gets a relative file name:
+
+require 'erb'
+Ruby looks for the file in the directories listed in $LOAD_PATH. That is, Ruby iterates over all its directories and for each one of them checks whether they have a file called "erb.rb", or "erb.so", or "erb.o", or "erb.dll". If it finds any of them, the interpreter loads it and ends the search. Otherwise, it tries again in the next directory of the list. If the list gets exhausted, LoadError is raised.
+
+We are going to cover how constant autoloading works in more detail later, but the idea is that when a constant like Post is hit and missing, if there's a post.rb file for example in app/models Rails is going to find it, evaluate it, and have Post defined as a side-effect.
+
+Alright, Rails has a collection of directories similar to $LOAD_PATH in which to look up post.rb. That collection is called autoload_paths and by default it contains:
+
+All subdirectories of app in the application and engines. For example, app/controllers. They do not need to be the default ones, any custom directories like app/workers belong automatically to autoload_paths.
+
+Any existing second level directories called app/*/concerns in the application and engines.
+
+The directory test/mailers/previews.
+
+Also, this collection is configurable via config.autoload_paths. For example, lib was in the list years ago, but no longer is. An application can opt-in throwing this to config/application.rb:
+
+config.autoload_paths += "#{Rails.root}/lib"
+The value of autoload_paths can be inspected. In a just generated application it is (edited):
+
+$ bin/rails r 'puts ActiveSupport::Dependencies.autoload_paths'
+.../app/assets
+.../app/controllers
+.../app/helpers
+.../app/mailers
+.../app/models
+.../app/controllers/concerns
+.../app/models/concerns
+.../test/mailers/previews
+autoload_paths is computed and cached during the initialization process. The application needs to be restarted to reflect any changes in the directory structure.
+
+6 Autoloading Algorithms :-
+---------------------------
+
+6.1 Relative References :-
+--------------------------
+A relative constant reference may appear in several places, for example, in
+
+class PostsController < ApplicationController
+  def index
+    @posts = Post.all
+  end
+end
+all three constant references are relative.
+
+6.1.1 Constants after the class and module Keywords
+
+Ruby performs a lookup for the constant that follows a class or module keyword because it needs to know if the class or module is going to be created or reopened.
+
+If the constant is not defined at that point it is not considered to be a missing constant, autoloading is not triggered.
+
+So, in the previous example, if PostsController is not defined when the file is interpreted Rails autoloading is not going to be triggered, Ruby will just define the controller.
+
+6.1.2 Top-Level Constants
+
+On the contrary, if ApplicationController is unknown, the constant is considered missing and an autoload is going to be attempted by Rails.
+
+In order to load ApplicationController, Rails iterates over autoload_paths. First checks if app/assets/application_controller.rb exists. If it does not, which is normally the case, it continues and finds app/controllers/application_controller.rb.
+
+If the file defines the constant ApplicationController all is fine, otherwise LoadError is raised:
+
+unable to autoload constant ApplicationController, expected
+<full path to application_controller.rb> to define it (LoadError)
+Rails does not require the value of autoloaded constants to be a class or module object. For example, if the file app/models/max_clients.rb defines MAX_CLIENTS = 100 autoloading MAX_CLIENTS works just fine.
+
+================================================================================================
+Try an example for this in rails console
+================================================================================================
+
+6.1.3 Namespaces:-
+------------------
+Autoloading ApplicationController looks directly under the directories of autoload_paths because the nesting in that spot is empty. The situation of Post is different, the nesting in that line is [PostsController] and support for namespaces comes into play.
+
+The basic idea is that given
+
+module Admin
+  class BaseController < ApplicationController
+    @@all_roles = Role.all
+  end
+end
+to autoload Role we are going to check if it is defined in the current or parent namespaces, one at a time. So, conceptually we want to try to autoload any of
+
+Admin::BaseController::Role
+Admin::Role
+Role
+in that order. That's the idea. To do so, Rails looks in autoload_paths respectively for file names like these:
+
+admin/base_controller/role.rb
+admin/role.rb
+role.rb
+
+Let's see how Rails autoloads the Post constant in the PostsController above assuming the application has a Post model defined in app/models/post.rb.
+
+First it checks for posts_controller/post.rb in autoload_paths:
+
+app/assets/posts_controller/post.rb
+app/controllers/posts_controller/post.rb
+app/helpers/posts_controller/post.rb
+...
+test/mailers/previews/posts_controller/post.rb
+Since the lookup is exhausted without success, a similar search for a directory is performed, we are going to see why in the next section:
+
+app/assets/posts_controller/post
+app/controllers/posts_controller/post
+app/helpers/posts_controller/post
+...
+test/mailers/previews/posts_controller/post
+If all those attempts fail, then Rails starts the lookup again in the parent namespace. In this case only the top-level remains:
+
+app/assets/post.rb
+app/controllers/post.rb
+app/helpers/post.rb
+app/mailers/post.rb
+app/models/post.rb
+A matching file is found in app/models/post.rb. The lookup stops there and the file is loaded. If the file actually defines Post all is fine, otherwise LoadError is raised.
