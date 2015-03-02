@@ -365,3 +365,62 @@ p "====$:======#{$:}"
 
 m = MotorCycle.new('Yamaha', 'red')
 m.start_engine
+
+Some points about autoload :-
+Rails internals make extensive use of it to defer as much work as possible from the boot process. But constant autoloading in Rails is not implemented with Module#autoload.
+
+One possible implementation based on Module#autoload would be to walk the application tree and issue autoload calls that map existing file names to their conventional constant name.
+
+There are a number of reasons that prevent Rails from using that implementation.
+
+For example, Module#autoload is only capable of loading files using require, so reloading would not be possible. Not only that, it uses an internal require which is not Kernel#require.
+
+Then, it provides no way to remove declarations in case a file is deleted. If a constant gets removed with Module#remove_const its autoload is not triggered again. Also, it doesn't support qualified names, so files with namespaces should be interpreted during the walk tree to install their own autoload calls, but those files could have constant references not yet configured.
+
+An implementation based on Module#autoload would be awesome but, as you see, at least as of today it is not possible. Constant autoloading in Rails is implemented with Module#const_missing, and that's why it has its own contract, documented in this guide.
+
+6.2 Qualified References :-
+---------------------------
+When a qualified constant is missing Rails does not look for it in the parent namespaces. But there is a caveat: When a constant is missing, Rails is unable to tell if the trigger was a relative reference or a qualified one.
+
+For example, consider
+
+module Admin
+  User
+end
+and
+
+Admin::User
+If User is missing, in either case all Rails knows is that a constant called "User" was missing in a module called "Admin".
+
+If there is a top-level User Ruby would resolve it in the former example, but wouldn't in the latter. In general, Rails does not emulate the Ruby constant resolution algorithms, but in this case it tries using the following heuristic:
+
+If none of the parent namespaces of the class or module has the missing constant then Rails assumes the reference is relative. Otherwise qualified.
+
+For example, if this code triggers autoloading
+
+Admin::User
+and the User constant is already present in Object, it is not possible that the situation is
+
+module Admin
+  User
+end
+because otherwise Ruby would have resolved User and no autoloading would have been triggered in the first place. Thus, Rails assumes a qualified reference and considers the file admin/user.rb and directory admin/user to be the only valid options.
+
+In practice, this works quite well as long as the nesting matches all parent namespaces respectively and the constants that make the rule apply are known at that time.
+
+However, autoloading happens on demand. If by chance the top-level User was not yet loaded, then Rails assumes a relative reference by contract.
+
+Naming conflicts of this kind are rare in practice, but if one occurs, require_dependency provides a solution by ensuring that the constant needed to trigger the heuristic is defined in the conflicting place.
+
+========================================================================================================================
+Try example
+========================================================================================================================
+
+6.3 Automatic Modules :-
+------------------------
+When a module acts as a namespace, Rails does not require the application to defines a file for it, a directory matching the namespace is enough.
+
+Suppose an application has a back office whose controllers are stored in app/controllers/admin. If the Admin module is not yet loaded when Admin::UsersController is hit, Rails needs first to autoload the constant Admin.
+
+If autoload_paths has a file called admin.rb Rails is going to load that one, but if there's no such file and a directory called admin is found, Rails creates an empty module and assigns it to the Admin constant on the fly.
