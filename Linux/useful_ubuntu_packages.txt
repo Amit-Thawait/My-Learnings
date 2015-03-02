@@ -1,0 +1,3 @@
+colordiff
+meld
+tree
