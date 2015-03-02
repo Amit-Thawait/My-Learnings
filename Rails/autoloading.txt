@@ -329,3 +329,39 @@ app/helpers/post.rb
 app/mailers/post.rb
 app/models/post.rb
 A matching file is found in app/models/post.rb. The lookup stops there and the file is loaded. If the file actually defines Post all is fine, otherwise LoadError is raised.
+
+Ruby Example :-
+---------------
+lib/amits_motor_cycle.rb
+------------------------
+p "===================In MotorCycle============#{caller}"
+
+class MotorCycle
+  def initialize(make, color)
+    # Instance variables
+    @make = make
+    @color = color
+    end
+  def start_engine
+    if @engine_state
+      puts 'Engine is already Running'
+    else
+      @engine_state = true
+      puts 'Engine Idle'
+    end
+  end
+end
+
+motorcycletest.rb
+-----------------
+# p031motorcycletest.rb
+# require_relative 'p030motorcycle'
+p "============#{File.expand_path("../lib", __FILE__)}"
+$:.unshift File.expand_path("../lib", __FILE__)
+
+# require 'amits_motor_cycle'
+# autoload(:MotorCycle, "./lib/amits_motor_cycle.rb")
+p "====$:======#{$:}"
+
+m = MotorCycle.new('Yamaha', 'red')
+m.start_engine
