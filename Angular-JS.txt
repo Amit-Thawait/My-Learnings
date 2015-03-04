@@ -141,3 +141,5 @@ http://brewhouse.io/blog/2014/09/23/writing-rails-flavored-angularjs.html
 http://www.airpair.com/angularjs
 
 http://scotch.io/tutorials/javascript/angularjs-form-validation
+
+http://angular-rails.com/
