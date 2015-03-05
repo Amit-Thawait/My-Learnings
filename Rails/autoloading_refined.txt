@@ -410,3 +410,156 @@ i) Module#autoload is only capable of loading files using require, so reloading 
 ii) Then, it provides no way to remove declarations in case a file is deleted. If a constant gets removed with Module#remove_const its autoload is not triggered again.
 
 Constant autoloading in Rails is implemented with Module#const_missing, and that's why it has its own contract.
+
+8) Some Gotchas :-
+------------------
+1) Autoloading and require :-
+
+Files defining constants to be autoloaded should never be required:
+
+users_controller.rb:-
+require 'user' # DO NOT DO THIS
+
+class UsersController < ApplicationController
+  ...
+end
+
+There are two possible gotchas here in development mode:
+
+If User is autoloaded before reaching the require, app/models/user.rb runs again because load does not update $LOADED_FEATURES.
+
+If the require runs first Rails does not mark User as an autoloaded constant and changes to app/models/user.rb aren't reloaded.
+
+Of course, using require in autoloaded files to load ordinary 3rd party libraries is fine, and Rails is able to distinguish their constants, they are not marked as autoloaded.
+
+2) Autoloading and Initializers :-
+
+Consider this assignment in config/initializers/set_auth_service.rb:
+
+AUTH_SERVICE = if Rails.env.production?
+  RealAuthService
+else
+  MockedAuthService
+end
+
+The purpose of this setup would be that the application uses the class that corresponds to the environment via AUTH_SERVICE. In development mode MockedAuthService gets autoloaded when the initializer runs. Let’s suppose we do some requests, change its implementation, and hit the application again. To our surprise the changes are not reflected. Why?
+
+As we saw earlier, Rails removes autoloaded constants, but AUTH_SERVICE stores the original class object. Stale, non-reachable using the original constant, but perfectly functional.
+
+The following code summarizes the situation:
+
+class C
+  def quack
+    'quack!'
+  end
+end
+
+X = C
+Object.instance_eval { remove_const(:C) }
+X.new.quack # => quack!
+X.name      # => C
+C           # => uninitialized constant C (NameError)
+
+Because of that, it is not a good idea to autoload constants on application initialization.
+
+In the case above we could implement a dynamic access point:
+
+# app/models/auth_service.rb
+class AuthService
+  if Rails.env.production?
+    def self.instance
+      RealAuthService
+    end
+  else
+    def self.instance
+      MockedAuthService
+    end
+  end
+end
+and have the application use AuthService.instance instead. AuthService would be loaded on demand and be autoload-friendly.
+
+3) When Constants aren't Missed :-
+----------------------------------
+3.1 Relative References
+-----------------------
+Let's consider a flight simulator. The application has a default flight model
+
+# app/models/flight_model.rb
+class FlightModel
+end
+
+that can be overridden by each airplane, for instance
+
+# app/models/bell_x1/flight_model.rb
+module BellX1
+  class FlightModel < FlightModel
+  end
+end
+
+# app/models/bell_x1/aircraft.rb
+module BellX1
+  class Aircraft
+    def initialize
+      @flight_model = FlightModel.new
+    end
+  end
+end
+The initializer wants to create a BellX1::FlightModel and nesting has BellX1, that looks good. But if the default flight model is loaded and the one for the Bell-X1 is not, the interpreter is able to resolve the top-level FlightModel and autoloading is thus not triggered for BellX1::FlightModel.
+
+That code depends on the execution path.
+
+These kind of ambiguities can often be resolved using qualified constants:
+
+module BellX1
+  class Plane
+    def flight_model
+      @flight_model ||= BellX1::FlightModel.new
+    end
+  end
+end
+Also, require_dependency is a solution:
+
+require_dependency 'bell_x1/flight_model'
+
+module BellX1
+  class Plane
+    def flight_model
+      @flight_model ||= FlightModel.new
+    end
+  end
+end
+
+3.2 Qualified References
+------------------------
+Given
+
+# app/models/hotel.rb
+class Hotel
+end
+
+# app/models/image.rb
+class Image
+end
+
+# app/models/hotel/image.rb
+class Hotel
+  class Image < Image
+  end
+end
+the expression Hotel::Image is ambiguous, depends on the execution path.
+
+As we saw before, Ruby looks up the constant in Hotel and its ancestors. If app/models/image.rb has been loaded but app/models/hotel/image.rb hasn't, Ruby does not find Image in Hotel, but it does in Object:
+
+$ bin/rails r 'Image; p Hotel::Image' 2>/dev/null
+Image # NOT Hotel::Image!
+The code evaluating Hotel::Image needs to make sure app/models/hotel/image.rb has been loaded, possibly with require_dependency.
+
+In these cases the interpreter issues a warning though:
+
+warning: toplevel constant Image referenced by Hotel::Image
+This surprising constant resolution can be observed with any qualifying class:
+
+2.1.5 :001 > String::Array
+(irb):1: warning: toplevel constant Array referenced by String::Array
+ => Array
+To find this gotcha the qualifying namespace has to be a class, Object is not an ancestor of modules.

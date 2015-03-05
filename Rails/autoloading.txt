@@ -541,7 +541,7 @@ and have the application use AuthService.instance instead. AuthService would be 
 3) When Constants aren't Missed :-
 ----------------------------------
 3.1 Relative References
-
+-----------------------
 Let's consider a flight simulator. The application has a default flight model
 
 # app/models/flight_model.rb
@@ -588,8 +588,9 @@ module BellX1
     end
   end
 end
-10.6.2 Qualified References
 
+3.2 Qualified References
+------------------------
 Given
 
 # app/models/hotel.rb
