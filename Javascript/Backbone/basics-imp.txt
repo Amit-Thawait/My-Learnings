@@ -13,3 +13,12 @@ var Note = Backbone.Model.extend({
 });
 
 3) If you pass a {collection: ...} as the options, the model gains a collection property that will be used to indicate which collection the model belongs to, and is used to help compute the model's url. The model.collection property is normally created automatically when you first add a model to a collection. Note that the reverse is not true, as passing this option to the constructor will not automatically add the model to the collection.
+
+4) escape :- model.escape(attribute)
+Similar to get, but returns the HTML-escaped version of a model's attribute. If you're interpolating data from the model into HTML, using escape to retrieve attributes will prevent XSS attacks.
+
+var hacker = new Backbone.Model({
+  name: "<script>alert('xss')</script>"
+});
+
+alert(hacker.escape('name'));
