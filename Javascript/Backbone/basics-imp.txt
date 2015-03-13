@@ -22,3 +22,39 @@ var hacker = new Backbone.Model({
 });
 
 alert(hacker.escape('name'));
+
+5) idAttribute contains the name of the attributes that is considered as id of the object.
+A model's unique identifier is stored under the id attribute. If you're directly communicating with a backend (CouchDB, MongoDB) that uses a different unique key, you may set a Model's idAttribute to transparently map from that key to id.
+
+6) id :- model.id
+A special property of models, the id is an arbitrary string (integer id or UUID). If you set the id in the attributes hash, it will be copied onto the model as a direct property. Models can be retrieved by id from collections, and the id is used to generate model URLs by default.
+
+7) cid :- model.cid
+A special property of models, the cid or client id is a unique identifier automatically assigned to all models when they're first created. Client ids are handy when the model has not yet been saved to the server, and does not yet have its eventual true id, but already needs to be visible in the UI.
+
+Example :
+
+var Meal = Backbone.Model.extend({
+  idAttribute: "abc"
+});
+
+var cake = new Meal({ abc: 1, name: "Cake", id:100 });
+
+> cake.cid
+"c5"
+
+> cake.idAttribute
+"abc"
+
+> cake.id
+1
+
+> cake.get("id")
+100
+
+8) attributes :- model.attributes
+The attributes property is the internal hash containing the model's state — usually (but not necessarily) a form of the JSON object representing the model data on the server. It's often a straightforward serialization of a row from the database, but it could also be client-side computed state.
+
+9) Please use set to update the attributes instead of modifying them directly. If you'd like to retrieve and munge a copy of the model's attributes, use _.clone(model.attributes) instead.
+
+Due to the fact that Events accepts space separated lists of events, attribute names should not include spaces.
