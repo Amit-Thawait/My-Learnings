@@ -58,3 +58,8 @@ The attributes property is the internal hash containing the model's state — us
 9) Please use set to update the attributes instead of modifying them directly. If you'd like to retrieve and munge a copy of the model's attributes, use _.clone(model.attributes) instead.
 
 Due to the fact that Events accepts space separated lists of events, attribute names should not include spaces.
+
+10) In JavaScript, objects are passed by reference, so if you include an object as a default value, it will be shared among all instances. Instead, define defaults(The defaults hash or function can be used to specify the default attributes for your model) as a function.
+
+11) For save method if you'd only like the changed attributes to be sent to the server, call model.save(attrs, {patch: true}). You'll get an HTTP PATCH request to the server with just the passed-in attributes.
+Pass {wait: true} if you'd like to wait for the server before setting the new attributes on the model.
