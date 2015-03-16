@@ -1,0 +1,24 @@
+1) sudo apt-get install zsh
+   sudo apt-get install git-core
+   sudo apt-get install curl wget
+
+2) Install oh-my-zsh 
+   via curl
+   curl -L https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh
+
+   OR
+
+   via wget
+   wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O - | sh
+
+3) Change shell to zsh (default is set to bash)
+   chsh -s `which zsh`
+
+4) Open ~/.zshrc and add required pluggins like ruby, rails git etc
+   check for plugins=() statement and add necessay pluggings
+   plugins=(git ruby rails)
+
+5) Set PATH in ~/.zshrc (Do this step only if you are getting any warning from rvm)
+   Comment the existing PATH. Set the new path as shown below :
+   export PATH="$PATH:$HOME/.rvm/bin"
+   
