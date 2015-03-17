@@ -3,6 +3,9 @@ Important points :-
 
 1) Generally speaking, when calling a function that emits an event (model.set, collection.add, and so on...), if you'd like to prevent the event from being triggered, you may pass {silent: true} as an option. Note that this is rarely, perhaps even never, a good idea. Passing through a specific flag in the options for your event callback to look at, and choose to ignore, will usually work out better.
 
+Backbone Models :-
+------------------
+
 2) Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined higher on the prototype chain. If you override a core function like set, or save, and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
 
 var Note = Backbone.Model.extend({
@@ -63,3 +66,9 @@ Due to the fact that Events accepts space separated lists of events, attribute n
 
 11) For save method if you'd only like the changed attributes to be sent to the server, call model.save(attrs, {patch: true}). You'll get an HTTP PATCH request to the server with just the passed-in attributes.
 Pass {wait: true} if you'd like to wait for the server before setting the new attributes on the model.
+
+
+Backbone Collections :-
+-----------------------
+
+12) Adding the same model (a model with the same id) to a collection more than once is a no-op.
