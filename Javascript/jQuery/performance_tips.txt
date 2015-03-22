@@ -1,0 +1,9 @@
+jQuery Best Practices :- (Performance)
+--------------------------------------
+1) Don't use .children(), use querySelectorAll() & DOM methods.
+
+2) Try keeping your dom element count < 1000.
+
+3) Don't use .html(str), instead use .innerHTML or DOM methods.
+
+4) Don't use .hide() for high performance visibility toggling. Use el.hidden = true/false or add/remove/toggle class.
