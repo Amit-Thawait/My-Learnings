@@ -116,3 +116,55 @@ Backbone.sync :-
 21) Whenever a model or collection begins a sync with the server, a "request" event is emitted. If the request completes successfully you'll get a "sync" event, and an "error" event if not.
 
 The sync function may be overriden globally as Backbone.sync, or at a finer-grained level, by adding a sync function to a Backbone collection or to an individual model.
+
+
+Backbone View :-
+----------------
+
+22) setElement :- view.setElement(element)
+If you'd like to apply a Backbone view to a different DOM element, use setElement, which will also create the cached $el reference and move the view's delegated events from the old element to the new one.
+
+23) template :- view.template([data])
+While templating for a view isn't a function provided directly by Backbone, it's often a nice convention to define a template function on your views. In this way, when rendering your view, you have convenient access to instance data. For example, using Underscore templates:
+
+var LibraryView = Backbone.View.extend({
+  template: _.template(...)
+});
+
+
+Utility :-
+----------
+
+24) Backbone.noConflict :- var backbone = Backbone.noConflict();
+Returns the Backbone object back to its original value. You can use the return value of Backbone.noConflict() to keep a local reference to Backbone. Useful for embedding Backbone on third-party websites, where you don't want to clobber the existing Backbone.
+
+var localBackbone = Backbone.noConflict();
+var model = localBackbone.Model.extend(...);
+
+25) Backbone.$ :- Backbone.$ = $;
+If you have multiple copies of jQuery on the page, or simply want to tell Backbone to use a particular object as its DOM / Ajax library, this is the property for you. If you're loading Backbone with CommonJS (e.g. node, component, or browserify) you must set this property manually.
+
+var Backbone.$ = require('jquery');
+
+
+Binding "this" :-
+-----------------
+
+25) Perhaps the single most common JavaScript "gotcha" is the fact that when you pass a function as a callback, its value for this is lost. When dealing with events and callbacks in Backbone, you'll often find it useful to rely on listenTo or the optional context argument that many of Underscore and Backbone's methods use to specify the this that will be used when the callback is later invoked.
+
+var MessageList = Backbone.View.extend({
+
+  initialize: function() {
+    var messages = this.collection;
+    messages.on("reset", this.render, this);
+    messages.on("add", this.addMessage, this);
+    messages.on("remove", this.removeMessage, this);
+
+    messages.each(this.addMessage, this);
+  }
+
+});
+
+// Later, in the app...
+
+Inbox.messages.add(newMessage);
