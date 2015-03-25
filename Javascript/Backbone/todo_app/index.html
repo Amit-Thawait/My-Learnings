@@ -31,32 +31,34 @@
             </div>
             <input class="edit" type="text" value="<%- title %>" />
         </script>
+        <!-- Backbone Code -->
+        <script type="text/javascript">
+            $(function(){
 
-		<!-- Backbone Code -->
-		<script type="text/javascript">
-		    $(function(){
+                // Model
+                var Todo = Backbone.Model.extend({
 
-				// Model
-				var Todo = Backbone.Model.extend({
+                    defaults: function(){
+                        return {
+                            title: "Empty TODO ...",
+                            order: Todos.nextOrder(),
+                            done: false
+                        };
+                    },
 
-					defaults: function(){
-						return {
-							title: "Empty TODO ...",
-							order: Todos.nextOrder(),
-							done: false
-						};
-					},
+                    toggle: function(){
 
-					toggle: function(){
+                    }
+                });
 
-					}
-				});
+                // Collection
+                var TodoList = Backbone.Collection.extend({
 
-				// Collection
-				var TodoList = Bacbone.Collection.extend({
+                    model: Todo,
 
-				});
-		    });
-		</script>
+
+                });
+            });
+        </script>
     </body>
 </html>
