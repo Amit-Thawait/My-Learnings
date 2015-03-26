@@ -1,6 +1,7 @@
 <html>
     <head>
         <title> Backbone TODO App </title>
+        <link rel="stylesheet" href="css/todos.css">
     </head>
     <body>
         <div id="todoapp">
@@ -28,7 +29,7 @@
             <div class="view">
               <input class="toggle" type="checkbox" <%= done ? 'checked="checked"' : '' %> />
               <label><%- title %></label>
-              <a class="destroy"></a>
+              <button class="destroy">x</button>
             </div>
             <input class="edit" type="text" value="<%- title %>" />
         </script>
@@ -94,11 +95,11 @@
                     template: _.template($("#item-template").html()),
 
                     events: {
-                        "click .toggle"   : "toggleDone",
-                        "dblclick .view"  : "edit",
-                        "click a.destroy" : "clear",
-                        "keypress .edit"  : "updateOnEnter",
-                        "blur .edit"      : "close"
+                        "click .toggle"        : "toggleDone",
+                        "dblclick .view"       : "edit",
+                        "click button.destroy" : "clear",
+                        "keypress .edit"       : "updateOnEnter",
+                        "blur .edit"           : "close"
                     },
 
                     initialize: function(){
@@ -109,6 +110,7 @@
                     render: function(){
                         this.$el.html(this.template(this.model.toJSON()));
                         this.$el.toggleClass('done', this.model.get("done"));
+                        this.input = this.$(".edit");
                         return this;
                     },
 
@@ -126,12 +128,12 @@
                     },
 
                     updateOnEnter: function(e){
-                        if (e.keycode == 13) this.close();
+                        if (e.keyCode == 13) this.close();
                     },
 
                     close: function(){
                         var value = this.input.val();
-                        if (!this.value()){
+                        if (!value){
                             this.clear();
                         } else {
                             this.model.save({title: value});
@@ -154,15 +156,15 @@
                     },
 
                     initialize: function(){
-                        this.input: this.$("#new-todo");
-                        this.allCheckbox: this.$("#toggle-all")[0];
+                        this.input = this.$("#new-todo");
+                        this.allCheckbox = this.$("#toggle-all")[0];
 
                         this.listenTo(Todos, "add", this.addOne);
-                        this.listenTo(Todos, "reset", this.addAll);
+                        // this.listenTo(Todos, "reset", this.addAll);
                         this.listenTo(Todos, "all", this.render);
 
-                        this.footer: this.$("footer");
-                        this.main: this.$("#main");
+                        this.footer = this.$("footer");
+                        this.main = this.$("#main");
 
                         Todos.fetch();
                     },
@@ -183,12 +185,36 @@
                         this.allCheckbox.checked = !remaining;
                     },
 
-                    addOne: function(){
+                    addOne: function(todo){
+                        var view = new TodoView({model: todo});
+                        this.$("#todo-list").append(view.render().el);
+                    },
 
+                    // addAll: function(){
+                    //     Todos.each(this.addOne, this);
+                    // },
+
+                    createOnEnter: function(e){
+                        if (e.keyCode != 13) return; // Cyclic loop till a user presses any key other than enter
+                        // if (!this.input.val() == '') return;
+
+                        Todos.create({title: this.input.val()});
+                        this.input.val('');
+                    },
+
+                    clearCompleted: function(){
+                        _.invoke(Todos.done(), 'destroy');
+                        // return false;
+                    },
+
+                    toggleAllComplete: function(){
+                        var done =  this.allCheckbox.checked;
+                        Todos.each(function(todo) { todo.save({done: done}); });
                     }
 
                 });
 
+                var App = new AppView;
             });
         </script>
     </body>
