@@ -92,7 +92,7 @@
 
                     tagName: "li",
 
-                    template: _.template($("#item-template").html()),
+                    todoTemplate: _.template($("#item-template").html()),
 
                     events: {
                         "click .toggle"        : "toggleDone",
@@ -108,7 +108,7 @@
                     },
 
                     render: function(){
-                        this.$el.html(this.template(this.model.toJSON()));
+                        this.$el.html(this.todoTemplate(this.model.toJSON()));
                         this.$el.toggleClass('done', this.model.get("done"));
                         this.input = this.$(".edit");
                         return this;
