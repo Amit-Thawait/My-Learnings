@@ -168,3 +168,11 @@ var MessageList = Backbone.View.extend({
 // Later, in the app...
 
 Inbox.messages.add(newMessage);
+
+
+Points to keep in mind :-
+-------------------------
+
+26) To prevent memeory leakage, keep in mid to unbind the event using listenTo or stopListening method.
+
+Ex: @model.off('change:foo', @fooChanged)
