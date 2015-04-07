@@ -1,0 +1,11 @@
+1) Adding csrf_token to form :
+
+  In views.py:
+  from django.shortcuts import render_to_response
+  from django.template import RequestContext
+
+  def existingCustomerInvitationView(request):
+    return render_to_response("create.html", context_instance=RequestContext(request))
+
+  In create.html:
+  <form method="post">{% csrf_token %}
