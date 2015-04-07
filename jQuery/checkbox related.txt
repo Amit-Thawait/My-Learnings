@@ -1,6 +1,10 @@
 To check whether a check box is checked or not :-
 -------------------------------------------------
-<input type="checkbox" name= "project" id =  "project"  value ="1"> Appdev Gurgaon
+<input id="verify" name="verify" type="checkbox" value="1">
+
+$('input#verify').is(':checked') ==> true (the result is not dependent on value of the value attribute)
+
+<input type="checkbox" name= "project" id =  "project"  value ="1"> Project 1
 
 jQuery("#project:checked").val()
 
@@ -14,7 +18,7 @@ To check/uncheck a checkbor(or radio button) we can use the command :-
 
 <input type="radio" name= "send_noti" value ="No" checked> No </input>
 or
-<input type="checkbox" name= "appdev_new_york" value ="1" checked id ="appdev_new_york">   Appdev New York
+<input type="checkbox" name="project_name" value ="1" checked id ="project">   Project 2
 
 jQuery("#project").attr('checked',true)  or  jQuery("#project").attr('checked',false)
 
