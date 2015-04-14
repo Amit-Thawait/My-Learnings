@@ -1,0 +1,15 @@
+npm install -g jasmine 
+
+jasmine init # This is not required (used when jasmine is used without grunt which is actually a bad idea due to lots of issues like window object not defined etc etc)
+
+Install the latest nodejs & npm
+
+sudo npm install -g grunt-cli
+
+npm init
+
+sudo npm install grunt --save-dev
+
+grunt ==> this command will now work
+
+npm install grunt-contrib-jasmine --save-devs
