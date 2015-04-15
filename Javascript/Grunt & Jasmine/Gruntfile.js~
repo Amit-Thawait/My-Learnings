@@ -2,6 +2,30 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    jasmine: {
+      myApp: {
+        src: 'PathOfSource/**/*.js',
+        options: {
+          specs: 'spec/**/*spec.js',
+          vendor: [
+            "lib/jquery.js" // Path to external libs on which our code is depenedent like jQuey
+          ]
+        }
+      }
+    }
+  });
+
+  grunt.loadNpmTasks('grunt-contrib-jasmine');
+
+  grunt.registerTask('default', ['jasmine:myApp']);
+
+};
+
+
+module.exports = function(grunt) {
+
+  grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
     meta: {
       src: {
         main: 'PathOfSource',
@@ -13,7 +37,7 @@ module.exports = function(grunt) {
     },
 
     jasmine: {
-      myApp: {
+      apollo: {
         src: '<%= meta.src.main %>/**/*.js',
         options: {
           specs: '<%= meta.src.test %>/**/*spec.js',
@@ -44,6 +68,6 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-jasmine');
 
-  grunt.registerTask('default', ['jasmine:myApp', 'jasmine:coverage']);
+  grunt.registerTask('default', ['jasmine:apollo', 'jasmine:coverage']);
 
 };
