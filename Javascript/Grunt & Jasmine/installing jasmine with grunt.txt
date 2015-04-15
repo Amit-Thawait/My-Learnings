@@ -1,8 +1,24 @@
+1) Install Node JS :
+
+sudo apt-get install g++ curl libssl-dev apache2-utils git-core
+git clone git://github.com/joyent/node.git
+cd node
+./configure
+make
+sudo make install
+
+check:
+node -v
+npm -v
+If npm is not installed run:
+sudo apt-get install npm
+check: npm -v
+
+2) Install Jasmine :
+
 npm install -g jasmine 
 
 jasmine init # This is not required (used when jasmine is used without grunt which is actually a bad idea due to lots of issues like window object not defined etc etc)
-
-Install the latest nodejs & npm
 
 sudo npm install -g grunt-cli
 
