@@ -35,14 +35,22 @@ module.exports = function(grunt) {
           template: require('grunt-template-jasmine-istanbul'),
           templateOptions: {
             coverage: '<%= meta.bin.coverage %>/coverage.json',
-            report: '<%= meta.bin.coverage %>'
+            report: [
+              {type: 'html', options: {dir: '<%= meta.bin.coverage %>'}},
+              {type: 'text-summary'}
+            ]
           }
         }
       }
+    },
+
+    clean: {
+      coverage: ['bin/coverage']
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-jasmine');
+  grunt.loadNpmTasks('grunt-contrib-clean');
 
   grunt.registerTask('default', ['jasmine:myApp', 'jasmine:coverage']);
 

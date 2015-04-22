@@ -32,3 +32,24 @@ sudo npm install grunt --save-dev
 grunt ==> this command will now work
 
 npm install grunt-contrib-jasmine --save-devs
+
+4) Check package.json
+{
+  "name": "myApp",
+  "version": "0.0.1",
+  "description": "Description",
+  "main": "Gruntfile.js",
+  "author": "Amit Thawait",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-jasmine": "^0.8.2",
+    "grunt-template-jasmine-istanbul": "^0.3.3"
+  },
+  "scripts": {
+    "install-g": "npm -g install grunt@0.4.5 grunt-cli@0.1.13 grunt-contrib-clean@0.6.0 grunt-contrib-jasmine@0.8.2 grunt-template-jasmine-istanbul@0.3.3",
+    "link": "npm link grunt grunt-cli grunt-contrib-clean grunt-contrib-jasmine grunt-template-jasmine-istanbul",
+    "uninstall-g": "npm uninstall -g grunt grunt-cli grunt-contrib-clean grunt-contrib-jasmine grunt-template-jasmine-istanbul grunt-contrib-clean"
+  }
+}
