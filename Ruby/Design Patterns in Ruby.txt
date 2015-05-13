@@ -174,7 +174,8 @@ news without tangling things up.
 	The GoF tell us that the Iterator pattern will do the following: 
 	Provide a way to access the elements of an aggregate object sequentially without exposing its underlying representation 
 	
-	In other words, an Iterator provides the outside world with a sort of movable pointer into the objects stored inside an otherwise opaque aggregate object.
+	In other words, an Iterator provides the outside world with a sort of movable pointer into the objects stored inside 
+	an otherwise opaque aggregate object.
 
     External Iterator
 	Internal Iterator
@@ -187,10 +188,18 @@ news without tangling things up.
 11) Adapter Pattern
     An adapter is an object that crosses the chasm between the interface that you have and the interface that you need.
 
-	The client knows about some target class—as a client, I have a reference to my target object. The client expects the target to have a certain interface. But unknown to the client, the target object is really an adapter, and buried inside of the adapter is a reference to a second object, the adaptee, which actually performs the work. Perhaps in a perfect world all interfaces would line up perfectly and the client would talk directly to the adaptee. In the real world, however, we need to build adapters because the interface that the client is expecting is not the interface that the adaptee is offering.
+	The client knows about some target class—as a client, I have a reference to my target object. The client expects the 
+	target to have a certain interface. But unknown to the client, the target object is really an adapter, and buried 
+	inside of the adapter is a reference to a second object, the adaptee, which actually performs the work. Perhaps in 
+	a perfect world all interfaces would line up perfectly and the client would talk directly to the adaptee. In the real 
+	world, however, we need to build adapters because the interface that the client is expecting is not the interface that
+	the adaptee is offering.
 
-	Encrypter is our client object—it is looking for a reference to its target, which in our case is an IO instance. As shown in Figure 9-2, what the client actually has is a reference to the adapter, StringIOAdapter.
-    The StringIOAdapter class looks like an ordinary IO object on the outside, but secretly it gets its characters from a string, which is the adaptee.
+        Encrypter is our client object—it is looking for a reference to its target, which in our case is an IO instance. As 
+	shown in Figure 9-2, what the client actually has is a reference to the adapter, StringIOAdapter.
+
+    The StringIOAdapter class looks like an ordinary IO object on the outside, but secretly it gets its characters from a 
+    string, which is the adaptee.
 
 	ActiveRecord Database Adapters
 
