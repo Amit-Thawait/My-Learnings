@@ -238,7 +238,12 @@ news without tangling things up.
 	subject.
 
 	Nevertheless, the proxy does not just act as a method call coduit for the subject. Instead, it servers  as a pinch 
-	point between the client and the subject.
+	point between the client and the subject. "Is this operation authorized?" ask the protection proxy. "Does the subject 
+	actually lives on this other machine?" ask the remote proxy. "Have I actually created the subject yet?" ask the 
+	virtual proxy. In short, the proxy controls access to the subject.
+
+	Instead of trying to transform the interface of that inner object in the same way that an adapter does, the proxy 
+	tries to control access to it.
 
 13) Difference between Patterns
 	Among the most basic questions of software engineering is this: How do you add features to your program without turning the whole thing into a huge, unmanageable mess? So far, you have seen how to split the internal workings of your objects up among a family of classes with the Template Method pattern and how to use the Strategy pattern to split off whole chunks of algorithms. You have also seen how to react to requests coming into your objects with the Command pattern and how to keep up with changes made to other objects with the Observer pattern. Composites and iterators each help in their own way in dealing with collections of objects.
