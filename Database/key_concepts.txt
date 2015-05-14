@@ -15,3 +15,27 @@ Database key-points :-
    CHECK
    PRIMARY KEY
    FOREIGN KEY
+
+4) ALTER TABLE EMP
+     ADD CONSTRAINT CK_SAL_EMP CHECK (SAL > 3000) NOVALIDATE;
+   NOVALIDATE is used to not validate the existing records while adding the constraint on the existing table.
+   It will validate the future records.
+   NOVALIDATE can only be applied to CHECK constraint and not primary key & foreign key.
+
+5) ALTER TABLE EMP
+     MODIFY(ENAME NOT NULL);
+   To change column from accepting NULL values to not NULL values use modify command. 
+   From now on Null values will not be accepted in the EMP table.
+
+6) CONSTRAINTS affects the performance while insertion.
+
+7) Use of functions in SELECT statement takes more time, so if possible try to use some operator otherwise function.
+   SELECT * FROM EMP WHERE LENGTH(ENAME) = 5;
+   can also be written as
+   SELECT * FROM EMP WHERE NAME = "_ _ _ _ _";
+
+8) Multi-row functions (that acts on multiple rows) are called as group functions or aggregate functions.
+   SELECT MAX(SAL) FROM EMP;
+   SELECT MAX(SAL, COMM) FROM EMP; ==> x (Not Allowed)
+
+9) COUNT function only counts not null values. NULL values are not counted.
