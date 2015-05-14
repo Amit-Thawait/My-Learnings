@@ -204,11 +204,34 @@ news without tangling things up.
 	ActiveRecord Database Adapters
 
 12) Proxy Pattern
-	Protecting an object from unauthorized access, hiding the fact that this object really lives somewhere else on the network, and delaying the creation of an expensive object until the last possible instant. Remarkably, all of these problems find a common solution in the Proxy pattern. Proxies are the con artists of the programming world: They pretend to be some other object when they are not, in fact, that object. Inside the proxy is hidden a reference to the other, real object—an object that the GoF referred to as the subject. 
+	Protecting an object from unauthorized access, hiding the fact that this object really lives somewhere else on the 
+	network, and delaying the creation of an expensive object until the last possible instant. Remarkably, all of these 
+	problems find a common solution in the Proxy pattern. Proxies are the con artists of the programming world: They 
+	pretend to be some other object when they are not, in fact, that object. Inside the proxy is hidden a reference to the 
+	other, real object—an object that the GoF referred to as the subject. 
 	
-	Nevertheless, the proxy does not just act as a method call conduit for the subject. Instead, it serves as a pinch point between the client and the subject. “Is this operation authorized?” asks the protection proxy. “Does the subject actually live on this other machine?” asks the remote proxy. “Have I actually created the subject yet?” asks the virtual proxy. In short, the proxy controls access to the subject. We also saw in this chapter how using the method_missing technique can substantially reduce the coding burden of building proxies.
+	Nevertheless, the proxy does not just act as a method call conduit for the subject. Instead, it serves as a pinch 
+	point between the client and the subject. “Is this operation authorized?” asks the protection proxy. “Does the subject 
+	actually live on this other machine?” asks the remote proxy. “Have I actually created the subject yet?” asks the 
+	virtual proxy. In short, the proxy controls access to the subject. We also saw in this chapter how using the 
+	method_missing technique can substantially reduce the coding burden of building proxies.
 	
-	The Proxy pattern is the second pattern we have encountered in which one object stands in for another. In Chapter 9, we considered the adapter, which wraps one object with another to transform the interface of the first object. Superficially, the proxy is very similar to the adapter: One object stands in for another. But the proxy does not change the interface; the interface of the proxy is exactly the same as the interface of its subject. Instead of trying to transform the interface of that inner object in the same way that an adapter does, the proxy tries to control access to it.
+	The Proxy pattern is the second pattern we have encountered in which one object stands in for another. In Chapter 9, 
+	we considered the adapter, which wraps one object with another to transform the interface of the first object. 
+	Superficially, the proxy is very similar to the adapter: One object stands in for another. But the proxy does not 
+	change the interface; the interface of the proxy is exactly the same as the interface of its subject. Instead of 
+	trying to transform the interface of that inner object in the same way that an adapter does, the proxy tries to 
+	control access to it.
+
+	The advantage of using Proxy for protection is that it gives us a nice seperation of concerns: The proxy worries about 
+	who is or who is not allowed to do what. The only thing that the real bank account need to be concerned with is, well, 
+	the bank account. By implementing the security in a proxy, we make it easy to swap in a different security scheme(just 
+	wrap the subject in a different proxy) or elimiate the security all together (just drop the proxy). For that matter, 
+	we can also change the implemention of BankAccount object without messing with our security scheme.
+
+	Protection proxies have another advantage over the naive "implement all of the security and functionality in one 
+	class" approach. By splitting the protection cleanly off from the workings of the real object, we can minimize the 
+	chance that any important information will inadvertently leak out through our protective shield.
 
 13) Difference between Patterns
 	Among the most basic questions of software engineering is this: How do you add features to your program without turning the whole thing into a huge, unmanageable mess? So far, you have seen how to split the internal workings of your objects up among a family of classes with the Template Method pattern and how to use the Strategy pattern to split off whole chunks of algorithms. You have also seen how to react to requests coming into your objects with the Command pattern and how to keep up with changes made to other objects with the Observer pattern. Composites and iterators each help in their own way in dealing with collections of objects.
