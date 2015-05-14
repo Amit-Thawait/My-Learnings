@@ -1,0 +1,17 @@
+Database key-points :-
+======================
+1) Order of execution for SQL clauses :
+   FROM
+   WHERE
+   GROUPBY
+   HAVING
+   SELECT
+   ORDERBY
+
+2) Long datatype cannot be used for primary key column.(oracle)
+
+3) Order of check of column constraint :
+   NOT NULL
+   CHECK
+   PRIMARY KEY
+   FOREIGN KEY
