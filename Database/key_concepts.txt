@@ -48,3 +48,11 @@ Database key-points :-
    In condition if aggregate function is present then use HAVING clause.
 
    WHERE clause should be used before GROUP BY & HAVING clause should be used after GROUP BY.
+
+11)If we want to get the data from one table by referring the data from other table then it can be done by either
+   subquery or join.
+   But in this case subquery gives better performance.
+   JOIN takes more time because both tables should be loaded in the memory and WHERE condition should be checked for
+   each & every record.
+
+   To get the data from multiple tables, use JOIN operation.
