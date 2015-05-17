@@ -39,3 +39,12 @@ Database key-points :-
    SELECT MAX(SAL, COMM) FROM EMP; ==> x (Not Allowed)
 
 9) COUNT function only counts not null values. NULL values are not counted.
+
+10)WHERE VS HAVING :
+   Both clauses are used to filter the data.
+   To filter rows use WHERE clause , but to filter groups use HAVING clause.
+
+   In condition if aggregate function is not present then use WHERE clause.
+   In condition if aggregate function is present then use HAVING clause.
+
+   WHERE clause should be used before GROUP BY & HAVING clause should be used after GROUP BY.
