@@ -251,19 +251,24 @@ news without tangling things up.
 	But what if you simply need to vary the responsibilities of an object? What do you do when sometimes your object needs to do a little more, but sometimes a little less? In this chapter we will look at the Decorator pattern, which enables you to easily add an enhancement to an existing object. The Decorator pattern also allows you to layer features atop one another so that you can construct objects that have exactly the right set of capabilities that you need for any given situation.
 
 14) Singleton Pattern
-	The motivation behind the Singleton pattern is very simple: There are some things that are unique. Programs frequently have a single configuration file. It is not unusual for a program to let you know how it is doing via a single log file. GUI applications frequently have a one main window, and they typically take input from exactly one keyboard. Many applications need to talk to exactly one database. If you only ever have one instance of a class and a lot of code that needs access to that instance, it seems silly to pass the object from one method to another. In this kind of situation, the GoF suggest that you build a singleton—a class that can have only one instance and that provides global access to that one instance.
+    The motivation behind the Singleton pattern is very simple: There are some things that are unique. Programs frequently have a single configuration file. It is not unusual for a program to let you know how it is doing via a single log file. GUI applications frequently have a one main window, and they typically take input from exactly one keyboard. Many applications need to talk to exactly one database. If you only ever have one instance of a class and a lot of code that needs access to that instance, it seems silly to pass the object from one method to another. In this kind of situation, the GoF suggest that you build a singleton—a class that can have only one instance and that provides global access to that one instance.
 	
-	Logger example : Restricting creation of new object of logger class from outside.
+    Logger example : Restricting creation of new object of logger class from outside.
 	
-	class SimpleLogger
-	  # Lots of code deleted...
-	  @@instance = SimpleLogger.new
+    class SimpleLogger
+      # Lots of code deleted...
+      @@instance = SimpleLogger.new
 	  
-	  def self.instance
-	    return @@instance
-	  end
+      def self.instance
+        return @@instance
+      end
 	  
-	  private_class_method :new
-	end
+      private_class_method :new
+    end
 	
-	Ex in Rails - Inflections
+    Ex in Rails - Inflections
+
+    Ruby's builtin utility, rake, also uses a singleton. As it runs, rake - like most build tools - reads in information about 
+    what it need to do: which directoriesto create, which files to copy, and so on. All of this information needs to be 
+    available to all of the moving parts of rake, so rake stores it all in a single object (the Rake::Application object) 
+    that is available as a singleton to the entire rake program.
