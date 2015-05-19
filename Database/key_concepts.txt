@@ -56,3 +56,8 @@ Database key-points :-
    each & every record.
 
    To get the data from multiple tables, use JOIN operation.
+
+12)A VIEW doesn't contain any data, doesn't occupy any space.
+   When a VIEW is created the query (SELECT empno, ename, sal FROM emp) associated with the view is stored in the DB.
+   A VIEW is also called as stored query.
+   Query fired using VIEW is slower compared to the same using base table.
