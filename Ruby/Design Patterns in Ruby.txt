@@ -272,3 +272,14 @@ news without tangling things up.
     what it need to do: which directoriesto create, which files to copy, and so on. All of this information needs to be 
     available to all of the moving parts of rake, so rake stores it all in a single object (the Rake::Application object) 
     that is available as a singleton to the entire rake program.
+
+15) Factory Method Pattern
+    Pond Example : Frog & Duck
+
+16) Abstract Factory Pattern
+    Habitat : PondOrganismFactory, JungleOrganismFactory (Group related object creation)
+
+17) Builder Pattern
+    Manufacturing a computer -> Desktop, Laptop
+    If you have to write a lot of code to configure each object, then you should factor all of that creation code into a 
+    seperate class, the builder.
