@@ -283,3 +283,6 @@ news without tangling things up.
     Manufacturing a computer -> Desktop, Laptop
     If you have to write a lot of code to configure each object, then you should factor all of that creation code into a 
     seperate class, the builder.
+
+18) Interpreter Pattern
+    SQL, HTML, Ruby
