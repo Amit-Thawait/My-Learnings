@@ -1,0 +1,7 @@
+Caching related links :-
+------------------------
+http://www.akitaonrails.com/2015/05/20/dynamic-site-as-fast-as-a-static-generated-one-with-raptor
+
+https://dev.firmafon.dk/blog/rails-5-much-faster-collection-rendering
+
+
