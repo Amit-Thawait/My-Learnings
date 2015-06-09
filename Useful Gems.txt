@@ -51,3 +51,5 @@ Useful Gems :-
 22) gretel :- Flexible Ruby on Rails breadcrumbs plugin.
 
 23) remotipart :- Remotipart is a Ruby on Rails gem enabling remote multipart forms (AJAX style file uploads) with jquery-rails. This gem augments the native Rails 3 jQuery-UJS remote form function enabling asynchronous file uploads with little to no modification to your application.
+
+24) sprockets-rails :- new sprockets gem which supports rails 3 & rails 4.

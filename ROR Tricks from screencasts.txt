@@ -2486,3 +2486,5 @@ The non-database functionality of Active Record is extracted out into Active Mod
 
 239) MySQL conditional update query : (Single update for different rows)
      http://www.karlrixon.co.uk/writing/update-multiple-rows-with-different-values-and-a-single-sql-query/
+
+240) Serving a file from the public directory means that it will always take precedence over any dynamic route in your application.
