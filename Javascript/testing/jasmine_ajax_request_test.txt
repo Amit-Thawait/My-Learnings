@@ -1,0 +1,39 @@
+Referece Links :-
+=================
+http://stackoverflow.com/questions/22041745/jasmine-spyonobj-method-andcallfake-or-and-callfake
+http://stackoverflow.com/questions/4662641/how-do-i-verify-jquery-ajax-events-with-jasmine
+http://www.htmlgoodies.com/html5/javascript/testing-ajax-event-handlers-using-jasmine-spies.html
+http://stackoverflow.com/questions/13148356/how-to-properly-unit-test-jquerys-ajax-promises-using-jasmine-and-or-sinon
+http://sinonjs.org/docs/#fakeServer
+
+
+describe("Funcationality Name", function() {
+
+  it("should make a ajax request to <action> if user confirms", function() {
+  	$('body').append(' \
+      <div id="abc"> \
+        <a class="xyz" href="javascript://" invitation-token="1234">Send</a> \
+      </div> \
+    ');
+    var el = $("div#abc a.xyz").first();
+    spyOn($, "ajax");
+    spyOn(window, 'confirm').and.returnValue(true);
+
+    namespace_name.function_name(el);  // basically call the actual function (here it takes 1 parameter which is an element)
+    expect($.ajax.calls.mostRecent().args[0].url).toContain("/link-to/invitations/1234/");
+  });
+
+  it("should not make a ajax request to <action> if user doesn't confirm", function() {
+    $('body').append(' \
+      <div id="abc"> \
+        <a class="xyz" href="javascript://" invitation-token="1234">Send</a> \
+      </div> \
+    ');
+    var el = $("div#abc a.xyz").first();
+    spyOn($, "ajax");
+    spyOn(window, 'confirm').and.returnValue(false);
+
+    expect(namespace_name.function_name(el)).toEqual(false);
+  });
+
+});
