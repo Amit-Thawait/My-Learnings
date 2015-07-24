@@ -1,6 +1,9 @@
 An attempt to create text-to-speech pluggin :-
 ----------------------------------------------
 
+Text to speech API : 
+http://tts-api.com/
+
 var audio = new Audio();
 audio.src ='http://translate.google.com/translate_tts?ie=utf-8&tl=en&q=Hello%20World';
 audio.play();
