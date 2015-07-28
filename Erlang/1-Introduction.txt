@@ -1,0 +1,60 @@
+Introduction :-
+---------------
+First of all, Erlang is a functional programming language. If you have ever worked with imperative languages, statements such as i++ may be normal to you; 
+in functional programming they are not allowed. In fact, changing the value of any variable is strictly forbidden! This may sound weird at first, but if you 
+remember your math classes, it's in fact how you've learned it.
+
+y = 2
+x = y + 3
+x = 2 + 3
+x = 5
+
+Had I added the following:
+
+x = 5 + 1
+x = x
+∴ 5 = 6
+
+Functions always returning the same result for the same parameter is called referential transparency. It's what lets us replace add_two_to(3) with 5, as the result 
+of 3+2 will always be 5.
+
+x = today() = 2009/10/22
+-- wait a day --
+x = today() = 2009/10/23
+x = x
+∴ 2009/10/22 = 2009/10/23
+Oh no! My beautiful equations! They suddenly all turned wrong! How come my function returns a different result every day?
+
+Obviously, there are some cases where it's useful to break referential transparency. Erlang has this very pragmatic approach with functional programming: obey its purest principles (referential transparency, avoiding mutable data, etc), but break away from them when real world problems pop up.
+
+Erlang's actor model can be imagined as a world where everyone is sitting alone in their own room and can perform a few distinct tasks. Everyone communicates strictly
+by writing letters and that's it. While it sounds like a boring life (and a new age for the postal service), it means you can ask many people to perform very specific
+tasks for you, and none of them will ever do something wrong or make mistakes which will have repercussions on the work of others; they may not even know the existence
+of people other than you (and that's great).
+
+To escape this analogy, Erlang forces you to write actors (processes) that will share no information with other bits of code unless they pass messages to each other.
+Every communication is explicit, traceable and safe.
+
+When we defined Erlang, we did so at a language level, but in a broader sense, this is not all there is to it: Erlang is also a development environment as a whole. The
+code is compiled to bytecode and runs inside a virtual machine. So Erlang, much like Java and kids with ADD, can run anywhere. The standard distribution includes (among
+others) development tools (compiler, debugger, profiler, test framework), the Open Telecom Platform (OTP) Framework, a web server, a parser generator, and the mnesia
+database, a key-value storage system able to replicate itself on many servers, supporting nested transactions and letting you store any kind of Erlang data.
+
+The VM and the libraries also allow you to update the code of a running system without interrupting any program, distribute your code with ease on many computers and
+manage errors and faults in a simple but powerful manner.
+
+The first case of this is related to Erlang's massive scaling abilities due to its lightweight processes. It is true that Erlang processes are very light: you can have
+hundreds of thousands of them existing at the same time, but this doesn't mean you have to use it that way just because you can. For example, creating a shooter game
+where everything including bullets is its own actor is madness. The only thing you'll shoot with a game like this is your own foot. There is still a small cost in
+sending a message from actor to actor, and if you divide tasks too much, you will make things slower!
+
+Erlang is also said to be able to scale in a directly proportional manner to how many cores your computer has, but this is usually not true: Bad Graph: Speed vs Cores:
+It just scales! it is possible, but most problems do not behave in a way that lets you just run everything at the same time.
+
+There's something else to keep in mind: while Erlang does some things very well, it's technically still possible to get the same results from other languages. The
+opposite is also true; evaluate each problem as it needs to be, and choose the right tool according to the problem being addressed. Erlang is no silver bullet and will
+be particularly bad at things like image and signal processing, operating system device drivers, etc. and will shine at things like large software for server use (i.e.:
+queues, map-reduce), doing some lifting coupled with other languages, higher-level protocol implementation, etc. Areas in the middle will depend on you. You should not
+necessarily wall yourself in server software with Erlang: there have been cases of people doing unexpected and surprising things. One example is IANO, a robot created
+by the UNICT team, which uses Erlang for its artificial intelligence and won the silver medal at the 2009 eurobot competition. Another example is Wings 3D, an open
+source 3D modeler (but not a renderer) written in Erlang and thus cross-platform.

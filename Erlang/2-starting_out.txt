@@ -1,0 +1,25 @@
+Starting Out :-
+===============
+
+Shell Commands
+--------------
+First of all, if you type some text and then go ^A (Ctrl+A), you should see your cursor moving to the beginning of the line. ^E (Ctrl+E) gets you to the end. 
+You can use arrow keys to go forward, backwards, show previous or next lines so you can repeat code.
+
+Just type in help(). and you should get information on a bunch of commands you can use in the shell (do not forget the full stop (.) as it is necessary for the command
+to run). We'll use some of them at a later point, but the only line of concern to us in order to get out is q() -- quit - shorthand for init:stop()
+
+So this is one way to do it (in fact, two ways). But this won't help us if the shell freezes! If you were paying attention, when you started the shell, there was a
+comment about 'aborting with ^G'. Let's do that, and then press h to get help!
+
+User switch command
+--> h
+c [nn]            - connect to job
+i [nn]            - interrupt job
+k [nn]            - kill job
+j                 - list all jobs
+s [shell]         - start local shell
+r [node [shell]]  - start remote shell
+q                 - quit erlang
+? | h             - this message
+-->
