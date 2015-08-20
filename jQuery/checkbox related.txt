@@ -15,11 +15,15 @@ We can also use the below line to check whether a checkbox(or radio button) is c
 jQuery("#project").attr('checked')  ---> returns true or false
 
 To check/uncheck a checkbor(or radio button) we can use the command :-
-
+----------------------------------------------------------------------
 <input type="radio" name= "send_noti" value ="No" checked> No </input>
 or
 <input type="checkbox" name="project_name" value ="1" checked id ="project">   Project 2
 
+jQuery 1.6+
+jQuery("#project").prop('checked',true)  or  jQuery("#project").prop('checked',false)
+
+till jQuery 1.5
 jQuery("#project").attr('checked',true)  or  jQuery("#project").attr('checked',false)
 
 
@@ -27,7 +31,6 @@ jQuery("#project").attr('checked',true)  or  jQuery("#project").attr('checked',f
 ----------------------------
 arr = jQuery("input[id*='project']")
 jQuery.each(arr,function(i){alert(jQuery(this).attr('checked'))})
-
 
 
 To check all the check-boxes :
