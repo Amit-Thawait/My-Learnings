@@ -5,8 +5,9 @@ Useful Gems :-
 
 2) rails_xss gem
 
-3) writeexcel - The Spreadsheet::WriteExcel module can be used to create a cross-platform Excel binary file. Multiple worksheets can be added to a
-				 workbook and formatting can be applied to cells. Text, numbers,formulas, hyperlinks, images and charts can be written to the cells.
+3) writeexcel - The Spreadsheet::WriteExcel module can be used to create a cross-platform Excel binary file. Multiple worksheets
+   can be added to a workbook and formatting can be applied to cells. Text, numbers,formulas, hyperlinks, images and charts can be
+   written to the cells.
 				 
 4) tabs_on_rails (For creating tabs : http://www.simonecarletti.com/code/tabs_on_rails/)
 
@@ -20,16 +21,17 @@ Useful Gems :-
 
 9) locale_setter for setting locale (https://github.com/jcasimir/locale_setter/)
 
-10)state_machine for creating different state rather than just true/false or -1,0,1 etc (https://github.com/pluginaweek/state_machine/)
+10) state_machine for creating different state rather than just true/false or -1,0,1 etc (https://github.com/pluginaweek/state_machine/)
 
-11)Turbo Sprockets for Rails 3.2.x (no repeatitive relaoding of JS & CSS) (https://github.com/ndbroadbent/turbo-sprockets-rails3)
+11) Turbo Sprockets for Rails 3.2.x (no repeatitive relaoding of JS & CSS) (https://github.com/ndbroadbent/turbo-sprockets-rails3)
 
-12)Hamster - Efficient, Immutable, Thread-Safe Collection classes for Ruby
+12) Hamster - Efficient, Immutable, Thread-Safe Collection classes for Ruby
 
-13)hirb gem is used to display the array of records (say for Product.all) in a nice table format 
+13) hirb gem is used to display the array of records (say for Product.all) in a nice table format
 
-14)searchlogic :- Searchlogic makes searching models(DB objects) easier than ever with its assortment of named scopes. 
-  (Diadvantage : some security issues since it creates a url containing all the searched strings even which is not mentioned in the form. Advised only for admin pages.)
+14) searchlogic :- Searchlogic makes searching models(DB objects) easier than ever with its assortment of named scopes.
+    (Diadvantage : some security issues since it creates a url containing all the searched strings even which is not mentioned in the form.
+    Advised only for admin pages.)
 
 15) Nokogiri :- (Used to parse the content in the page, Using the CSS Selector pluggin 'SelectorGadget' - also available for firefox) 
    (Recommended for single page)
@@ -38,7 +40,7 @@ Useful Gems :-
     (It uses nokogiri under the hood but with some extra features like clicking the links and submitting the form)
 
 17) rails-api :- Gem for writing api's in rails (light-weight framework compared to rails just for API's).
-	https://github.com/rails-api/rails-api#why-use-rails-for-json-apis
+    https://github.com/rails-api/rails-api#why-use-rails-for-json-apis
 	
 18) rest-client :- Gem to interact with any API (https://github.com/rest-client/rest-client)
 
@@ -50,6 +52,17 @@ Useful Gems :-
 
 22) gretel :- Flexible Ruby on Rails breadcrumbs plugin.
 
-23) remotipart :- Remotipart is a Ruby on Rails gem enabling remote multipart forms (AJAX style file uploads) with jquery-rails. This gem augments the native Rails 3 jQuery-UJS remote form function enabling asynchronous file uploads with little to no modification to your application.
+23) remotipart :- Remotipart is a Ruby on Rails gem enabling remote multipart forms (AJAX style file uploads) with jquery-rails.
+    This gem augments the native Rails 3 jQuery-UJS remote form function enabling asynchronous file uploads with little to no
+    modification to your application.
 
 24) sprockets-rails :- new sprockets gem which supports rails 3 & rails 4.
+
+25) bootstrap-sass-rails :- Add bootstrap to rails app.
+
+26) compass-rails :- Compass is a Stylesheet Authoring Environment that makes your website design simpler to implement and easier to
+    maintain. http://compass-style.org
+
+27) eco :- Eco lets you embed CoffeeScript logic in your markup. It's like EJS and ERB, but with CoffeeScript inside the <% ... %>.
+    Use it from Node.js to render your application's views on the server side, or compile your templates to JavaScript with the eco
+    command-line utility and use them to dynamically render views in the browser.
