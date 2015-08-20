@@ -1,0 +1,10 @@
+Steps to add bootstrap CSS to Rails app :-
+==========================================
+1) Add to Gemfile :
+   gem 'compass-rails'
+   gem 'bootstrap-sass-rails'
+
+2) Change extension of all css files from css to css.scss like application.css to application.css.scss
+
+3) In application.css.scss file add this line :
+   @import "twitter/bootstrap";
