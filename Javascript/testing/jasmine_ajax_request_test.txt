@@ -48,4 +48,15 @@ describe("Funcationality Name", function() {
     $.ajax.calls.mostRecent().args[0].success({error: 'Sorry the billing API is down'});
     expect($("div#error_msg").html()).toEqual("Sorry the name could not be fetched");
   });
+
+  it("should uncheck the terms and conditions checkbox on window load", function() {
+    $('body').innerHTML = '';
+    $('body').append('\
+      <input id="terms-checkbox" name="agree_to_terms" type="checkbox">\
+    ');
+    $("input#terms-checkbox").prop('checked', true);
+
+    spyOn(window, 'onload').and.returnValue(registration.uncheck_term_and_conditions());
+    expect($("input#terms-checkbox").is(':checked')).toEqual(false);
+  });
 });
