@@ -12,7 +12,7 @@ describe("Funcationality Name", function() {
   it("should make a ajax request to <action> if user confirms", function() {
   	$('body').append(' \
       <div id="abc"> \
-        <a class="xyz" href="javascript://" invitation-token="1234">Send</a> \
+        <a class="xyz" href="javascript://" some-token="1234">Send</a> \
       </div> \
     ');
     var el = $("div#abc a.xyz").first();
@@ -26,7 +26,7 @@ describe("Funcationality Name", function() {
   it("should not make a ajax request to <action> if user doesn't confirm", function() {
     $('body').append(' \
       <div id="abc"> \
-        <a class="xyz" href="javascript://" invitation-token="1234">Send</a> \
+        <a class="xyz" href="javascript://" some-token="1234">Send</a> \
       </div> \
     ');
     var el = $("div#abc a.xyz").first();
@@ -36,4 +36,16 @@ describe("Funcationality Name", function() {
     expect(namespace_name.function_name(el)).toEqual(false);
   });
 
+  it("should display the error message if the ajax call fails", function() {
+    $('body').innerHTML = '';
+    $('body').append('\
+      <input id="name" type="text" value="ho" /> \
+      <div id="error_msg" class="error_msg"></div> \
+    ');
+
+    spyOn($, "ajax");
+    namespace.function_name("/get_names/", "ho", {}, []);
+    $.ajax.calls.mostRecent().args[0].success({error: 'Sorry the billing API is down'});
+    expect($("div#error_msg").html()).toEqual("Sorry the name could not be fetched");
+  });
 });
