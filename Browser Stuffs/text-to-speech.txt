@@ -16,3 +16,8 @@ window.speechSynthesis.speak(msg);
 Firefox Extension :-
 --------------------
 https://github.com/dgil/generator-firefox-extension
+
+
+http://responsivevoice.org/
+
+https://developers.google.com/web/updates/2014/01/Web-apps-that-talk---Introduction-to-the-Speech-Synthesis-API?hl=en
