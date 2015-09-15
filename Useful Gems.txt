@@ -66,3 +66,5 @@ Useful Gems :-
 27) eco :- Eco lets you embed CoffeeScript logic in your markup. It's like EJS and ERB, but with CoffeeScript inside the <% ... %>.
     Use it from Node.js to render your application's views on the server side, or compile your templates to JavaScript with the eco
     command-line utility and use them to dynamically render views in the browser.
+
+28) autoprefixer-rails :- The Autoprefixer PostCSS plugin is one of the most popular CSS processors. Autoprefixer is a tool to parse CSS and add vendor prefixes to CSS rules using values from the Can I Use(caniuse.com). This gem provides Ruby and Ruby on Rails integration with this JavaScript tool.
