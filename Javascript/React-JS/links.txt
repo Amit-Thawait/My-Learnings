@@ -1,0 +1,7 @@
+Gentle Introduction to the React Flux Architecture :-
+-----------------------------------------------------
+https://egghead.io/articles/gentle-introduction-to-the-react-flux-architecture
+
+Building an app :-
+------------------
+https://egghead.io/lessons/react-building-a-react-js-app-notetaker-introduction
