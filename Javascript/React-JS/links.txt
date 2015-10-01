@@ -9,3 +9,5 @@ https://egghead.io/lessons/react-building-a-react-js-app-notetaker-introduction
 General :-
 ----------
 http://jamesknelson.com/learn-raw-react-no-jsx-flux-es6-webpack/
+
+https://egghead.io/playlists/using-refluxjs-for-react-applications
