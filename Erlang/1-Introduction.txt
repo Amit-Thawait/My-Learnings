@@ -25,7 +25,8 @@ x = x
 ∴ 2009/10/22 = 2009/10/23
 Oh no! My beautiful equations! They suddenly all turned wrong! How come my function returns a different result every day?
 
-Obviously, there are some cases where it's useful to break referential transparency. Erlang has this very pragmatic approach with functional programming: obey its purest principles (referential transparency, avoiding mutable data, etc), but break away from them when real world problems pop up.
+Obviously, there are some cases where it's useful to break referential transparency. Erlang has this very pragmatic approach with functional programming: obey its
+purest principles (referential transparency, avoiding mutable data, etc), but break away from them when real world problems pop up.
 
 Erlang's actor model can be imagined as a world where everyone is sitting alone in their own room and can perform a few distinct tasks. Everyone communicates strictly
 by writing letters and that's it. While it sounds like a boring life (and a new age for the postal service), it means you can ask many people to perform very specific
@@ -53,8 +54,94 @@ It just scales! it is possible, but most problems do not behave in a way that le
 
 There's something else to keep in mind: while Erlang does some things very well, it's technically still possible to get the same results from other languages. The
 opposite is also true; evaluate each problem as it needs to be, and choose the right tool according to the problem being addressed. Erlang is no silver bullet and will
-be particularly bad at things like image and signal processing, operating system device drivers, etc. and will shine at things like large software for server use (i.e.:
+be particularly BAD at things like IMAGE and SIGNAL PROCESSING, OPERATING SYSTEM DEVICE DRIVERS, etc. and will shine at things like large software for server use (i.e.:
 queues, map-reduce), doing some lifting coupled with other languages, higher-level protocol implementation, etc. Areas in the middle will depend on you. You should not
 necessarily wall yourself in server software with Erlang: there have been cases of people doing unexpected and surprising things. One example is IANO, a robot created
 by the UNICT team, which uses Erlang for its artificial intelligence and won the silver medal at the 2009 eurobot competition. Another example is Wings 3D, an open
 source 3D modeler (but not a renderer) written in Erlang and thus cross-platform.
+
+Installation :-
+---------------
+Install dependencies
+--------------------
+1) Install OpenSSL
+   sudo apt-get install openssl
+
+2) Install Oracle Java SE JDK
+   sudo apt-add-repository ppa:webupd8team/java
+   sudo apt-get update
+   sudo apt-get install oracle-java8-installer
+
+3) Install wxWidgets - Toolkit for GUI applications. Required for building the wx application. At least version 3.0 of wxWidgets is required
+   i) Download the source
+      http://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2/download
+
+   ii) Extract and move the source
+       tar -xf wxWidgets-3.0.2.tar.bz2
+       sudo mv wxWidgets-3.0.2 /opt/
+
+   iii) To compile wxwidgets we would need some utility programs including the C++ compiler on Linux called g++. And all of it would be installed from the
+        repositories using apt-get.
+        sudo apt-get install libgtk-3-dev build-essential checkinstall
+
+   iv) Compile wxWidgets: Get inside the directory where wxWidgets is extracted. In order to keep things clean, create a directory where the compilation would be done
+       mkdir gtk-build
+       cd gtk-build/
+       Now run the configure and make commands one by one. Each one would take some time to finish. make command will take long time.
+       ../configure --disable-shared --enable-unicode
+       > make
+
+   v) Install with checkinstall (It will ask couple of questions, just press enter for both)
+      sudo checkinstall
+
+We also need the GTK development libraries which wxWidgets depend on
+
+For Building Documentation :
+4) Install xsltproc - A command line XSLT processor
+   sudo apt-get install xsltproc
+
+5) Install fop - Apache FOP print formatter (requires Java)
+   sudo apt-get install fop
+
+Unpacking
+---------
+1) Download the source from http://www.erlang.org/download.html by selecting appropriate release from Available releases section on the right side.
+
+2) Extract the tar file downloaded
+   tar -xf otp_src_18.1.tar.gz
+
+3) Move the extracted folder to /opt/
+   sudo mv otp_src_18.1 /opt/
+
+4) Go to the new otp directory
+   cd /opt/otp_src_18.1
+
+5) Set the $ERL_TOP variable to the above directory
+   export ERL_TOP=`pwd`
+
+Configuring
+-----------
+6) Run the following commands to configure the build
+   ./configure
+
+Building
+--------
+7) Build the Erlang/OTP release.
+   > make
+
+Installing
+----------
+8) You are now ready to install the Erlang/OTP release! The following command will install the release on your system.
+   make install
+
+Erlang Shell :-
+---------------
+> erl
+Erlang R16B03 (erts-5.10.4) [source] [64-bit] [smp:4:4] [async-threads:10] [kernel-poll:false]
+
+Eshell V5.10.4  (abort with ^G)
+1>
+
+To quit the shell type
+> q().
+don't forget the dot at the end
