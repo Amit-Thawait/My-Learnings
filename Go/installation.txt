@@ -1,0 +1,48 @@
+Installation (Ubuntu):-
+-----------------------
+1) Download the source
+   https://storage.googleapis.com/golang/go1.5.1.linux-amd64.tar.gz
+
+2) Extract the source
+   sudo tar -C /usr/local -xzf go1.5.1.linux-amd64.tar.gz
+
+3) Set PATH for go : Add /usr/local/go/bin to the PATH environment variable
+   Add the below line in $HOME/.profile
+   export PATH=$PATH:/usr/local/go/bin
+
+   OR (If you want to keep the extracted go source to some other location besides /usr/local/)
+
+   Installing to a custom location :
+   For example, if you installed Go to your home directory you should add the following commands to $HOME/.profile
+   export GOROOT=$HOME/go
+   export PATH=$PATH:$GOROOT/bin
+
+   Run > . ~/.profile (To relaod the env variable)
+
+4) Test your installation
+   Create a dir where you want to keep your go programs.
+   Lets say you create a dir name workspace under $HOME dir, then lets say you created a dir named go_programs.
+
+   Now set GOPATH to the above created dir where you want to keep your go programs.
+   Add the below line in $HOME/.profile
+   export GOPATH=$HOME/workspace/go_programs
+
+   Next, make the directories src/github.com/user/hello inside your workspace (if you use GitHub, substitute your user name for user), and inside the hello
+   directory create a file named hello.go with the following contents:
+
+   package main
+
+   import "fmt"
+
+   func main() {
+       fmt.Printf("hello, world\n")
+   }
+
+   Then compile it with the go tool:
+   > cd ~/workspace/go_programs/src
+   > go install github.com/user/hello
+
+   The above command will put an executable command named hello (or hello.exe) inside the bin directory of your workspace. Execute the command to see the greeting:
+   > $GOPATH/bin/hello  # hello, world
+   OR
+   > ~/workspace/go_programs/bin/hello   # hello, world
