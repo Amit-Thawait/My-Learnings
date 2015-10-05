@@ -27,6 +27,8 @@ Installation (Ubuntu):-
    Add the below line in $HOME/.profile
    export GOPATH=$HOME/workspace/go_programs
 
+   > . ~/.profile (To relaod the env variable)
+
    Next, make the directories src/github.com/user/hello inside your workspace (if you use GitHub, substitute your user name for user), and inside the hello
    directory create a file named hello.go with the following contents:
 
