@@ -1,0 +1,12 @@
+Go Playground :-
+----------------
+Go Playground summary
+http://talks.golang.org/2012/insidepresent.slide#1
+
+The playground service is used by more than just the official Go project (Go by Example is one other instance) and we are happy for you to use it on your own site.
+All we ask is that you contact us first, use a unique user agent in your requests (so we can identify you), and that your service is of benefit to the Go community.
+
+Go by Example :-
+----------------
+Go by Example is a hands-on introduction to Go using annotated example programs.
+https://gobyexample.com/
