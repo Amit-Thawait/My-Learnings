@@ -29,6 +29,8 @@ Installation (Ubuntu):-
 
    > . ~/.profile (To relaod the env variable)
 
+   Add $GOPATH/bin to $PATH in ~/.profile or ~/.zprofile
+
    Next, make the directories src/github.com/user/hello inside your workspace (if you use GitHub, substitute your user name for user), and inside the hello
    directory create a file named hello.go with the following contents:
 
