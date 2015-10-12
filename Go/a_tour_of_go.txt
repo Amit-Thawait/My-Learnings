@@ -18,8 +18,21 @@ A Tour of Go :-
 
 3) In string interpolation
    %T => data type of variable
-   %v => value of the variable
+   %v => value of the variable (OR %g)
    %q => int     -> '\x00'
          float64 -> %!q(float64=0)
          boolean -> %!q(bool=false)
          string  -> ""
+
+4) There are two println in Go
+   println :- Predeclared identifiers defined in Go which is a function.
+   fmt.Println :- This is from the fmt package fmt.Println
+   Ex: println("The sum at %v\n", sum) => The sum at %v 1
+   fmt.Println("The sum at %v\n", sum) => The sum at 1
+
+   No need to append space at the end of string if you are interpolating it.
+   Ex: println("The sum at", sum) => The sum at 1
+
+   One gotcha : println doesn't prints time
+   println("Time =", time.Now())  => Doesn't work
+   fmt.Println("Time =", time.Now()) => works
