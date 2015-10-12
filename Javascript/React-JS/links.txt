@@ -6,6 +6,10 @@ Building an app :-
 ------------------
 https://egghead.io/lessons/react-building-a-react-js-app-notetaker-introduction
 
+Style Guide :-
+--------------
+https://github.com/Khan/style-guides/blob/master/style/react.md
+
 React Native :-
 ---------------
 https://egghead.io/series/react-native-fundamentals
