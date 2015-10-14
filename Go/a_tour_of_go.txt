@@ -36,3 +36,7 @@ A Tour of Go :-
    One gotcha : println doesn't prints time
    println("Time =", time.Now())  => Doesn't work
    fmt.Println("Time =", time.Now()) => works
+
+5) Converting an array into slice
+   x := [3]string{"aaa", "bbb", "ccc"}
+   s := x[:] // a slice referencing the storage of x
