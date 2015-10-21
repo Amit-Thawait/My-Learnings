@@ -1,0 +1,43 @@
+Adding rspec for a Rails application from scratch :-
+====================================================
+
+rails new bookmark_manager -d mysql --skip-test-unit
+
+cd bookmark_manager
+
+vim Gemfile
+add rspec-rails gem
+
+bundle
+
+rails g rspec:install
+      create  .rspec
+      create  spec
+      create  spec/spec_helper.rb
+      create  spec/rails_helper.rb
+
+bundle binstubs rspec-core
+
+Add factory_girl_rails gem as a replacement for fixtures
+vim Gemfile
+gem 'factory_girl_rails'
+
+rails g scaffold Bookmark name:string url:string tags:string description:string
+
+tree spec
+
+vim spec/controllers/bookmarks_controller_spec.rb
+
+bin/rspec spec/controllers
+=> This will display almost all as pending
+
+In spec_helper.rb file :
+Before RSpec.configure line add
+require 'factory_girl_rails'
+
+Creating factory girl object
+bookmark = FactoryGirl.build(:bookmark)
+or
+FactoryGirl.create(:bookmark)
+
+Refer https://github.com/Amit-Thawait/bookmark_manager/commit/610f141afcf9362afe3323877613d3cfcbccc989
