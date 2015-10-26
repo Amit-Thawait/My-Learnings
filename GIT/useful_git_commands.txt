@@ -4,3 +4,5 @@
    
    Replace "your-git-files-to-be-deleted" with the path of actual files to be deleted.
    The above command goes through each and every commit across all the branches and removes the specified files.
+
+   Refernce Link : https://help.github.com/articles/remove-sensitive-data/
