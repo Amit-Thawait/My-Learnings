@@ -1,0 +1,3 @@
+commit id : 03d28f6ca74d552ff18a01abb40055849e06339c
+branch name : omniauth_integration
+Repo : bookmark_manager
