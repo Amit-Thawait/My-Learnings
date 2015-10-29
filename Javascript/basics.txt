@@ -5,3 +5,52 @@
    0
    NaN
    the empty string ("")
+
+   All other values, including all objects evaluate to true when passed to a conditional statement.
+   Do not confuse the primitive boolean values true and false with the true and false values of the Boolean object. For example:
+
+   var b = new Boolean(false);
+   if (b) // this condition evaluates to true
+
+2) for...of statement :- (part of the ECMAScript 2015 (ES6) standard)
+   The for...of statement creates a loop Iterating over iterable objects (including Array, Map, Set, arguments object and so on), invoking a custom iteration hook
+   with statements to be executed for the value of each distinct property.
+
+    for (variable of object) {
+      statement
+    }
+
+   The following example shows the difference between a for...of loop and a for...in loop. While for...in iterates over property names, for...of iterates over
+   property values:
+
+    let arr = [3, 5, 7];
+    arr.foo = "hello";
+
+    for (let i in arr) {
+       console.log(i); // logs "0", "1", "2", "foo"
+    }
+
+    for (let i of arr) {
+       console.log(i); // logs "3", "5", "7"
+    }
+
+3) Nested functions and closures :-
+   You can nest a function within a function. The nested (inner) function is private to its containing (outer) function. It also forms a closure. A closure is
+   an expression (typically a function) that can have free variables together with an environment that binds those variables (that "closes" the expression).
+
+   Since a nested function is a closure, this means that a nested function can "inherit" the arguments and variables of its containing function. In other words,
+   the inner function contains the scope of the outer function.
+
+   To summarize:
+   The inner function can be accessed only from statements in the outer function.
+   The inner function forms a closure: the inner function can use the arguments and variables of the outer function, while the outer function cannot use the
+   arguments and variables of the inner function.
+
+4) Using the arguments object :-
+   All the arguments passed to a function are accessible via arguments variable in the form of array.
+   function numbers(n){
+     console.log("=========n===="+n);
+     console.log("=======args==="+arguments.length+"======"+arguments[0]+arguments[1]+arguments[2]+arguments[3]);
+   }
+   => =========n====1
+      =======args===4======1234
