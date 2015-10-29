@@ -1,0 +1,7 @@
+1) Falsy values : The following values will evaluate to false:
+   false
+   undefined
+   null
+   0
+   NaN
+   the empty string ("")
