@@ -2502,3 +2502,6 @@ The non-database functionality of Active Record is extracted out into Active Mod
                              # default content type, which currently is `text/html`
 
      We want to phrase out the usage of render :text, to reduce the confusion in the future. There's currently no plan for deprecating render :text.
+
+242) For per-request (threadsafe) Time zone setter : use
+     time.in_time_zone(user.time_zone) in the view
