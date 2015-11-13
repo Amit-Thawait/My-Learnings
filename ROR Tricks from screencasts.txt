@@ -2510,3 +2510,6 @@ The non-database functionality of Active Record is extracted out into Active Mod
      In config/application.rb or one of env file
      config.logger = Logger.new(config.paths['log'].first, 5, 20*1024)
      # 5 files each of 20 MB
+
+244) Instead of to_sql use capture_sql to get the actual SQL query :
+     capture_sql command is used to make assertions against the sql run against the database.
