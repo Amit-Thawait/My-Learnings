@@ -2505,3 +2505,8 @@ The non-database functionality of Active Record is extracted out into Active Mod
 
 242) For per-request (threadsafe) Time zone setter : use
      time.in_time_zone(user.time_zone) in the view
+
+243) Log file rotation in Ruby :
+     In config/application.rb or one of env file
+     config.logger = Logger.new(config.paths['log'].first, 5, 20*1024)
+     # 5 files each of 20 MB
