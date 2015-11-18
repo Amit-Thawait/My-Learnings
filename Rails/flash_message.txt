@@ -1,0 +1,75 @@
+application.html.erb
+--------------------
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BookmarkManager</title>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header col-md-3">
+        <a class="navbar-brand" href="#">
+          <img alt="Brand" src="/assets/bookmark_logo.png">
+        </a>
+      </div>
+      <% if session[:user_id].present? %>
+        Signed in as <%= current_user.email %>
+        <div id="logout-section" class="col-md-9">
+          <ul>
+            <li><a href="/logout">Logout from this application</a></li>
+            <li><a href="/logout_all">Logout from <%= session[:provider] %> as well</a></li>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+  </nav>
+
+  <div class="container padding-left-100">
+    <div class="row">
+      <%= render 'layouts/messages' %>
+      <%= yield %>
+    </div>
+  </div>
+
+</body>
+</html>
+
+layouts/_messages.html.erb
+--------------------------
+<% flash.each do |name, msg| %>
+  <% if msg.is_a?(String) %>
+    <%= content_tag :div, msg, :class => "flash_#{name}" %>
+  <% end %>
+<% end %>
+
+application.scss
+----------------
+.flash_notice, .flash_alert {
+  padding: 8px 35px 8px 14px;
+  margin-bottom: 20px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid #fbeed5;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.flash_notice {
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+  color: #468847;
+}
+
+.flash_alert {
+  background-color: #f2dede;
+  border-color: #eed3d7;
+  color: #b94a48;
+}
