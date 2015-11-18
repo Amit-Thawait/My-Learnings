@@ -1892,8 +1892,15 @@ Then the URL becomes : http://localhost:3000/projects?search=yard
 
 	The h method in the helper method escaped any script or tag if present and the html_safe method to mark it as html safe.
 
-         #html_safe marks a string HTML-safe. It’s a common misconception that this method makes the string safe, it doesn’t. If you know that the string is safe, you can call this method, but it will only set the HTML-safe flag. So you should never do <%= params[:user_input].html_safe %>. Use the h() method to make it real HTML-safe.
-	
+        #html_safe marks a string HTML-safe. It’s a common misconception that this method makes the string safe, it doesn’t. If you know that the string is safe, you can call this method, but it will only set the HTML-safe flag. So you should never do <%= params[:user_input].html_safe %>. Use the h() method to make it real HTML-safe.
+
+        The raw() method is similar to the html_safe method. So you should never do: <%= raw params[:user_input] %>
+        raw = to_string + html_safe
+
+        This is how the string concatenation methods (+, concat(), <<) work:
+        If the left side is HTML-unsafe or the right side is HTML-safe, then it works like normal string concatenation and keeps the HTML-safe flag of the left side
+        Otherwise it will HTML-escape the right side and add it to the string
+
 179) Unobtrusive Javascript is a way to seperate out javascript from html document, so that we may not place javascript code directly inline.
 
 180) Purpose of javascript include tag and CSRF meta tag :-
