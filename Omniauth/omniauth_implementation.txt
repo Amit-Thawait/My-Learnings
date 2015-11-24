@@ -1,0 +1,22 @@
+Omniauth Gotcha :-
+==================
+
+1) Twitter :-
+=============
+
+https://apps.twitter.com/
+
+In twitter the apps section doesn't allow you to save url with localhost, instead use 127.0.0.1 in place of localhost or can also use a url shortner.
+
+https://twittercommunity.com/t/how-to-get-email-from-twitter-user-using-oauthtokens/558/175
+http://stackoverflow.com/questions/22627083/can-we-get-email-id-from-twitter-oauth-api
+
+How to get email ID from twitter oauth API?
+
+This is now possible by filling out a form to request elevated permissions(https://dev.twitter.com/rest/reference/get/account/verify_credentials):
+
+Go to https://support.twitter.com/forms/platform
+Select "I need access to special permissions"
+Enter Application Name and ID. These can be obtained via https://apps.twitter.com/ -- the application ID is the numeric part in the browser's address bar after you click your app.
+Permissions Request: "Email address"
+Submit & wait for response
