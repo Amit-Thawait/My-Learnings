@@ -20,3 +20,14 @@ Select "I need access to special permissions"
 Enter Application Name and ID. These can be obtained via https://apps.twitter.com/ -- the application ID is the numeric part in the browser's address bar after you click your app.
 Permissions Request: "Email address"
 Submit & wait for response
+
+After your request is granted, an addition permission setting is added in your twitter app's permission section.
+Go to permission setting and just tick the checkbox for "Request email addresses from users"
+
+This permission is only enabled on new sign-ins to your app.
+
+Check out various authentication options available for omniauth-twitter gem :
+https://github.com/arunagw/omniauth-twitter#authentication-options
+
+http://tutorials.jumpstartlab.com/topics/auth/remote_authentication.html
+http://stackoverflow.com/questions/22184824/how-to-log-out-social-sites-via-gem-omniauth-facebook-twitter
