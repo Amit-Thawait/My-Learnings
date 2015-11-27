@@ -1,3 +1,8 @@
 colordiff
 meld
 tree
+cowsay
+fortune
+gem install lolcat
+figlet
+sl
