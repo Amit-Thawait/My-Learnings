@@ -140,6 +140,38 @@ module M
   end
 end
 
+Autoload in Ruby :-
+-------------------
+
+module XML
+  autoload :SAXParser, 'parsers/sax.rb'
+end
+
+Ruby autoload gets evaluated lazily. It will be get initialized unless it is called.
+
+=========================================================================================
+Constant autoloading in Rails is not based on Module#autoload
+=========================================================================================
+Why the above point ?
+Answer :
+1) It only accept constant names, we cannot pass constant paths(like namespaces)
+2) It uses require (so code will not be reloaded due to this)
+
+Constant Autloading :-
+----------------------
+
+config.autoload_paths # => collection of directories to look for constants in Rails
+
+Uses load in development mode.
+Uses require in production mode.
+
+Sometimes we need some constants to defined beforehand instead of lazily. For that we can use require_dependency (This type of stuff is done rarely)
+
+In Rails autoloading no attempt is made to follow ancestors to avoid complicating things.
+
+ActiveSupport doesn't  emulate constant name resolution algorithm.
+
+If any file is changed in the development all the autoloaded constants are wiped before serving the next request. Constants are created again for next requests.
 
 1 Introduction :-
 ------------------
