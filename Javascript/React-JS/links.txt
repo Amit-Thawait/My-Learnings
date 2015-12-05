@@ -8,6 +8,8 @@ https://www.youtube.com/watch?v=Dm9NgjR5Jn4
 
 Redux :-
 --------
+https://egghead.io/series/getting-started-with-redux
+
 https://egghead.io/lessons/javascript-redux-the-single-immutable-state-tree
 
 Building an app :-
