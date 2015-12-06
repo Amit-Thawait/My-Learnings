@@ -1,0 +1,106 @@
+Reference :- https://github.com/rails/rails/issues/22503
+
+ActionView
+==========
+actionview/lib/action_view/tasks/dependencies.rake
+--------------------------------------------------
+rake cache_digests:nested_dependencies
+rake cache_digests:dependencies
+
+ActiveRecord
+============
+activerecord/lib/active_record/railties/databases.rake
+------------------------------------------------------
+rake db:load_config
+rake db:create
+rake db:create:all
+rake db:drop
+rake db:drop:all
+rake db:purge
+rake db:purge:all
+rake db:migrate
+rake db:migrate:redo
+rake db:migrate:reset
+rake db:migrate:up
+rake db:migrate:down
+rake db:migrate:status
+rake db:rollback
+rake db:forward
+rake db:reset
+rake db:charset
+rake db:collation
+rake db:version
+rake db:abort_if_pending_migrations
+rake db:setup
+rake db:seed
+rake db:fixtures:load
+rake db:fixtures:identify
+rake db:schema:dump
+rake db:schema:load
+rake db:schema:load_if_ruby
+rake db:cache:dump
+rake db:cache:clear
+rake db:structure:dump
+rake db:structure:load
+rake db:structure:load_if_sql
+rake db:test:load
+rake db:test:load_schema
+rake db:test:load_structure
+rake db:test:clone
+rake db:test:clone_schema
+rake db:test:clone_structure
+rake db:test:purge
+rake db:test:prepare
+rake db:railties:install:migrations
+
+Railties
+========
+railties/lib/rails/tasks/annotations.rake
+-----------------------------------------
+rake notes
+rake notes:custom
+rake notes:fixme
+rake notes:optimize
+rake notes:todo
+
+railties/lib/rails/tasks/engine.rake
+railties/lib/rails/tasks/framework.rake
+railties/lib/rails/tasks/initializers.rake
+------------------------------------------
+rake initializers
+
+railties/lib/rails/tasks/log.rake
+---------------------------------
+rake log:clear
+
+railties/lib/rails/tasks/middleware.rake
+----------------------------------------
+rake middleware
+
+railties/lib/rails/tasks/misc.rake
+----------------------------------
+rake secret
+rake about
+rake time:zones
+rake time:us
+rake time:local
+
+railties/lib/rails/tasks/restart.rake
+-------------------------------------
+rake restart
+
+railties/lib/rails/tasks/routes.rake
+------------------------------------
+rake routes
+
+railties/lib/rails/tasks/statistics.rake
+----------------------------------------
+rake stats
+
+railties/lib/rails/tasks/tmp.rake
+---------------------------------
+rake tmp:clear
+rake tmp:create
+rake tmp:cache:clear
+rake tmp:sockets:clear
+rake tmp:pids:clear
