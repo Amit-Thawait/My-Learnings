@@ -12,6 +12,8 @@ https://egghead.io/series/getting-started-with-redux
 
 https://egghead.io/lessons/javascript-redux-the-single-immutable-state-tree
 
+http://teropa.info/blog/2015/09/10/full-stack-redux-tutorial.html
+
 Building an app :-
 ------------------
 https://egghead.io/lessons/react-building-a-react-js-app-notetaker-introduction
