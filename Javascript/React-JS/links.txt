@@ -1,3 +1,15 @@
+Getting started with React JS :-
+--------------------------------
+http://reactfordesigners.com/labs/reactjs-introduction-for-people-who-know-just-enough-jquery-to-get-by/
+
+https://reactforbeginners.com/
+
+http://buildwithreact.com/tutorial
+
+https://zapier.com/engineering/react-js-tutorial-guide-gotchas/
+
+https://www.pluralsight.com/courses/react-flux-building-applications
+
 Gentle Introduction to the React Flux Architecture :-
 -----------------------------------------------------
 https://egghead.io/articles/gentle-introduction-to-the-react-flux-architecture
@@ -8,7 +20,11 @@ https://www.youtube.com/watch?v=Dm9NgjR5Jn4
 
 Redux :-
 --------
+https://egghead.io/series/getting-started-with-redux
+
 https://egghead.io/lessons/javascript-redux-the-single-immutable-state-tree
+
+http://teropa.info/blog/2015/09/10/full-stack-redux-tutorial.html
 
 Building an app :-
 ------------------
