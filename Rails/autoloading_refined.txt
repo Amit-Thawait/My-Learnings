@@ -1,5 +1,247 @@
 Constants in Ruby :-
 --------------------
+https://www.youtube.com/watch?v=wCyTRdtKm98
+X = 1  # Constant assignment
+
+class User < ActiveRecord::Base
+end
+
+this is also a constant assignment.
+
+In other programming languages you cannot modify a constant
+but Ruby gives a warning
+X = 1
+X = 2
+#=> WARNING: already initialized constant X
+
+# mutable object
+If you store a mutable object in a constant you can change the state of that object
+John = User.new
+John.email = 'john@example.com'
+
+Some built-in constants in the interpreter :
+ARGF
+ARGV
+CROSS_COMPILING
+ENV
+FALSE
+IRB
+NIL
+RUBY_COPYRIGHT
+RUBY_DESCRIPTION
+RUBY_ENGINE
+RUBY_PATCHLEVEL
+RUBY_PLATFORM
+RUBY_RELEASE_DATE
+RUBY_REVISION
+RUBY_VERSION
+STDERR
+STDIN
+STDOUT
+TOPLEVEL_BINDING
+TRUE
+
+Other constants
+ArgumentError
+Array
+BasicObject
+Bignum
+Binding
+Class
+Comparable
+Complex
+ConditionVariable
+Data
+Date
+DateTime
+Dir
+EOFError
+Encoding
+EncodingError
+Enumerable
+Enumerator
+Errno
+Exception
+Exception2MessageMapper
+FalseClass
+Fiber
+FiberError
+File
+FileTest
+Fixnum
+Float
+FloatDomainError
+GC
+Gem
+Hash
+IO
+IOError
+IRB
+IndexError
+Integer
+Interrupt
+Kernel
+KeyError
+LoadError
+LocalJumpError
+Marshal
+MatchData
+Math
+Method
+Module
+Monitor
+MonitorMixin
+Mutex
+NameError
+NilClass
+NoMemoryError
+NoMethodError
+NotImplementedError
+Numeric
+Object
+ObjectSpace
+Proc
+Process
+Psych
+Queue
+RUBYGEMS_ACTIVATION_MONITOR
+Random
+Range
+RangeError
+Rational
+RbConfig
+Readline
+Regexp
+RegexpError
+RubyLex
+RubyToken
+RubyVM
+RuntimeError
+ScanError
+ScriptError
+SecurityError
+Signal
+SignalException
+SizedQueue
+StandardError
+StopIteration
+String
+StringIO
+StringScanner
+Struct
+Symbol
+SyntaxError
+SystemCallError
+SystemExit
+SystemStackError
+Thread
+ThreadError
+ThreadGroup
+Time
+TracePoint
+TrueClass
+TypeError
+UnboundMethod
+UncaughtThrowError
+YAML
+ZeroDivisionError
+
+These are called as "abuse of language"
+
+__FILE__
+__LINE__
+__ENCODING__
+__END__
+are not constants, they change according the file they are in and they don't start with uppercase. Basically they are keywords.
+
+Classes & Modules
+#ordinary class definition
+class C < D
+  include M
+end
+
+# equivalent modulus scope and details
+C = Class.new(D) do
+  include M
+end
+
+# class name comes from the constant
+C.name #=> 'C'
+
+# ordinary class definition in a namespace
+module XML
+  class SAXParser
+  end
+end
+
+# equivalent modulus details are
+module XML
+  SAXParser = Class.new
+end
+
+# class name comes from the constant
+SAXParser.name = "XML::SAXParser"
+
+c = Class.new #Anonymous class
+c.name # => nil
+
+#gets a name when assigned to a constant
+User = c
+c.name #=> "User"
+
+# once set, that's the name
+Person = User
+c.name #=> "User"
+c.name == User.name == Person.name # => true
+
+# even if you remove the constant
+Object.instance_eval { remove_const(:User) }
+c.name # => "User"
+User #=> NameError
+
+module M
+end
+
+N = M # storing module object in constant N
+
+module N
+  class C
+  end
+end
+
+N::C.name #=> 'M::C'
+
+class C
+  X = 1
+end
+If we want to spell out what is happening above
+X constant that stores 1 is stored in the table of constants of the Class object that is stored in the C constant.
+
+module Admin
+  class Product
+  end
+end
+
+The Class object that is stored in the Product constant that lives inside the module object that is stored in the Admin constant.
+
+Concept of ancestors.
+
+Constant API :- Its always relative to a module.
+const_get(name, value)
+const_get(name, inherit=true)
+remove_const
+
+const_missing:
+class C
+  def self.const_missing(name)
+    1
+  end
+end
+
+C::X # => 1
+C.const_defined?(:X) # => false
+
+--------------------------------------------------
 Refer : https://www.youtube.com/watch?v=4sIU8PxJEEk
 
 Class A
@@ -29,9 +271,11 @@ end
 # equivalent modulus details are
 module XML
   SAXParser = Class.new
-
-  SAXParser.name = "XML::SAXParser"
 end
+
+# class name comes from the constant
+SAXParser.name = "XML::SAXParser"
+
 
 module XML
 end
@@ -72,7 +316,7 @@ the interpreter checks whether you are defining something or reopening something
 
 For the above code RubyVM checks whether UsersController is defined in Admin namespace or not, check will be done only in the Admin namespace.
 
-In the top level constants are stored in object.
+In the top level constants are stored in Object.
 
 2) For second approach first lets revise the ancestors concept
 
@@ -189,7 +433,8 @@ class PostsController < ApplicationController
   end
 end
 
-Moreover, Kernel#require loads files once, but development is much more smooth if code gets refreshed when it changes without restarting the server. It would be nice to be able to use Kernel#load in development, and Kernel#require in production.
+Moreover, Kernel#require loads files once, but development is much more smooth if code gets refreshed when it changes without restarting the server. It would be
+nice to be able to use Kernel#load in development, and Kernel#require in production.
 
 Indeed, those features are provided by Ruby on Rails, where we just write
 
@@ -252,12 +497,12 @@ class A
     class C
       class D
         p Module.nesting
-        end
       end
     end
   end
+end
 [A::B::C::D, A::B::C, A::B, A]
- => [A::B::C::D, A::B::C, A::B, A] 
+ => [A::B::C::D, A::B::C, A::B, A]
 B
 NameError: uninitialized constant B
 	from (irb):86
@@ -266,7 +511,7 @@ A::B
  => A::B
 
 2.2 Class and Module Definitions are Constant Assignments :-
--------------------------------------------------------------
+------------------------------------------------------------
 Let's suppose the following snippet creates a class (rather than reopening it):
 
 Ex:
