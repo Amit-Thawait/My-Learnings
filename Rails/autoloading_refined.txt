@@ -241,6 +241,28 @@ end
 C::X # => 1
 C.const_defined?(:X) # => false
 
+Where const_get searches for constant?
+1) In case of a class, it checks in the ancestor chain.
+2) In case of a module, in addition to checking the ancestor chain it also checks in Object.
+
+> Abc.ancestors
+=> [Abc, Object, Kernel, BasicObject]
+
+> module X
+> end
+=> nil
+> X.ancestors
+=> [X]
+
+
+Constant Name Resolution
+3 cases
+1) #constant path
+  M::N::X # When we have a fully qualified path of  constant.
+
+2)
+
+
 --------------------------------------------------
 Refer : https://www.youtube.com/watch?v=4sIU8PxJEEk
 
