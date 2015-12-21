@@ -215,7 +215,7 @@ class C
   X = 1
 end
 If we want to spell out what is happening above
-X constant that stores 1 is stored in the table of constants of the Class object that is stored in the C constant.
+X constant that stores 1 is stored in the table of constants of the class Object that is stored in the C constant.
 
 module Admin
   class Product
@@ -259,10 +259,55 @@ Constant Name Resolution
 3 cases
 1) #constant path
   M::N::X # When we have a fully qualified path of  constant.
+  If you are using constant resolution operation then it check only in the ancestor chain.
+  If you are using const_get then it checks in ancestors + in Object.
 
-2)
+  Example of class inheriting from BasicObject.
+
+  Module Nesting examples.
 
 
+2) # assignment
+
+   module M
+     X = 1
+   end
+
+   module X
+     class C
+     end
+   end
+   Here C constant is stored in the constant table of X.
+   Here there can be 2 cases:
+   1) If C is already defined in the namespace of X then you are opening it,
+   2) otherwise you are defining a new constant.
+
+3) # relative name
+
+   module M
+     module N
+       module O
+         module P
+           class C < D
+             puts X
+           end
+          end
+        end
+      end
+    end
+
+    Here the sequence in which constant X is being lookup is, first it is checked in C then P then O then N then M and then the ancestors of C (D, object, kernel,
+    BasicObject) and then const_missing is called if not found.
+
+Constant Autoloading in Ruby on Rails
+
+You might have seen classes/files being required explicitly in ruby libraries, gems etc but that's not the case in Rails application. 
+In development mode you get Class reloading which is indeed constant reloading.
+In Rails the way in which constant autoloading works is : ActiveSupport sets a global const_missing hook and then const_missing hook is called.
+Then we have the conventions where to find the file, which file to find by matching the class name, then that matching file is loaded using load and if that file
+defines that constant then you get the constant back and the same is referenced in other parts of the code, so constant missing is just triggered once.
+That file can also define other constants so ActiveSupport maintains which constants have defined by that call, so it has a collection of constants and information 
+about where are they stored.
 --------------------------------------------------
 Refer : https://www.youtube.com/watch?v=4sIU8PxJEEk
 
@@ -366,6 +411,7 @@ M is there in the Object's constant table.
 Next it try to find X in M's constant table and if not found it will invoke const_missing(uninitialized constant M::X).
 
 3) For third approach we will see an example module nesting
+   Module nesting is lexically scoped.
 
 Ex 1:
 module N; end
@@ -512,6 +558,8 @@ module X::Y
     p Module.nesting
   end
 end
+
+In the above example, X,Y and A,B are totally different unrelated modules which I am opening at this point.
 
 Ex:
 class A
