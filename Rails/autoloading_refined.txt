@@ -227,7 +227,7 @@ The Class object that is stored in the Product constant that lives inside the mo
 Concept of ancestors.
 
 Constant API :- Its always relative to a module.
-const_get(name, value)
+const_set(name, value)
 const_get(name, inherit=true)
 remove_const
 
@@ -258,14 +258,13 @@ Where const_get searches for constant?
 Constant Name Resolution
 3 cases
 1) #constant path
-  M::N::X # When we have a fully qualified path of  constant.
+  M::N::X # When we have a fully qualified path of constant.
   If you are using constant resolution operation then it check only in the ancestor chain.
   If you are using const_get then it checks in ancestors + in Object.
 
   Example of class inheriting from BasicObject.
 
   Module Nesting examples.
-
 
 2) # assignment
 
@@ -301,12 +300,12 @@ Constant Name Resolution
 
 Constant Autoloading in Ruby on Rails
 
-You might have seen classes/files being required explicitly in ruby libraries, gems etc but that's not the case in Rails application. 
+You might have seen classes/files being required explicitly in ruby libraries, gems etc but that's not the case in Rails application.
 In development mode you get Class reloading which is indeed constant reloading.
 In Rails the way in which constant autoloading works is : ActiveSupport sets a global const_missing hook and then const_missing hook is called.
 Then we have the conventions where to find the file, which file to find by matching the class name, then that matching file is loaded using load and if that file
 defines that constant then you get the constant back and the same is referenced in other parts of the code, so constant missing is just triggered once.
-That file can also define other constants so ActiveSupport maintains which constants have defined by that call, so it has a collection of constants and information 
+That file can also define other constants so ActiveSupport maintains which constants have defined by that call, so it has a collection of constants and information
 about where are they stored.
 --------------------------------------------------
 Refer : https://www.youtube.com/watch?v=4sIU8PxJEEk
@@ -481,7 +480,7 @@ Sometimes we need some constants to defined beforehand instead of lazily. For th
 
 In Rails autoloading no attempt is made to follow ancestors to avoid complicating things.
 
-ActiveSupport doesn't  emulate constant name resolution algorithm.
+ActiveSupport doesn't emulate constant name resolution algorithm.
 
 If any file is changed in the development all the autoloaded constants are wiped before serving the next request. Constants are created again for next requests.
 
@@ -494,7 +493,7 @@ In a normal Ruby program classes need to load their dependencies:
 
 require 'application_controller'
 require 'post'
- 
+
 class PostsController < ApplicationController
   def index
     @posts = Post.all
@@ -575,8 +574,8 @@ end
  => [A::B::C::D, A::B::C, A::B, A]
 B
 NameError: uninitialized constant B
-	from (irb):86
-	from /home/amit/.rvm/rubies/ruby-2.1.5/bin/irb:11:in `<main>'
+    from (irb):86
+    from /home/amit/.rvm/rubies/ruby-2.1.5/bin/irb:11:in `<main>'
 A::B
  => A::B
 
@@ -614,7 +613,8 @@ Project.name # => "Project"
 
 Constant assignment has a special rule to make that happen: if the object being assigned is an anonymous class or module, Ruby sets its name to be the one the constant.
 
-From then on, what happens to the constant and the instance does not matter. For example, the constant could be deleted, the class object could be assigned to a different constant, be stored in no constant anymore, etc. Once the name is set, it doesn't change.
+From then on, what happens to the constant and the instance does not matter. For example, the constant could be deleted, the class object could be assigned to a
+different constant, be stored in no constant anymore, etc. Once the name is set, it doesn't change.
 
 Similarly, module creation using the module keyword as in
 
@@ -644,16 +644,19 @@ That is why we talk about constant autoloading, Rails has the ability to load co
 -------------------------
 Constants belong to modules in a very literal sense. Classes and modules have a constant table; think of it as a hash table.
 
-Let's analyze an example to really understand what that means. While common abuses of language like "the String class" are convenient, the exposition is going to be precise here for didactic purposes.
+Let's analyze an example to really understand what that means. While common abuses of language like "the String class" are convenient, the exposition is going
+to be precise here for didactic purposes.
 
 Let's consider the following module definition:
 
 module Colors
   RED = '0xff0000'
 end
-First, when the module keyword is processed the interpreter creates a new entry in the constant table of the class object stored in the Object constant. Said entry associates the name "Colors" to a newly created module object. Furthermore, the interpreter sets the name of the new module object to be the string "Colors".
+First, when the module keyword is processed the interpreter creates a new entry in the constant table of the class object stored in the Object constant. Said
+entry associates the name "Colors" to a newly created module object. Furthermore, the interpreter sets the name of the new module object to be the string "Colors".
 
-Later, when the body of the module definition is interpreted, a new entry is created in the constant table of the module object stored in the Colors constant. That entry maps the name "RED" to the string "0xff0000".
+Later, when the body of the module definition is interpreted, a new entry is created in the constant table of the module object stored in the Colors constant.
+That entry maps the name "RED" to the string "0xff0000".
 
 > Object.constants.sort
 
@@ -664,12 +667,13 @@ Later, when the body of the module definition is interpreted, a new entry is cre
 > Object::Colors::RED
 
 Object = Object
-	   |
-           ---> Colors
+          |
+          ---> Colors
                   |
                   ---> READ
 
-In particular, Colors::RED is totally unrelated to any other RED constant that may live in any other class or module object. If there were any, they would have separate entries in their respective constant tables.
+In particular, Colors::RED is totally unrelated to any other RED constant that may live in any other class or module object. If there were any, they would have
+separate entries in their respective constant tables.
 
 3) Types of constants :-
 ------------------------
@@ -690,6 +694,19 @@ Billing::Invoice is composed of two constants.
 Billing is relative, Invoice on the other hand is qualified by Billing.
 
 Leading colons would make the first segment absolute rather than relative: ::Billing::Invoice. That would force Billing to be looked up only as a top-level constant.
+Example for ::User
+
+module Admin
+  class User
+    def first
+      p User.first
+    end
+  end
+end
+
+# => NoMethodError: undefined method `first' for Admin::User:Class
+
+replace p User.first with p ::User.first
 
 Resolution Algorithm for Relative Constants :-
 ----------------------------------------------
@@ -707,7 +724,8 @@ The constant is looked up in the parent and its ancestors.
 
 If the lookup fails, const_missing is invoked in the parent. The default implementation of const_missing raises NameError, but it can be overridden.
 
-As you see, this algorithm is simpler than the one for relative constants. In particular, the nesting plays no role here, and modules are not special-cased, if neither they nor their ancestors have the constants, Object is not checked.
+As you see, this algorithm is simpler than the one for relative constants. In particular, the nesting plays no role here, and modules are not special-cased, if
+neither they nor their ancestors have the constants, Object is not checked.
 
 Difference : Nesting (See 2.1 section)
 
@@ -729,19 +747,22 @@ Ruby performs a lookup for the constant that follows a class or module keyword b
 
 If the constant is not defined at that point it is not considered to be a missing constant, autoloading is not triggered.
 
-So, in the previous example, if PostsController is not defined when the file is interpreted Rails autoloading is not going to be triggered, Ruby will just define the controller.
+So, in the previous example, if PostsController is not defined when the file is interpreted Rails autoloading is not going to be triggered, Ruby will just define
+the controller.
 
 2) Top-Level Constants (ApplicationController)
 
 On the contrary, if ApplicationController is unknown, the constant is considered missing and an autoload is going to be attempted by Rails.
 
-In order to load ApplicationController, Rails iterates over autoload_paths. First checks if app/assets/application_controller.rb exists. If it does not, which is normally the case, it continues and finds app/controllers/application_controller.rb.
+In order to load ApplicationController, Rails iterates over autoload_paths. First checks if app/assets/application_controller.rb exists. If it does not, which is
+normally the case, it continues and finds app/controllers/application_controller.rb.
 
 If the file defines the constant ApplicationController all is fine, otherwise LoadError is raised:
 
 unable to autoload constant ApplicationController, expected
 <full path to application_controller.rb> to define it (LoadError)
-Rails does not require the value of autoloaded constants to be a class or module object. For example, if the file app/models/max_clients.rb defines MAX_CLIENTS = 100 autoloading MAX_CLIENTS works just fine.
+Rails does not require the value of autoloaded constants to be a class or module object. For example, if the file app/models/max_clients.rb defines MAX_CLIENTS = 100
+autoloading MAX_CLIENTS works just fine.
 
 **********************************************************************************************************************************************************************
 Try an example for this in rails console
@@ -749,7 +770,8 @@ Try an example for this in rails console
 
 3) Namespaces
 
-Autoloading ApplicationController looks directly under the directories of autoload_paths because the nesting in that spot is empty. The situation of Post is different, the nesting in that line is [PostsController] and support for namespaces comes into play.
+Autoloading ApplicationController looks directly under the directories of autoload_paths because the nesting in that spot is empty. The situation of Post is
+different, the nesting in that line is [PostsController] and support for namespaces comes into play.
 
 The basic idea is that given
 
