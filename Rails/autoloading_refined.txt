@@ -708,6 +708,9 @@ end
 
 replace p User.first with p ::User.first
 
+Resolution Algorithm in Ruby :-
+-------------------------------
+
 Resolution Algorithm for Relative Constants :-
 ----------------------------------------------
 the resolution algorithm for relative constant references goes like this:
@@ -715,6 +718,8 @@ the resolution algorithm for relative constant references goes like this:
 If the nesting is not empty the constant is looked up in its elements and in order. The ancestors of those elements are ignored.
 
 If not found, then the algorithm walks up the ancestor chain for that constant.
+
+If not found and the constant is a module, the constant is looked up in Object.
 
 If not found, const_missing is invoked on the constant. The default implementation of const_missing raises NameError, but it can be overridden.
 
@@ -727,7 +732,82 @@ If the lookup fails, const_missing is invoked in the parent. The default impleme
 As you see, this algorithm is simpler than the one for relative constants. In particular, the nesting plays no role here, and modules are not special-cased, if
 neither they nor their ancestors have the constants, Object is not checked.
 
+Rails autoloading does not emulate these algorithm, but its starting point for the concept of constant autoloading in Rails.
+
 Difference : Nesting (See 2.1 section)
+
+3 Vocabulary :-
+---------------
+3.1 Parent Namespaces :-
+------------------------
+Given a string with a constant path we define its parent namespace to be the string that results from removing its rightmost segment.
+
+For example, the parent namespace of the string "A::B::C" is the string "A::B", the parent namespace of "A::B" is "A", and the parent namespace of "A" is "".
+
+3.2 Loading Mechanism :-
+------------------------
+Rails autoloads files with Kernel#load when config.cache_classes is false, the default in development mode, and with Kernel#require in production mode.
+
+Kernel#load allows Rails to execute files more than once if constant reloading is enabled.
+
+4 Autoloading Availability :-
+------------------------------
+Rails is always able to autoload provided its environment is in place. For example the runner command autoloads:
+
+**********************************************************************************************************************************************************************
+
+$ bin/rails runner 'p User.column_names'
+["id", "email", "created_at", "updated_at"]
+The console autoloads, the test suite autoloads, and of course the application autoloads.
+
+By default, Rails eager loads the application files when it boots in production mode, so most of the autoloading going on in development does not happen. But
+autoloading may still be triggered during eager loading.
+
+For example, given
+
+class BeachHouse < House
+end
+if House is still unknown when app/models/beach_house.rb is being eager loaded, Rails autoloads it.
+
+**********************************************************************************************************************************************************************
+
+5 autoload_paths :-
+-------------------
+As you probably know, when require gets a relative file name:
+
+require 'erb'
+Ruby looks for the file in the directories listed in $LOAD_PATH. That is, Ruby iterates over all its directories and for each one of them checks whether they have a
+file called "erb.rb", or "erb.so", or "erb.o", or "erb.dll". If it finds any of them, the interpreter loads it and ends the search. Otherwise, it tries again in
+the next directory of the list. If the list gets exhausted, LoadError is raised.
+
+We are going to cover how constant autoloading works in more detail later, but the idea is that when a constant like Post is hit and missing, if there's a post.rb
+file for example in app/models Rails is going to find it, evaluate it, and have Post defined as a side-effect.
+
+Alright, Rails has a collection of directories similar to $LOAD_PATH in which to look up post.rb. That collection is called autoload_paths and by default it contains:
+1) All subdirectories of app in the application and engines. For example, app/controllers. They do not need to be the default ones, any custom directories like
+   app/workers belong automatically to autoload_paths.
+
+2) Any existing second level directories called app/*/concerns in the application and engines.
+
+3) The directory test/mailers/previews.
+
+Also, this collection is configurable via config.autoload_paths. For example, lib was in the list years ago, but no longer is. An application can opt-in throwing
+this to config/application.rb:
+
+config.autoload_paths += "#{Rails.root}/lib"
+The value of autoload_paths can be inspected. In a just generated application it is (edited):
+
+$ bin/rails r 'puts ActiveSupport::Dependencies.autoload_paths'
+.../app/assets
+.../app/controllers
+.../app/helpers
+.../app/mailers
+.../app/models
+.../app/controllers/concerns
+.../app/models/concerns
+.../test/mailers/previews
+
+autoload_paths is computed and cached during the initialization process. The application needs to be restarted to reflect any changes in the directory structure.
 
 Example for Relative References :-
 ----------------------------------
@@ -770,10 +850,19 @@ Try an example for this in rails console
 
 3) Namespaces
 
+require 'application_controller'
+require 'post'
+
+class PostsController < ApplicationController
+  def index
+    @posts = Post.all
+  end
+end
+
 Autoloading ApplicationController looks directly under the directories of autoload_paths because the nesting in that spot is empty. The situation of Post is
 different, the nesting in that line is [PostsController] and support for namespaces comes into play.
 
-The basic idea is that given
+The basic idea is that, lets say
 
 module Admin
   class BaseController < ApplicationController
@@ -816,74 +905,60 @@ app/mailers/post.rb
 app/models/post.rb
 A matching file is found in app/models/post.rb. The lookup stops there and the file is loaded. If the file actually defines Post all is fine, otherwise LoadError is raised.
 
-3 Vocabulary :-
----------------
-3.1 Parent Namespaces :-
-------------------------
-Given a string with a constant path we define its parent namespace to be the string that results from removing its rightmost segment.
+To see the order in which search is done : In rails console check the output of
+ActiveSupport::Dependencies.autoload_paths
 
-For example, the parent namespace of the string "A::B::C" is the string "A::B", the parent namespace of "A::B" is "A", and the parent namespace of "A" is "".
-
-3.2 Loading Mechanism :-
-------------------------
-Rails autoloads files with Kernel#load when config.cache_classes is false, the default in development mode, and with Kernel#require otherwise, the default in production mode.
-
-Kernel#load allows Rails to execute files more than once if constant reloading is enabled.
-
-This guide uses the word "load" freely to mean a given file is interpreted, but the actual mechanism can be Kernel#load or Kernel#require depending on that flag.
-
-4 Autoloading Availability :-
-------------------------------
-Rails is always able to autoload provided its environment is in place. For example the runner command autoloads:
-
-**********************************************************************************************************************************************************************
-
-$ bin/rails runner 'p User.column_names'
-["id", "email", "created_at", "updated_at"]
-The console autoloads, the test suite autoloads, and of course the application autoloads.
-
-By default, Rails eager loads the application files when it boots in production mode, so most of the autoloading going on in development does not happen. But autoloading may still be triggered during eager loading.
-
-For example, given
-
-class BeachHouse < House
-end
-if House is still unknown when app/models/beach_house.rb is being eager loaded, Rails autoloads it.
-
-**********************************************************************************************************************************************************************
-
-5 autoload_paths :-
--------------------
-As you probably know, when require gets a relative file name:
-
-require 'erb'
-Ruby looks for the file in the directories listed in $LOAD_PATH. That is, Ruby iterates over all its directories and for each one of them checks whether they have a file called "erb.rb", or "erb.so", or "erb.o", or "erb.dll". If it finds any of them, the interpreter loads it and ends the search. Otherwise, it tries again in the next directory of the list. If the list gets exhausted, LoadError is raised.
-
-We are going to cover how constant autoloading works in more detail later, but the idea is that when a constant like Post is hit and missing, if there's a post.rb file for example in app/models Rails is going to find it, evaluate it, and have Post defined as a side-effect.
-
-Alright, Rails has a collection of directories similar to $LOAD_PATH in which to look up post.rb. That collection is called autoload_paths and by default it contains:
-
-All subdirectories of app in the application and engines. For example, app/controllers. They do not need to be the default ones, any custom directories like app/workers belong automatically to autoload_paths.
-
-Any existing second level directories called app/*/concerns in the application and engines.
-
-The directory test/mailers/previews.
-
-Also, this collection is configurable via config.autoload_paths. For example, lib was in the list years ago, but no longer is. An application can opt-in throwing this to config/application.rb:
-
-config.autoload_paths += "#{Rails.root}/lib"
-The value of autoload_paths can be inspected. In a just generated application it is (edited):
-
-$ bin/rails r 'puts ActiveSupport::Dependencies.autoload_paths'
-.../app/assets
-.../app/controllers
-.../app/helpers
-.../app/mailers
-.../app/models
-.../app/controllers/concerns
-.../app/models/concerns
-.../test/mailers/previews
 autoload_paths is computed and cached during the initialization process. The application needs to be restarted to reflect any changes in the directory structure.
+
+Example of Qualified References :-
+----------------------------------
+When a qualified constant is missing Rails does not look for it in the parent namespaces. But there is a caveat: When a constant is missing, Rails is unable to tell
+if the trigger was a relative reference or a qualified one.
+
+For example, consider
+
+module Admin
+  User
+end
+
+and
+
+Admin::User
+
+If User is missing, in either case all Rails knows is that a constant called "User" was missing in a module called "Admin".
+
+If there is a top-level User Ruby would resolve it in the former example, but wouldn't in the latter. In general, Rails does not emulate the Ruby constant resolution
+algorithms, but in this case it tries using the following heuristic:
+"If none of the parent namespaces of the class or module has the missing constant then Rails assumes the reference is relative. Otherwise qualified."
+
+Why ? For example, if this code triggers autoloading
+
+Admin::User
+and the User constant is already present in Object, it is not possible that the situation is
+
+module Admin
+  User
+end
+
+because otherwise Ruby would have resolved User and no autoloading would have been triggered in the first place. Thus, Rails assumes a qualified reference and
+considers the file admin/user.rb and directory admin/user to be the only valid options.
+
+In practice, this works quite well as long as the nesting matches all parent namespaces respectively and the constants that make the rule apply are known at that time.
+
+However, autoloading happens on demand. If by chance the top-level User was not yet loaded, then Rails assumes a relative reference by contract.
+
+Naming conflicts of this kind are rare in practice, but if one occurs, require_dependency provides a solution by ensuring that the constant needed to trigger the
+heuristic is defined in the conflicting place.
+
+Automatic Modules
+------------------
+When a module acts as a namespace, Rails does not require the application to defines a file for it, a directory matching the namespace is enough.
+
+Suppose an application has a back office whose controllers are stored in app/controllers/admin. If the Admin module is not yet loaded when Admin::UsersController
+is hit, Rails needs first to autoload the constant Admin.
+
+If autoload_paths has a file called admin.rb Rails is going to load that one, but if there's no such file and a directory called admin is found, Rails creates an
+empty module and assigns it to the Admin constant on the fly.
 
 6 Constant Reloading :-
 -----------------------
@@ -893,39 +968,85 @@ For example, in you're in a console session and edit some file behind the scenes
 
 > reload!
 When the application runs, code is reloaded when something relevant to this logic changes. In order to do that, Rails monitors a number of things:
+1) config/routes.rb
 
-config/routes.rb.
+2) Locales
 
-Locales.
+3) Ruby files under autoload_paths
 
-Ruby files under autoload_paths.
-
-db/schema.rb and db/structure.sql.
+4) db/schema.rb and db/structure.sql.
 
 If anything in there changes, there is a middleware that detects it and reloads the code.
 
-Autoloading keeps track of autoloaded constants. Reloading is implemented by removing them all from their respective classes and modules using Module#remove_const. That way, when the code goes on, those constants are going to be unknown again, and files reloaded on demand.
+Autoloading keeps track of autoloaded constants. Reloading is implemented by removing them all from their respective classes and modules using Module#remove_const.
+That way, when the code goes on, those constants are going to be unknown again, and files reloaded on demand.
 
-This is an all-or-nothing operation, Rails does not attempt to reload only what changed since dependencies between classes makes that really tricky. Instead, everything is wiped.
+This is an all-or-nothing operation, Rails does not attempt to reload only what changed since dependencies between classes makes that really tricky. Instead, everything
+is wiped.
 
 7 Module#autoload isn't Involved :-
 -----------------------------------
-Rails internals make extensive use of it to defer as much work as possible from the boot process. But constant autoloading in Rails is not implemented with Module#autoload.
+Module#autoload provides a lazy way to load constants that is fully integrated with the Ruby constant lookup algorithms, dynamic constant API, etc. It is quite
+transparent.
+Rails internals make extensive use of it to defer as much work as possible from the boot process. But constant autoloading in Rails is not implemented with
+Module#autoload.
 
-One possible implementation based on Module#autoload would be to walk the application tree and issue autoload calls that map existing file names to their conventional constant name.
+One possible implementation based on Module#autoload would be to walk the application tree and issue autoload calls that map existing file names to their conventional
+constant name.
 
 There are a number of reasons that prevent Rails from using that implementation.
 
 For example,
-i) Module#autoload is only capable of loading files using require, so reloading would not be possible. Not only that, it uses an internal require which is not Kernel#require.
+i) Module#autoload is only capable of loading files using require, so reloading would not be possible. Not only that, it uses an internal require which is not
+   Kernel#require.
 
 ii) Then, it provides no way to remove declarations in case a file is deleted. If a constant gets removed with Module#remove_const its autoload is not triggered again.
+
+iii)It doesn't support qualified names, so files with namespaces should be interpreted during the walk tree to make their own autoload calls, but those files could
+    have constant references not yet configured.
 
 Constant autoloading in Rails is implemented with Module#const_missing, and that's why it has its own contract.
 
 8) Some Gotchas :-
 ------------------
-1) Autoloading and require :-
+1) Nesting and Qualified Constants
+   Let's consider
+
+module Admin
+  class UsersController < ApplicationController
+    def index
+      @users = User.all
+    end
+  end
+end
+
+and
+
+class Admin::UsersController < ApplicationController
+  def index
+    @users = User.all
+  end
+end
+
+To resolve User Ruby checks Admin in the former case, but it does not in the latter because it does not belong to the nesting (see Nesting and Resolution Algorithms).
+
+Unfortunately Rails autoloading does not know the nesting in the spot where the constant was missing and so it is not able to act as Ruby would. In particular,
+Admin::User will get autoloaded in either case.
+
+Albeit qualified constants with class and module keywords may technically work with autoloading in some cases, it is preferable to use relative constants instead:
+
+module Admin
+  class UsersController < ApplicationController
+    def index
+      @users = User.all
+    end
+  end
+end
+
+2) STI issue :
+   STI Example
+
+3) Autoloading and require :-
 
 Files defining constants to be autoloaded should never be required:
 
@@ -938,9 +1059,9 @@ end
 
 There are two possible gotchas here in development mode:
 
-If User is autoloaded before reaching the require, app/models/user.rb runs again because load does not update $LOADED_FEATURES.
+i) If User is autoloaded before reaching the require, app/models/user.rb runs again because load does not update $LOADED_FEATURES.
 
-If the require runs first Rails does not mark User as an autoloaded constant and changes to app/models/user.rb aren't reloaded.
+ii)If the require runs first Rails does not mark User as an autoloaded constant and changes to app/models/user.rb aren't reloaded.
 
 Of course, using require in autoloaded files to load ordinary 3rd party libraries is fine, and Rails is able to distinguish their constants, they are not marked as autoloaded.
 
