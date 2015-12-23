@@ -3,16 +3,31 @@ Constants in Ruby :-
 https://www.youtube.com/watch?v=wCyTRdtKm98
 X = 1  # Constant assignment
 
-class User < ActiveRecord::Base
-end
-
-this is also a constant assignment.
-
 In other programming languages you cannot modify a constant
 but Ruby gives a warning
 X = 1
 X = 2
 #=> WARNING: already initialized constant X
+
+Class A
+end
+
+this is also a constant assignment.
+
+A = Class.new
+
+A.name = "A"
+
+class and module definitions are basically constant assignment.
+
+Array
+String ....etc
+are constants created by the Ruby VM that stores the object. Like String stores the object of class having methods related to strings.
+String.class => Class
+
+Constants belong to modules conceptually in Ruby.
+Hash Table
+Hash table contains constant name and its value
 
 # mutable object
 If you store a mutable object in a constant you can change the state of that object
@@ -154,34 +169,6 @@ __ENCODING__
 __END__
 are not constants, they change according the file they are in and they don't start with uppercase. Basically they are keywords.
 
-Classes & Modules
-#ordinary class definition
-class C < D
-  include M
-end
-
-# equivalent modulus scope and details
-C = Class.new(D) do
-  include M
-end
-
-# class name comes from the constant
-C.name #=> 'C'
-
-# ordinary class definition in a namespace
-module XML
-  class SAXParser
-  end
-end
-
-# equivalent modulus details are
-module XML
-  SAXParser = Class.new
-end
-
-# class name comes from the constant
-SAXParser.name = "XML::SAXParser"
-
 c = Class.new #Anonymous class
 c.name # => nil
 
@@ -224,6 +211,54 @@ end
 
 The Class object that is stored in the Product constant that lives inside the module object that is stored in the Admin constant.
 
+Classes & Modules
+#ordinary class definition
+class C < D
+  include M
+end
+
+# equivalent modulus scope and details
+C = Class.new(D) do
+  include M
+end
+
+# class name comes from the constant
+C.name #=> 'C'
+
+# ordinary class definition in a namespace
+module XML
+  class SAXParser
+  end
+end
+
+# equivalent modulus details are
+module XML
+  SAXParser = Class.new
+end
+
+# class name comes from the constant
+SAXParser.name = "XML::SAXParser"
+
+module XML
+end
+
+M = XML
+
+module M
+  class SAXParser
+  end
+end
+ => nil
+
+2.2.2 :016 > M
+ => XML
+
+2.2.2 :017 > M::SAXParser
+ => XML::SAXParser
+
+2.2.2 :018 > M::SAXParser.name
+ => "XML::SAXParser"
+
 Concept of ancestors.
 
 Constant API :- Its always relative to a module.
@@ -241,6 +276,12 @@ end
 C::X # => 1
 C.const_defined?(:X) # => false
 
+Since module stores constants so we have an API to access/modify the constant table of those modules.
+Module#const_get
+Module#const_set
+Module#const_defined?
+Module#constants
+
 Where const_get searches for constant?
 1) In case of a class, it checks in the ancestor chain.
 2) In case of a module, in addition to checking the ancestor chain it also checks in Object.
@@ -257,7 +298,7 @@ Where const_get searches for constant?
 
 Constant Name Resolution
 3 cases
-1) #constant path
+1) # constant path
   M::N::X # When we have a fully qualified path of constant.
   If you are using constant resolution operation then it check only in the ancestor chain.
   If you are using const_get then it checks in ancestors + in Object.
@@ -271,6 +312,7 @@ Constant Name Resolution
    module M
      X = 1
    end
+   Here X is a constant stored in constant table of M
 
    module X
      class C
@@ -295,8 +337,10 @@ Constant Name Resolution
       end
     end
 
-    Here the sequence in which constant X is being lookup is, first it is checked in C then P then O then N then M and then the ancestors of C (D, object, kernel,
-    BasicObject) and then const_missing is called if not found.
+    Here the sequence in which constant X is being lookup is, first it is checked in C then P then O then N then M , the ancestors of these modules(P, O, N, M)
+    are ignored, then it is checked in the ancestors of C (D, object, kernel, BasicObject) and then const_missing is called if not found.
+
+    If C would have been module then, along with constant X being looked up in the heirarchy (P, O, N, M), it would have been looked up in Object.
 
 Constant Autoloading in Ruby on Rails
 
@@ -309,65 +353,6 @@ That file can also define other constants so ActiveSupport maintains which const
 about where are they stored.
 --------------------------------------------------
 Refer : https://www.youtube.com/watch?v=4sIU8PxJEEk
-
-Class A
-end
-
-A = Class.new
-
-A.name = "A"
-
-class and module definitions are basically constant assignment.
-
-Array
-String ....etc
-are constants created by the Ruby VM that stores the object. Like String stores the object of class having methods related to strings.
-String.class => Class
-
-Constants belong to modules conceptually in Ruby.
-Hash Table
-Hash table contains constant name and its value
-
-# ordinary class definition in a namespace
-module XML
-  class SAXParser
-  end
-end
-
-# equivalent modulus details are
-module XML
-  SAXParser = Class.new
-end
-
-# class name comes from the constant
-SAXParser.name = "XML::SAXParser"
-
-
-module XML
-end
-
-M = XML
-
-module M
-  class SAXParser
-  end
-end
- => nil
-
-2.2.2 :016 > M
- => XML
-
-2.2.2 :017 > M::SAXParser
- => XML::SAXParser
-
-2.2.2 :018 > M::SAXParser.name
- => "XML::SAXParser"
-
-Since module stores constants so we have an API to access/modify the constant table of those modules.
-Module#const_get
-Module#const_set
-Module#const_defined?
-Module#constants
 
 How does Ruby resolves the Constant :-
 --------------------------------------
