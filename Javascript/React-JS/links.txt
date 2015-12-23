@@ -28,6 +28,8 @@ http://teropa.info/blog/2015/09/10/full-stack-redux-tutorial.html
 
 https://egghead.io/lessons/javascript-redux-writing-a-counter-reducer-with-tests
 
+https://code-cartoons.com/a-cartoon-intro-to-redux-3afb775501a6#.yvuhz3y7l
+
 Building an app :-
 ------------------
 https://egghead.io/lessons/react-building-a-react-js-app-notetaker-introduction
