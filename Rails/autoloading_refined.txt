@@ -169,6 +169,11 @@ __ENCODING__
 __END__
 are not constants, they change according the file they are in and they don't start with uppercase. Basically they are keywords.
 
+Constants Refresher :-
+----------------------
+1) Class and Module Definitions are Constant Assignments
+--------------------------------------------------------
+
 c = Class.new #Anonymous class
 c.name # => nil
 
@@ -185,6 +190,63 @@ c.name == User.name == Person.name # => true
 Object.instance_eval { remove_const(:User) }
 c.name # => "User"
 User #=> NameError
+
+Let's suppose the following snippet creates a class (rather than reopening it):
+
+Ex:
+class Amit
+end
+
+> Amit.name
+
+> Object.constants.sort
+
+> Object.const_get(:Amit)
+
+> Object.const_get(:Amit).class
+
+> Object.const_get(:Amit).name
+
+Ruby creates a constant Amit in Object and stores in that constant a Class object. The name of the Class instance is "Amit", a string, named after the constant.
+
+That is,
+
+class Project < ActiveRecord::Base
+end
+performs a constant assignment equivalent to
+
+Project = Class.new(ActiveRecord::Base)
+
+including setting the name of the class as a side-effect:
+
+Project.name # => "Project"
+
+Constant assignment has a special rule to make that happen: if the object being assigned is an anonymous class or module, Ruby sets its name to be the one the constant.
+
+From then on, what happens to the constant and the instance does not matter. For example, the constant could be deleted, the class object could be assigned to a
+different constant, be stored in no constant anymore, etc. Once the name is set, it doesn't change.
+
+Similarly, module creation using the module keyword as in
+
+module Admin
+end
+
+performs a constant assignment equivalent to
+
+Admin = Module.new
+
+including setting the name as a side-effect:
+
+Admin.name # => "Admin"
+
+Likewise, in the controller
+
+class PostsController < ApplicationController
+  def index
+    @posts = Post.all
+  end
+end
+Post is not syntax for a class. Rather, Post is a regular Ruby constant. If all is good, the constant evaluates to an object that responds to all.
 
 module M
 end
@@ -295,9 +357,111 @@ Where const_get searches for constant?
 > X.ancestors
 => [X]
 
+2) Nesting :-
+-------------
 
-Constant Name Resolution
-3 cases
+Class and module definitions can be nested to create namespaces:
+
+module XML
+  class SAXParser
+    # (1)
+  end
+end
+The nesting at any given place is the collection of enclosing nested class and module objects outwards. For example, in the previous example, the nesting at (1) is
+
+[XML::SAXParser, XML]
+
+For instance, while this definition is similar to the previous one:
+
+class XML::SAXParser
+  # (2)
+end
+the nesting in (2) is different:
+
+[XML::SAXParser]
+XML does not belong to it.
+
+We can see in this example that the name of a class or module that belongs to a certain nesting does not necessarily correlate with the namespaces at the spot.
+
+Even more, they are totally independent, take for instance
+
+module X::Y
+  module A::B
+    # (3)
+  end
+end
+The nesting in (3) consists of two module objects:
+
+[A::B, X::Y]
+So, it not only doesn't end in A, which does not even belong to the nesting, but it also contains X::Y, which is independent from A::B.
+
+The nesting at any given place can be inspected with Module.nesting
+Ex:
+module X::Y
+  module A::B
+    p Module.nesting
+  end
+end
+
+In the above example, X,Y and A,B are totally different unrelated modules which I am opening at this point.
+
+Ex:
+class A
+  class B
+    class C
+      class D
+        p Module.nesting
+      end
+    end
+  end
+end
+[A::B::C::D, A::B::C, A::B, A]
+ => [A::B::C::D, A::B::C, A::B, A]
+B
+NameError: uninitialized constant B
+    from (irb):86
+    from /home/amit/.rvm/rubies/ruby-2.1.5/bin/irb:11:in `<main>'
+A::B
+ => A::B
+
+3) Constants location :-
+------------------------
+
+Constants belong to modules in a very literal sense. Classes and modules have a constant table; think of it as a hash table.
+
+Let's analyze an example to really understand what that means. While common abuses of language like "the String class" are convenient, the exposition is going
+to be precise here for didactic purposes.
+
+Let's consider the following module definition:
+
+module Colors
+  RED = '0xff0000'
+end
+First, when the module keyword is processed the interpreter creates a new entry in the constant table of the class object stored in the Object constant. Said
+entry associates the name "Colors" to a newly created module object. Furthermore, the interpreter sets the name of the new module object to be the string "Colors".
+
+Later, when the body of the module definition is interpreted, a new entry is created in the constant table of the module object stored in the Colors constant.
+That entry maps the name "RED" to the string "0xff0000".
+
+> Object.constants.sort
+
+> Object::Colors
+
+> Object::Colors.is_a?(Object)
+
+> Object::Colors::RED
+
+Object = Object
+          |
+          ---> Colors
+                  |
+                  ---> READ
+
+In particular, Colors::RED is totally unrelated to any other RED constant that may live in any other class or module object. If there were any, they would have
+separate entries in their respective constant tables.
+
+4) Constant Name Resolution Algorithm :-
+----------------------------------------
 1) # constant path
   M::N::X # When we have a fully qualified path of constant.
   If you are using constant resolution operation then it check only in the ancestor chain.
@@ -320,7 +484,7 @@ Constant Name Resolution
    end
    Here C constant is stored in the constant table of X.
    Here there can be 2 cases:
-   1) If C is already defined in the namespace of X then you are opening it,
+   1) If C is already defined in the namespace of X then that Class object is re-opened,
    2) otherwise you are defining a new constant.
 
 3) # relative name
@@ -498,167 +662,7 @@ end
 
 2) Constants Refresher :-
 -------------------------
-
-2.1 Nesting
-Class and module definitions can be nested to create namespaces:
-
-module XML
-  class SAXParser
-    # (1)
-  end
-end
-The nesting at any given place is the collection of enclosing nested class and module objects outwards. For example, in the previous example, the nesting at (1) is
-
-[XML::SAXParser, XML]
-
-For instance, while this definition is similar to the previous one:
-
-class XML::SAXParser
-  # (2)
-end
-the nesting in (2) is different:
-
-[XML::SAXParser]
-XML does not belong to it.
-
-We can see in this example that the name of a class or module that belongs to a certain nesting does not necessarily correlate with the namespaces at the spot.
-
-Even more, they are totally independent, take for instance
-
-module X::Y
-  module A::B
-    # (3)
-  end
-end
-The nesting in (3) consists of two module objects:
-
-[A::B, X::Y]
-So, it not only doesn't end in A, which does not even belong to the nesting, but it also contains X::Y, which is independent from A::B.
-
-The nesting at any given place can be inspected with Module.nesting
-Ex:
-module X::Y
-  module A::B
-    p Module.nesting
-  end
-end
-
-In the above example, X,Y and A,B are totally different unrelated modules which I am opening at this point.
-
-Ex:
-class A
-  class B
-    class C
-      class D
-        p Module.nesting
-      end
-    end
-  end
-end
-[A::B::C::D, A::B::C, A::B, A]
- => [A::B::C::D, A::B::C, A::B, A]
-B
-NameError: uninitialized constant B
-    from (irb):86
-    from /home/amit/.rvm/rubies/ruby-2.1.5/bin/irb:11:in `<main>'
-A::B
- => A::B
-
-2.2 Class and Module Definitions are Constant Assignments :-
-------------------------------------------------------------
-Let's suppose the following snippet creates a class (rather than reopening it):
-
-Ex:
-class Amit
-end
-
-> Amit.name
-
-> Object.constants.sort
-
-> Object.const_get(:Amit)
-
-> Object.const_get(:Amit).class
-
-> Object.const_get(:Amit).name
-
-Ruby creates a constant Amit in Object and stores in that constant a class object. The name of the class instance is "Amit", a string, named after the constant.
-
-That is,
-
-class Project < ActiveRecord::Base
-end
-performs a constant assignment equivalent to
-
-Project = Class.new(ActiveRecord::Base)
-
-including setting the name of the class as a side-effect:
-
-Project.name # => "Project"
-
-Constant assignment has a special rule to make that happen: if the object being assigned is an anonymous class or module, Ruby sets its name to be the one the constant.
-
-From then on, what happens to the constant and the instance does not matter. For example, the constant could be deleted, the class object could be assigned to a
-different constant, be stored in no constant anymore, etc. Once the name is set, it doesn't change.
-
-Similarly, module creation using the module keyword as in
-
-module Admin
-end
-
-performs a constant assignment equivalent to
-
-Admin = Module.new
-
-including setting the name as a side-effect:
-
-Admin.name # => "Admin"
-
-Likewise, in the controller
-
-class PostsController < ApplicationController
-  def index
-    @posts = Post.all
-  end
-end
-Post is not syntax for a class. Rather, Post is a regular Ruby constant. If all is good, the constant evaluates to an object that responds to all.
-
-That is why we talk about constant autoloading, Rails has the ability to load constants on the fly.
-
-2.3 Constants location :-
--------------------------
-Constants belong to modules in a very literal sense. Classes and modules have a constant table; think of it as a hash table.
-
-Let's analyze an example to really understand what that means. While common abuses of language like "the String class" are convenient, the exposition is going
-to be precise here for didactic purposes.
-
-Let's consider the following module definition:
-
-module Colors
-  RED = '0xff0000'
-end
-First, when the module keyword is processed the interpreter creates a new entry in the constant table of the class object stored in the Object constant. Said
-entry associates the name "Colors" to a newly created module object. Furthermore, the interpreter sets the name of the new module object to be the string "Colors".
-
-Later, when the body of the module definition is interpreted, a new entry is created in the constant table of the module object stored in the Colors constant.
-That entry maps the name "RED" to the string "0xff0000".
-
-> Object.constants.sort
-
-> Object::Colors
-
-> Object::Colors.is_a?(Object)
-
-> Object::Colors::RED
-
-Object = Object
-          |
-          ---> Colors
-                  |
-                  ---> READ
-
-In particular, Colors::RED is totally unrelated to any other RED constant that may live in any other class or module object. If there were any, they would have
-separate entries in their respective constant tables.
+Covered Earlier
 
 3) Types of constants :-
 ------------------------
