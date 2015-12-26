@@ -527,9 +527,11 @@ module Admin
   end
 end
 
+For the above code RubyVM checks whether UsersController is defined in Admin namespace or not, check will be done only in the Admin namespace.
+
 the interpreter checks whether you are defining something or reopening something.
 
-For the above code RubyVM checks whether UsersController is defined in Admin namespace or not, check will be done only in the Admin namespace.
+The top level UsersController is different from the one in the namespace of Admin (stored seperately in the constant table)
 
 In the top level constants are stored in Object.
 
@@ -584,6 +586,20 @@ M::N::B.class_eval do
  p Module.nesting # => []
 end
 
+Why [] because nesting is a lexical thing.
+
+class_eval/module_eval with string argument gives nesting at that point.
+
+module M
+  module N
+    class B
+    end
+  end
+end
+
+M::N::B.class_eval "p Module.nesting"
+# => [M::N::B]
+
 Ex 2:
 
 module M
@@ -620,7 +636,27 @@ Answer :
 Constant Autloading :-
 ----------------------
 
-config.autoload_paths # => collection of directories to look for constants in Rails
+Let's consider an example
+
+module Admin
+  class UsersController < ApplicationController
+    def index
+      @users = User.all
+    end
+  end
+end
+
+After following the constant name resolution algorithm if the constant User is still not found then the below const_missing hook is called.
+
+# active_support/dependencies.rb
+
+def self.const_missing(const_name)
+  name       # => "Admin::UsersController"
+  const_name # => :User
+end
+
+config.autoload_paths # => collection of directories to look for constants in Rails (directories inside app dir are included by default even if you have created a new one named
+services or presenter or something else).
 
 Uses load in development mode.
 Uses require in production mode.
