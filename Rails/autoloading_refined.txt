@@ -985,6 +985,8 @@ is hit, Rails needs first to autoload the constant Admin.
 If autoload_paths has a file called admin.rb Rails is going to load that one, but if there's no such file and a directory called admin is found, Rails creates an
 empty module and assigns it to the Admin constant on the fly.
 
+Object.const_set("Admin", Module.new)
+
 6 Constant Reloading :-
 -----------------------
 When config.cache_classes is false Rails is able to reload autoloaded constants.
@@ -997,9 +999,9 @@ When the application runs, code is reloaded when something relevant to this logi
 
 2) Locales
 
-3) Ruby files under autoload_paths
+3) Ruby files under autoload_paths / authoload_once_paths (autoload_*)
 
-4) db/schema.rb and db/structure.sql.
+4) db/(schema.rb|structure.sql)
 
 If anything in there changes, there is a middleware that detects it and reloads the code.
 
@@ -1007,7 +1009,7 @@ Autoloading keeps track of autoloaded constants. Reloading is implemented by rem
 That way, when the code goes on, those constants are going to be unknown again, and files reloaded on demand.
 
 This is an all-or-nothing operation, Rails does not attempt to reload only what changed since dependencies between classes makes that really tricky. Instead, everything
-is wiped.
+is wiped at the beginning of the request.
 
 7 Module#autoload isn't Involved :-
 -----------------------------------
@@ -1034,7 +1036,7 @@ Constant autoloading in Rails is implemented with Module#const_missing, and that
 
 8) Some Gotchas :-
 ------------------
-1) Nesting and Qualified Constants
+1) Nesting and Qualified Constants (Rails autoloading does not know the nesting in the spot)
    Let's consider
 
 module Admin
