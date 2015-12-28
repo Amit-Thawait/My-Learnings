@@ -264,7 +264,7 @@ class C
   X = 1
 end
 If we want to spell out what is happening above
-X constant that stores 1 is stored in the table of constants of the class Object that is stored in the C constant.
+X constant that stores 1 is stored in the table of constants of the Class object that is stored in the C constant.
 
 module Admin
   class Product
@@ -646,7 +646,7 @@ module Admin
   end
 end
 
-After following the constant name resolution algorithm if the constant User is still not found then the below const_missing hook is called.
+To resolve the constant User in rails first const_missing hook is called. const_missing is the entry point in ActiveSupport::Dependencies to resolve any constant.
 
 # active_support/dependencies.rb
 
@@ -1056,6 +1056,9 @@ class Admin::UsersController < ApplicationController
 end
 
 To resolve User Ruby checks Admin in the former case, but it does not in the latter because it does not belong to the nesting (see Nesting and Resolution Algorithms).
+Check Module.nesting in both cases.
+For first its [Admin::UsersController, Admin] and
+for second its [Admin::UsersController] only.
 
 Unfortunately Rails autoloading does not know the nesting in the spot where the constant was missing and so it is not able to act as Ruby would. In particular,
 Admin::User will get autoloaded in either case.
