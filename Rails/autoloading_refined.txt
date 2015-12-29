@@ -935,6 +935,13 @@ ActiveSupport::Dependencies.autoload_paths
 
 autoload_paths is computed and cached during the initialization process. The application needs to be restarted to reflect any changes in the directory structure.
 
+**********************************************************************************************************************************************************************
+ActiveSupport::Dependencies.log_activity = true
+ActiveSupport::Dependencies.logger = Rails.logger
+
+Use the above setting to see the trace of execution for constant autoloading done by ActiveSupport::Dependencies
+**********************************************************************************************************************************************************************
+
 Example of Qualified References :-
 ----------------------------------
 When a qualified constant is missing Rails does not look for it in the parent namespaces. But there is a caveat: When a constant is missing, Rails is unable to tell
