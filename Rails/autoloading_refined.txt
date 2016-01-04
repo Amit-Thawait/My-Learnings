@@ -867,7 +867,7 @@ If the file defines the constant ApplicationController all is fine, otherwise Lo
 unable to autoload constant ApplicationController, expected
 <full path to application_controller.rb> to define it (LoadError)
 Rails does not require the value of autoloaded constants to be a class or module object. For example, if the file app/models/max_clients.rb defines MAX_CLIENTS = 100
-autoloading MAX_CLIENTS works just fine.
+autoloading MAX_CLIENTS works just fine and const_missing for MAX_CLIENTS is not even invoked.
 
 **********************************************************************************************************************************************************************
 Try an example for this in rails console
@@ -959,7 +959,7 @@ Admin::User
 
 If User is missing, in either case all Rails knows is that a constant called "User" was missing in a module called "Admin".
 
-If there is a top-level User Ruby would resolve it in the former example, but wouldn't in the latter. In general, Rails does not emulate the Ruby constant resolution
+If there is a top-level User, Ruby would resolve it in the former example, but wouldn't in the latter. In general, Rails does not emulate the Ruby constant resolution
 algorithms, but in this case it tries using the following heuristic:
 "If none of the parent namespaces of the class or module has the missing constant then Rails assumes the reference is relative. Otherwise qualified."
 
@@ -978,6 +978,21 @@ considers the file admin/user.rb and directory admin/user to be the only valid o
 In practice, this works quite well as long as the nesting matches all parent namespaces respectively and the constants that make the rule apply are known at that time.
 
 However, autoloading happens on demand. If by chance the top-level User was not yet loaded, then Rails assumes a relative reference by contract.
+**********************************************************************
+Example:
+
+app/models/admin/my_bookmark.rb
+
+Bookmark = [1,2,3]
+
+module Admin
+  class MyBookmark
+    def abc
+      p Bookmark.first
+    end
+  end
+end
+**********************************************************************
 
 Naming conflicts of this kind are rare in practice, but if one occurs, require_dependency provides a solution by ensuring that the constant needed to trigger the
 heuristic is defined in the conflicting place.
@@ -996,7 +1011,7 @@ Object.const_set("Admin", Module.new)
 
 6 Constant Reloading :-
 -----------------------
-When config.cache_classes is false Rails is able to reload autoloaded constants.
+When config.cache_classes is false, Rails is able to reload autoloaded constants.
 
 For example, in you're in a console session and edit some file behind the scenes, the code can be reloaded with the reload! command:
 
@@ -1082,6 +1097,9 @@ end
 
 2) STI issue :
    STI Example
+   Polygon.all => shows all
+   Rectangle.all => Shows only Rectangles, should show Rectangle & Square
+   comment square.rb then exit then Rectangle.all then autoload Square then Rectangle.all
 
 3) Autoloading and require :-
 
@@ -1217,6 +1235,14 @@ $ bin/rails c
 > Hotel::Image
 Image # NOT Hotel::Image!
 The code evaluating Hotel::Image needs to make sure app/models/hotel/image.rb has been loaded, possibly with require_dependency.
+
+require_dependency 'image'
+
+# app/models/hotel/image.rb
+class Hotel
+  class Image < Image
+  end
+end
 
 In these cases the interpreter issues a warning though:
 
