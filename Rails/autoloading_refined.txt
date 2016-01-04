@@ -1095,6 +1095,27 @@ module Admin
   end
 end
 
+Example :
+-------------------------------
+app/models/admin/my_bookmark.rb
+module Admin
+  class MyBookmark
+    def abc
+      p Bookmark.first
+    end
+  end
+end
+
+app/models/admin.rb
+module Admin
+  Bookmark = [1, 2, 3]
+end
+
+In Rails console :
+1) Bookmark.first then Admin::MyBookmark.new.abc # => Returns Bookmark record
+2) Admin::Bookmark then Admin::MyBookmark.new.abc # => Returns 1
+-------------------------------
+
 2) STI issue :
    STI Example
    Polygon.all => shows all
