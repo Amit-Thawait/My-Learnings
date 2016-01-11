@@ -61,3 +61,8 @@ Database key-points :-
    When a VIEW is created the query (SELECT empno, ename, sal FROM emp) associated with the view is stored in the DB.
    A VIEW is also called as stored query.
    Query fired using VIEW is slower compared to the same using base table.
+
+13) A composite index on user_id and created_at, you do not need an index on user_id as the composite will cover you.
+    Column order in composite indexes is important. As far as a rule of thumb, you should order by whatever will satisfy
+    the most queries or when only dealing with similar queries, whatever will reduce the rows your database has to read.
+    (Always use a limit when reading data)
