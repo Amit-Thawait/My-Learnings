@@ -66,3 +66,19 @@ Database key-points :-
     Column order in composite indexes is important. As far as a rule of thumb, you should order by whatever will satisfy
     the most queries or when only dealing with similar queries, whatever will reduce the rows your database has to read.
     (Always use a limit when reading data)
+
+14) Denormalize
+    If indexes and limits are not enough to improve read performance, you can denormalize your data. Denormalizing is
+    effectively trading increased read performance for more writes. This trade off works when the read to write ratio
+    heavily favors reads, which is true for most web apps.
+
+15) Cache
+    Caching is the last option I would reach for when trying to improve read performance, but can definitely get the job
+    done. The more you simplify the read model (key/value vs relational) and the more often you are reading from memory (as
+    opposed to disk), the faster your reads will be. This is why memcached and redis are so fast. Caching is another form
+    of denormalization, but you lose whatever transactional semantics the database you are using has. Complexity is the
+    reason I would reach for caching last.
+
+    Writes are fastest when just appending (rows in a table, bytes in a file, etc.). To make them faster, partition them by
+    function or by server. Reads can be made faster through indexing, limiting, denormalizing and caching. Read/write
+    performance is all about tradeoffs and balance.
