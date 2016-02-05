@@ -1,0 +1,292 @@
+Add JS & CSS related to jquery_ui_fileupload
+--------------------------------------------
+https://github.com/blueimp/jQuery-File-Upload
+
+
+app/assets/javascripts/images.js.coffee :-
+-----------------------------------------
+# Place all the behaviors and hooks related to the matching controller here.
+# All this logic will automatically be available in application.js.
+# You can use CoffeeScript in this file: http://coffeescript.org/
+
+# The jQuery UI widget factory, can be omitted if jQuery UI is already included
+//= require plugins/jquery_ui_fileupload/vendor/jquery.ui.widget
+# The Templates plugin is included to render the upload/download listings
+//= require plugins/jquery_ui_fileupload/tmpl.min
+# The Load Image plugin is included for the preview images and image resizing functionality
+//= require plugins/jquery_ui_fileupload/load-image.all.min
+# The Iframe Transport is required for browsers without support for XHR file uploads
+//= require plugins/jquery_ui_fileupload/jquery.iframe-transport
+# The basic File Upload plugin
+//= require plugins/jquery_ui_fileupload/jquery.fileupload
+# The File Upload processing plugin
+//= require plugins/jquery_ui_fileupload/jquery.fileupload-process
+# The File Upload image preview & resize plugin
+//= require plugins/jquery_ui_fileupload/jquery.fileupload-image
+# The File Upload validation plugin
+//= require plugins/jquery_ui_fileupload/jquery.fileupload-validate
+# The File Upload user interface plugin
+//= require plugins/jquery_ui_fileupload/jquery.fileupload-ui
+# The main application script
+//= require plugins/jquery_ui_fileupload/main
+
+
+app/assets/stylesheets/images.css.scss :-
+-----------------------------------------
+// Place all the styles related to the PaletteImages controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+/*
+*= require jquery_ui_fileupload/style.css
+*= require jquery_ui_fileupload/jquery.fileupload.css
+*= require jquery_ui_fileupload/jquery.fileupload-ui.css
+*/
+
+
+app/assets/stylesheets/images.css.scss :-
+-----------------------------------------
+.delete-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+a.delete-btn {
+	text-decoration: none;
+}
+
+
+ImagesController :-
+-------------------
+class ImagesController < ApplicationController
+
+  before_action :establish_s3_connection, only: [:create, :destroy]
+
+  def create
+    image_file = params[:files]
+    if image_file && image_file.size > 0
+      @image = PaletteImage.new(recording: @recording)
+      if image_file.content_type == "image/jpeg"
+        ext = "jpg"
+      elsif image_file.content_type == "image/png"
+        ext = "png"
+      elsif image_file.content_type == "video/mp4"
+        ext = "mp4"
+      end
+      new_file_name = "#{Rails.env}/palette-image-#{@recording.id}-#{rand.to_s[2..10]}.#{ext}"
+      s3_file_obj = @bucket.objects[new_file_name].write(image_file.read, {:acl => :public_read, :cache_control => 'max-age=315569000', :content_type => image.content_type})
+      s3url = "http://#{AWS_CONFIG['aws_bucket_url']}/#{new_file_name}"
+      @image.name = image_file.original_filename
+      @image.size = s3_file_obj.content_length
+      @image.image_url = s3url
+      @image.save!
+    else
+      flash[:alert] = 'Please select atleast one image to upload'
+    end
+    render json: {files: [@image.to_jq_upload]}.as_json
+  end
+
+  def destroy
+    @image.destroy
+    @bucket.objects["#{Rails.env}/palette-image-1095-988749311.png"].delete
+  end
+
+  private
+    def set_image
+      @image = PaletteImage.find(params[:id])
+    end
+
+    def image_params
+      params.require(:image).permit(:recording_id)
+    end
+
+    def establish_s3_connection
+      s3 = AWS::S3.new
+      @bucket = s3.buckets[AWS_CONFIG['aws_bucket']]
+    end
+
+end
+
+
+config/initializers/aws.rb :-
+-----------------------------
+ENV['RAILS_ENV'] = "development" unless ENV['RAILS_ENV']
+AWS_CONFIG = YAML.load(File.read("#{Rails.root}/config/aws.yml"))[ENV['RAILS_ENV']]
+
+AWS.config({
+     :access_key_id => AWS_CONFIG['access_key_id'],
+     :secret_access_key => AWS_CONFIG['secret_access_key']
+})
+
+
+app/models/image.rb :-
+----------------------
+class Image < ActiveRecord::Base
+  include Rails.application.routes.url_helpers
+
+  attr_accessor :name, :size
+
+  def to_jq_upload
+    {
+      "id" => id,
+      "name" => name,
+      "size" => size,
+      "url" => self.image_url,
+      "thumbnail_url" => self.image_url,
+      "delete_url" => image_path(id: id),
+      "delete_type" => "DELETE"
+    }
+  end
+
+end
+
+
+app/views/images/_file_upload.html.erb :-
+-----------------------------------------
+<!-- CSS adjustments for browsers with JavaScript disabled -->
+<noscript><link rel="stylesheet" href="css/jquery.fileupload-noscript.css"></noscript>
+<noscript><link rel="stylesheet" href="css/jquery.fileupload-ui-noscript.css"></noscript>
+
+<div class="container">
+    <!-- The file upload form used as target for the file upload widget -->
+    <form id="fileupload" action="<%= images_path(@recording) %>" method="POST" enctype="multipart/form-data">
+        <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token.to_s %>">
+        <!-- Redirect browsers with JavaScript disabled to the origin page -->
+        <noscript><input type="hidden" name="redirect" value="/"></noscript>
+        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+        <div class="row fileupload-buttonbar">
+            <div class="col-lg-7">
+                <!-- The fileinput-button span is used to style the file input field as button -->
+                <span class="btn btn-success fileinput-button">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <span>Add files...</span>
+                    <input type="file" name="files" multiple>
+                </span>
+                <button type="submit" class="btn btn-primary-blue start">
+                    <i class="glyphicon glyphicon-upload"></i>
+                    <span>Start upload</span>
+                </button>
+                <button type="reset" class="btn btn-warning cancel">
+                    <i class="glyphicon glyphicon-ban-circle"></i>
+                    <span>Cancel upload</span>
+                </button>
+                <!-- The global file processing state -->
+                <span class="fileupload-process"></span>
+            </div>
+            <!-- The global progress state -->
+            <div class="col-lg-5 fileupload-progress fade">
+                <!-- The global progress bar -->
+                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar progress-bar-success" style="width:0%;"></div>
+                </div>
+                <!-- The extended global progress state -->
+                <div class="progress-extended">&nbsp;</div>
+            </div>
+        </div>
+        <!-- The table listing the files available for upload/download -->
+        <table id="images_upload" role="presentation" class="table table-striped"><tbody class="files"></tbody></table>
+    </form>
+    <br>
+</div>
+<!-- The template to display files available for upload -->
+<script id="template-upload" type="text/x-tmpl">
+{% for (var i=0, file; file=o.files[i]; i++) { %}
+    <tr class="template-upload fade">
+        <td>
+            <span class="preview"></span>
+        </td>
+        <td>
+            <p class="name">{%=file.name%}</p>
+            <strong class="error text-danger"></strong>
+        </td>
+        <td>
+            <p class="size">Processing...</p>
+            <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar progress-bar-success" style="width:0%;"></div></div>
+        </td>
+        <td>
+            {% if (!i && !o.options.autoUpload) { %}
+                <button class="btn btn-primary-blue start" disabled>
+                    <i class="glyphicon glyphicon-upload"></i>
+                    <span>Start</span>
+                </button>
+            {% } %}
+            {% if (!i) { %}
+                <button class="btn btn-warning cancel">
+                    <i class="glyphicon glyphicon-ban-circle"></i>
+                    <span>Cancel</span>
+                </button>
+            {% } %}
+        </td>
+    </tr>
+{% } %}
+</script>
+<!-- The template to display files available for download -->
+<script id="template-download" type="text/x-tmpl">
+{% for (var i=0, file; file=o.files[i]; i++) {  %}
+    <tr id="{%=file.id%}" class="template-download fade">
+        <td>
+            <span class="preview">
+                {% console.log(file); if (file.thumbnail_url) { %}
+                    <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" data-gallery><img src="{%=file.thumbnail_url%}" style="width:80px; height:44px"></a>
+                {% } %}
+            </span>
+        </td>
+        <td>
+            <p class="name">
+                <span>{%=file.name%}</span>
+            </p>
+            {% if (file.error) { %}
+                <div><span class="label label-danger">Error</span> {%=file.error%}</div>
+            {% } %}
+        </td>
+        <td>
+            <span class="size">{%=o.formatFileSize(file.size)%}</span>
+        </td>
+        <td>
+            {% if (file.delete_url) { %}
+                <a class="btn btn-danger" data-method="{%=file.delete_type%}" data-confirm='Are you sure?' data-remote="true" href="{%=file.delete_url%}"{% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>
+                    <i class="glyphicon glyphicon-trash"></i>
+                    <span>Delete</span>
+                </a>
+                <input type="checkbox" name="delete" value="1" class="toggle">
+            {% } else { %}
+                <button class="btn btn-warning cancel">
+                    <i class="glyphicon glyphicon-ban-circle"></i>
+                    <span>Cancel</span>
+                </button>
+            {% } %}
+        </td>
+    </tr>
+{% } %}
+</script>
+
+<!-- The XDomainRequest Transport is included for cross-domain file deletion for IE 8 and IE 9 -->
+<!--[if (gte IE 8)&(lt IE 10)]>
+<script src="js/cors/jquery.xdr-transport.js"></script>
+<![endif]-->
+
+
+app/views/images/destroy.js.erb :-
+----------------------------------
+$("table#images, table#images_upload").find("tr#<%= @image.id %>").remove();
+
+
+app/views/images/index.html.erb :-
+----------------------------------
+images listings
+render file_upload.html.erb
