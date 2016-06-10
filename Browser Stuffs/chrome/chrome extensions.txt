@@ -4,3 +4,12 @@ Video Speed Controller
 rails panel
 awesome screenshot
 todo-ed
+sourcegraph
+wappalyzer
+JSON view
+React Developer Tool
+ColorZilla
+AdBlock
+Advanced REST client
+Google Docs Offline
+Postman
