@@ -78,3 +78,5 @@ sudo chown ubuntu:ubuntu /var/log/cron.log
 
 0 3 20 * * /bin/bash -l -c 'cd ~/certbot && ./certbot-auto renew --pre-hook "service nginx stop" --post-hook "service nginx start" >> /var/log/cron.log'
 
+You can test automatic renewal for your certificates by running this command:
+./path/to/certbot-auto renew --dry-run
