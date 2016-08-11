@@ -1,0 +1,5 @@
+1) Always try to relate the question with a real world example and try to solve it before thinking about anything further. (Reverse engineering)
+Ex : Find all permutations of a smaller string s within a larger string b.
+s = abbc
+b = cbabadcbbabbcbabaabccbabc
+Think about how would you have done it manully, then try to convert it into an algorithm (Keep in mind the optimizations you made manully)
