@@ -44,3 +44,8 @@ To check all the check-boxes :
   
   select_multiple -> class of the header checkbox
   person_event_table -> class of the checkbox of each row
+
+To select a option from selectbox :-
+------------------------------------
+$($("select#shipping_rates option")[2]).prop("selected", true);
+$("select#shipping_rates option:selected").val()

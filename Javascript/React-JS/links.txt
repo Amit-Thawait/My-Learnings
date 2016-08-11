@@ -5,6 +5,12 @@ http://www.overreact.io/
 
 Getting started with React JS :-
 --------------------------------
+http://www.reactjsprogram.com/
+
+http://courses.reactjsprogram.com/courses/reactjsfundamentals/
+
+http://jamesknelson.com/learn-raw-react-no-jsx-flux-es6-webpack/
+
 http://reactfordesigners.com/labs/reactjs-introduction-for-people-who-know-just-enough-jquery-to-get-by/
 
 https://reactforbeginners.com/
@@ -64,3 +70,5 @@ https://egghead.io/lessons/react-introduction-to-properties
 Testing :-
 ----------
 https://egghead.io/lessons/react-testing-setting-up-dependencies?series=react-testing-cookbook
+
+https://medium.com/javascript-inside/testing-in-react-getting-off-the-ground-5f569f3088a#.ulrux6vyc

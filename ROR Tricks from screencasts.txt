@@ -2522,3 +2522,9 @@ The non-database functionality of Active Record is extracted out into Active Mod
 
 244) Instead of to_sql use capture_sql to get the actual SQL query :
      capture_sql command is used to make assertions against the sql run against the database.
+
+245) Stubbing time for RSpec
+     Time.stub(:now).and_return(@time)
+     @time.stub(:utc).and_return(Time.utc(2016, 3, 5))
+     DateTime.stub(:now).and_return(@date_time)
+     @date_time.stub(:utc).and_return(DateTime.parse(Time.utc(2016, 3, 5).to_s))
