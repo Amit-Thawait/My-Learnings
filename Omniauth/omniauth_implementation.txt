@@ -31,3 +31,7 @@ https://github.com/arunagw/omniauth-twitter#authentication-options
 
 http://tutorials.jumpstartlab.com/topics/auth/remote_authentication.html
 http://stackoverflow.com/questions/22184824/how-to-log-out-social-sites-via-gem-omniauth-facebook-twitter
+
+Accessing email of user:(New)
+------------------------
+https://docs.fabric.io/web/digits/sign-in-options.html
