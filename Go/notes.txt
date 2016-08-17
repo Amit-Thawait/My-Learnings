@@ -8,6 +8,61 @@ Package main is special. It defines a standalone executable program, not a libra
 of the program begins. Whatever main does is what the program does. Of course, main will normally call upon functions in other packages to do much of the work,
 such as the function fmt.Println .
 
+The import declarations must follow the package declaration. After that, a program consists of the declarations of functions, variables, constants, and
+types (introduced by the keywords func, var, const and type); for the most part, the order of declarations does not matter.
+
+Go does not require semicolons at the end of statements or declarations, except where two or more appear on the same line.
+
+Newlines following certain tokens are converted into semicolons, so where newlines are placed matters to proper parsing of Go code. For instance, the opening
+brace { of the function must be on the same line as the end of the func declaration, not on a line by itself, and in the expression x + y, a newline is
+permitted after but not before the + operator.
+
+Go takes a strong stance on code formatting. The gofmt tool rewrites code into the standard format, and the go tool’s fmt subcommand applies gofmt to all the
+files in the specified package, or the ones in the current directory by default.
+
+Gofmt is used by many editors to format code automatically as you save the file.
+A related tool, goimports, additionally manages the insertion and removal of import declarations as needed. It is not part of the standard distribution but
+you can obtain it with this command:
+$ go get golang.org/x/tools/cmd/goimports
+
+The os package provides functions and other values for dealing with the operating system in a platform independent fashion. Command-line arguments are
+available to a program in a variable named Args that is part of the os package; thus its name any where outside the os package is os.Args .
+
+The for loop is the only loop statement in Go. It has a number of forms, one of which is illustrated here:
+  for initialization; condition; post {
+    // zero or more statements
+  }
+
+Any of these parts (initialization; condition; post) may be omitted. If there is no initialization and no post, the semicolons may also be omitted:
+  // a traditional "while" loop
+  for condition {
+    // ...
+  }
+
+If the condition is omitted entirely in any of these forms, for example in
+  // a traditional infinite loop
+  for {
+    // ...
+  }
+the loop is infinite, though loops of this form may be terminated in some other way, like a break or return statement.
+
+There are several ways to declare a string variable, these are all equivalent:
+s := ""
+var s string
+var s = ""
+var s string = ""
+
+Why should you prefer one form to another? The first form, a short variable declaration, is the most compact, but it may be used only within a function,
+not for package level variables. The second form relies on default initialization to the zero value for strings, which is "". The third form is rarely used
+except when declaring multiple variables. The fourth form is explicit about the variable's type, which is redundant when it is the same as that of the initial
+value but necessary in other cases where they are not of the same type. In practice, you should generally use one of the first two forms, with explicit
+initialization to say that the initial value is important and implicit initialization to say that the initial value doesn’t matter.
+
+Different bahaviors of for loop :
+for condition => behaves like a while
+for i,v := range list => ranges over a list
+for i=0;i<10;i++ => C style classical for
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
@@ -30,3 +85,7 @@ Channels help to solve this problem by providing a pattern that makes data safe 
 goroutine should modify the data at any time. You can see an example of this flow in Figure 1.3, where channels are used to send data between several running
 goroutines. Imagine an application where many different processes need to know about or modify data sequentially. Using goroutines and channels, you can model
 this process safely.
+
+
+Reference:
+1) https://www.whitesmith.co/blog/why-i-started-to-use-golang-more-than-python-or-ruby/
