@@ -148,6 +148,77 @@ iteration of the outermost loop. There is even a goto statement, though it’s i
 17) Pointers are explicitly visible. The & operator yields the address of a variable, and the * operator retrieves the variable that the pointer refers to, but
 there is no pointer arithmetic.
 
+18) If an entity is declared within a function, it is local to that function. If declared outside of a function, however, it is visible in all files of the
+package to which it belongs. The case of the first letter of a name determines its visibility across package boundaries. If the name begins with an uppercase
+letter, it is exported, which means that it is visible and accessible outside of its own package and may be referred to by other parts of the program, as with
+Printf in the fmt package. Package names themselves are always in lower case.
+
+Go programmers use camel case when forming names by combining words; that is, interior capital letters are preferred over interior underscores. Thus the
+standard libraries have functions with names like QuoteRuneToASCII and parseRequestLine but never quote_rune_to_ASCII or parse_request_line. The letters of
+acronyms and initialisms like ASCII and HTML are always rendered in the same case, so a function might be called htmlEscape, HTMLEscape, or escapeHTML, but
+not escapeHtml.
+
+19) Declaration:
+A declaration names a program entity and specifies some or all of its properties. There are four major kinds of declarations: var, const, type and func.
+
+20) Variables:
+A var declaration creates a variable of a particular type, attaches a name to it, and sets its initial value. Each declaration has the general form
+    var name type = expression
+
+21) Either the type or the = expression part may be omitted, but not both. If the type is omitted, it is determined by the initializer expression. If the
+expression is omitted, the initial value is the zero value for the type, which is 0 for numbers, false for booleans, "" for strings, and nil for interfaces
+and reference types (slice, pointer, map, channel, function). The zero value of an aggregate type like an array or a struct has the zero value of all of
+its elements or fields.
+
+The zero-value mechanism ensures that a variable always holds a well-defined value of its type; in Go there is no such thing as an uninitialized variable.
+This simplifies code and often ensures sensible behavior of boundary conditions without extra work. For example,
+    var s string
+    fmt.Println(s) // ""
+
+It is possible to declare and optionally initialize a set of variables in a single declaration, with a matching list of expressions. Omitting the type allows
+declaration of multiple variables of different types:
+    var i, j, k int                 // int, int, int
+    var b, f, s = true, 2.3, "four" // bool, float64, string
+
+22) Short Variable Declarations
+Within a function, an alternate form called a short variable declaration may be used to declare and initialize local variables. It takes the form 
+    name := expression
+and the type of name is determined by the type of expression.
+
+Because of their brevity and flexibility, short variable declarations are used to declare and initialize the majority of local variables. A var declaration
+tends to be reserved for local variables that need an explicit type that differs from that of the initializer expression, or for when the variable will be
+assigned a value later and its initial value is unimportant.
+    i := 100 // an int
+    var boiling float64 = 100 // a float64
+    var names []string
+    var err error
+    var p Point
+
+As with var declarations, multiple variables may be declared and initialized in the same short variable declaration,
+    i, j := 0, 1
+is same as
+    var i, j = 0, 1
+
+    i, j = j, i // swap values of i and j
+
+23) One subtle but important point: a short variable declaration does not necessarily declare all the variables on its left-hand side. If some of them were
+already declared in the same lexical block, then the short variable declaration acts like an assignment to those variables.
+
+In the code below, the first statement declares both in and err. The second declares out but only assigns a value to the existing err variable.
+    in, err := os.Open(infile)
+    // ...
+    out, err := os.Create(outfile)
+
+A short variable declaration must declare at least one new variable, however, so this code will not compile:
+    f, err := os.Open(infile)
+    // ...
+    f, err := os.Create(outfile) // compile error: no new variables
+
+The fix is to use an ordinary assignment for the second statement.
+
+A short variable declaration acts like an assignment only to variables that were already declared in the same lexical block; declarations in an outer block
+are ignored.
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
