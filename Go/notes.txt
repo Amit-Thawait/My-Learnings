@@ -97,6 +97,57 @@ the variable color.White belongs to the image/color package and gif.GIF belongs 
 10) Like var declarations, const declarations may appear at package level(so the names are visible throughout the package) or within a function(so the names
 are visible only within that function). The value of a constant must be a number, string, or boolean.
 
+11) A goroutine is a concurrent function execution. A channel is a communication mechanism that allows one goroutine to pass values of a specified type to
+another goroutine. The function main runs in a goroutine and the go statement creates addition al goroutines.
+
+12) When one goroutine attempts a send or receive on a channel, it blocks until another goroutine attempts the corresponding receive or send operation, at
+which point the value is transferred and both goroutines proceed.
+
+13) if err := r.ParseForm(); err != nil {
+      log.Print(err)
+    }
+Go allows a simple statement such as a local variable declaration to precede the if condition, which is particularly useful for error handling as in this example. We could have written it as
+   err := r.ParseForm()
+   if err != nil {
+     log.Print(err)
+   }
+but combining the statements is shorter and reduces the scope of the variable err, which is good practice.
+
+14) Use the strconv.Atoi function to convert the string parameter into an integer.
+
+15) Switch statement
+    switch coinflip() {
+    case "heads":
+      heads++
+    case "tails":
+      tails++
+    default:
+      fmt.Println("landed on edge!")
+    }
+
+A switch does not need an operand; it can just list the cases, each of which is a boolean expression:
+
+    func Signum(x int) int {
+      switch {
+      case x > 0:
+        return +1
+      default:
+        return 0
+      case x < 0:
+        return -1
+      }
+    }
+This form is called a tagless switch; it’s equivalent to switch true.
+
+Like the for and if statements, a switch may include an optional simple statement - a short variable declaration, an increment or assignment statement, or a
+function call that can be used to set a value before it is tested.
+
+16) Statements may be labeled so that break and continue can refer to them, for instance to break out of several nested loops at once or to start the next
+iteration of the outermost loop. There is even a goto statement, though it’s int ended for machine-generated code, not regular use by programmers.
+
+17) Pointers are explicitly visible. The & operator yields the address of a variable, and the * operator retrieves the variable that the pointer refers to, but
+there is no pointer arithmetic.
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
