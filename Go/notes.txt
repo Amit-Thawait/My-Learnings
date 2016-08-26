@@ -219,6 +219,22 @@ The fix is to use an ordinary assignment for the second statement.
 A short variable declaration acts like an assignment only to variables that were already declared in the same lexical block; declarations in an outer block
 are ignored.
 
+24) If a variable is declared var x int, the expression &x ("address of x") yields a pointer to an integer variable, that is, a value of type *int, which is
+pronounced "pointer to int". If this value is called p, we say "p points to x", or equivalently "p contains the address of x". The variable to which p points
+is written *p. The expression *p yields the value of that variable, an int, but since *p denotes a variable, it may also appear on the lefthand side of an
+assignment, in which case the assignment updates the variable.
+
+x := 1
+p := &x         // p, of type *int, points to x
+fmt.Println(*p) // "1"
+*p = 2          // equivalent to x = 2
+fmt.Println(x)  // "2"
+
+25) The zero value for a pointer of any type is nil . The test p != nil is true if p points to a variable. Pointers are comparable; two pointers are equal if
+and only if the y point to the same variable or both are nil.
+    var x, y int
+    fmt.Println(&x == &x, &x == &y, &x == nil) // "true false false"
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
