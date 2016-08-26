@@ -6,3 +6,4 @@ fortune
 gem install lolcat
 figlet
 sl
+byzanz => used for creating GIFs (http://askubuntu.com/questions/107726/how-to-create-animated-gif-images-of-a-screencast#answer-123515)
