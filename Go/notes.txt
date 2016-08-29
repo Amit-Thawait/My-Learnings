@@ -235,6 +235,31 @@ and only if the y point to the same variable or both are nil.
     var x, y int
     fmt.Println(&x == &x, &x == &y, &x == nil) // "true false false"
 
+26) The new function:
+Another way to create a variable is to use the built-in function new. The expression new(T) creates an unnamed variable of type T, initializes it to the zero
+value of T, and returns its address, which is a value of type *T.
+
+p := new(int)    // p, of type *int, points to an unnamed int variable
+fmt.Println(*p)  // "0"
+*p = 2           // sets the unnamed int to 2
+fmt.Println(*p)  // "2"
+
+A variable created with new is no different from an ordinary local variable whose address is taken, except that there's no need to invent (and declare) a dummy
+name, and we can use new(T) in an expression. Thus new is only a syntactic convenience, not a fundamental notion:
+the two newInt functions below have identical behaviors.
+  func newInt() *int {
+    return new(int)
+  }
+
+  func newInt() *int {
+    var dummy int
+    return &dummy
+  }
+
+Since new is a predeclared function, not a keyword, it's possible to redefine the name for something else within a function, for example:
+  func delta(old, new int) int { return new - old }
+Of course, within delta, the built-in new function is unavailable.
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
