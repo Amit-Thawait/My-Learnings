@@ -260,6 +260,18 @@ Since new is a predeclared function, not a keyword, it's possible to redefine th
   func delta(old, new int) int { return new - old }
 Of course, within delta, the built-in new function is unavailable.
 
+27) Packages in Go serve the same purposes as libraries or modules in other languages, supporting modularity, encapsulation, separate compilation, and reuse.
+The source code for a package resides in one or more .go files, usually in a directory whose name ends with the import path.
+
+28) Packages also let us hide information by controlling which names are visible outside the package, or exported. In Go, a simple rule governs which
+identifiers are exported and which are not: exported identifiers start with an upper-case letter.
+
+29) Package initialization:
+Any file may contain any number of functions whose declaration is just
+  func init() { /* ... */ }
+Such init functions can’t be called or referenced, but otherwise they are normal functions. Within each file, init functions are automatically executed when
+the program starts, in the order in which they are declared.
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
