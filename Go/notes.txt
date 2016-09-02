@@ -78,7 +78,7 @@ that are available:
 %x, %o, %b => integer in hexadecimal, octal, binary
 %f, %g, %e => floating-point number: 3.141593 3.141592653589793 3.141593e+00
 %t         => boolean: true or false
-%c         => rune (Unicode code point)
+%c         => rune (Unicode code point) (The type rune is an synonym for int32 and conventionally indicates that a value is a Unicode code point)
 %s         => string
 %q         => quoted string "abc" or rune 'c'
 %v         => any value in a natural format
@@ -271,6 +271,49 @@ Any file may contain any number of functions whose declaration is just
   func init() { /* ... */ }
 Such init functions can’t be called or referenced, but otherwise they are normal functions. Within each file, init functions are automatically executed when
 the program starts, in the order in which they are declared.
+
+30) Within a function, lexical blocks may be nested to arbitrary depth, so one local declaration can shadow another. Most blocks are created by control-flow
+constructs like if statements and for loops.
+
+Not all lexical blocks correspond to explicit brace-delimited sequences of statements; some are merely implied. The for loop above creates two lexical blocks:
+the explicit block for the loop body, and an implicit block that additionally encloses the variables declared by the initialization clause, such as i. The scope
+of a variable declared in the implicit block is the condition, post-statement (i++), and body of the for statement.
+
+The example below also has three variables named x, each declared in a different block : one in the function body, one in the for statement’s block, and one in
+the loop body—but only two of the blocks are explicit:
+    func main() {
+        x := "hello"
+        for _, x := range x {
+            x := x + 'A' - 'a'
+            fmt.Printf("%c", x) // "HELLO" (one letter per iteration)
+        }
+    }
+
+Like for loops, if statements and switch statements also create implicit blocks in addition to their body blocks. The code in the following if - else chain
+shows the scope of x and y :
+    if x := f(); x == 0 {
+        fmt.Println(x)
+    } else if y := g(x); x == y {
+        fmt.Println(x, y)
+    } else {
+        fmt.Println(x, y)
+    }
+    fmt.Println(x, y) // compile error: x and y are not visible here
+
+The second if statement is nested within the first, so variables declared within the first statement's initializer are visible within the second. Similar rules
+apply to each case of a switch statement: there is a block for the condition and a block for each case body.
+
+31) Go's types fall into four categories: basic types, aggregate types, reference types, and interface types.
+Basic types     : numbers, strings, and booleans
+Aggregate types : arrays and structs form more complicated data types by combining values of several simpler ones.
+Reference types : pointers, slices, maps, functions and channels.
+
+32) The type rune is an synonym for int32 and conventionally indicates that a value is a Unicode code point. The two names may be used interchangeably. Similarly,
+the type byte is an synonym for uint8, and emphasizes that the value is a piece of raw data rather than a small numeric quantity.
+
+33) Signed numbers are represented in 2's-complement for m, in which the high-order bit is reserved for the sign of the number and the range of values of an
+n-bit number is from -(2^(n-1)) to (2^(n-1))-1. Unsigned integers use the full range of bits for non-negative values and thus have the range 0 to 2^(n−1).
+For instance, the range of int8 is −128 to 127, where as the range of uint8 is 0 to 255.
 
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
