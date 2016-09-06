@@ -315,6 +315,48 @@ the type byte is an synonym for uint8, and emphasizes that the value is a piece 
 n-bit number is from -(2^(n-1)) to (2^(n-1))-1. Unsigned integers use the full range of bits for non-negative values and thus have the range 0 to 2^(n−1).
 For instance, the range of int8 is −128 to 127, where as the range of uint8 is 0 to 255.
 
+34) o := 0666
+    fmt.Printf("%d %[1]o %#[1]o\n", o) // "438 666 0666"
+    x := int64(0xdeadbeef)
+    fmt.Printf("%d %[1]x %#[1]x %#[1]X\n", x)  // Output: 3735928559 deadbeef 0xdeadbeef 0XDEADBEEF
+Note the use of two fmt tricks. Usually a Printf format string containing multiple % verbs would require the same number of extra operands, but the [1] "adverbs"
+after % tell Printf to use the first operand over and over again. Second, the # adverb for %o or %x or %X tells Printf to emit a 0 or 0x or 0X prefix respectively.
+
+35) Runes(unicode code points) are printed with %c , or with %q if quoting is desired.
+    ascii := 'a'
+    fmt.Printf("%d %[1]c %[1]q\n", ascii) // "97 a 'a'"
+
+36) Go provides two sizes of floating-point numbers, float32 and float64.
+Values of these numeric types range from tiny to huge. The limits of floating-point values can be found in the math package. The constant math.MaxFloat32,
+the largest float32 , is about 3.4e38, and math.MaxFloat64 is about 1.8e308. The smallest positive values are near 1.4e-45 and 4.9e-324, respectively.
+
+A float32 provides approximately six decimal digits of precision, where as a float64 provides about 15 digits; float64 should be preferred for most purposes
+because float32 computations accumulate error rapidly unless one is quite careful, and the smallest positive integer that cannot be exactly represented as a
+float32 is not large:
+    var f float32 = 16777216 // 1 << 24
+    fmt.Println(f == f+1) // "true"!
+
+Very small or very large numbers are better written in scientific notation, with the letter e or E preceding the decimal exponent:
+    const Avogadro = 6.02214129e23
+    const Planck   = 6.62606957e-34
+
+37) Floating-point values are conveniently printed with Printf's %g verb, which chooses the most compact representation that has adequate precision, but for
+tables of data, the %e (exponent) or %f (no exponent) forms may be more appropriate. All three verbs allow field width and numeric precision to be controlled.
+    for x := 0; x < 8; x++ {
+        fmt.Printf("x = %d e A = %8.3f\n", x, math.Exp(float64(x)))
+    }
+The code above prints the powers of e with three decimal digits of precision, aligned in an eight-character field.
+
+38) The function math.IsNaN tests whether its argument is a not-a-number value, and math.NaN returns such a value but any comparison with NaN always yields false.
+
+39) Complex Numbers:
+    var x complex128 = complex(1, 2) // 1+2i
+    OR
+    x := 1 + 2i
+
+The math/cmplx package provides library functions for working with complex numbers, such as the complex square root and exponentiation functions.
+    fmt.Println(cmplx.Sqrt(-1)) // "(0+1i)"
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
