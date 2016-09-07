@@ -357,6 +357,66 @@ The code above prints the powers of e with three decimal digits of precision, al
 The math/cmplx package provides library functions for working with complex numbers, such as the complex square root and exponentiation functions.
     fmt.Println(cmplx.Sqrt(-1)) // "(0+1i)"
 
+40) Strings:
+A string is an immutable sequence of bytes. The built-in len function returns the number of bytes (not runes) in a string, and the index operation s[i] retrieves
+the i-th byte of string s, where 0 ≤ i < len(s)
+    s := "hello, world"
+    fmt.Println(len(s))     // "12"
+    fmt.Println(s[0], s[7]) // "104 119" ('h' and 'w')
+
+The i-th byte of a string is not necessarily the i-th character of a string, because the UTF-8 encoding of a non-ASCII code point requires two or more bytes.
+
+The substring operation s[i:j] yields a new string consisting of the bytes of the original string starting at index i and continuing up to, but not including,
+the byte at index j.
+    fmt.Println(s[0:5]) // "hello"
+Either or both of the i and j operands may be omitted, in which case the default values of 0 (the start of the string) and len(s) (its end) are assumed, respectively.
+    fmt.Println(s[:5])  // "hello"
+    fmt.Println(s[7:])  // "world"
+    fmt.Println(s[:])   // "hello, world"
+
+The + operator makes a new string by concatenating two strings:
+    fmt.Println("goodbye" + s[5:]) // "goodbye, world"
+
+41) String comparison is done byte by byte. String values are immutable: the byte sequence contained in a string value can never be changed, though of course we
+can assign a new value to a string variable. += operator does not modify the string, creates a new string. For a string s :
+    s[0] = 'L' // compile error: cannot assign to s[0]
+
+42) Immutability me ans that it is safe for two copies of a string to share the same underlying memory, making it cheap to copy strings of any length. Similarly,
+a string s and a substring like s[7:] may safely share the same data, so the substring operation is also cheap. No new memory is allocated in either case.
+
+43) Within a double-quoted string literal, escape sequences that begin with a backslash \ can be used to insert arbitrary byte values into the string. One set
+of escapes handles ASCII control codes like newline, carriage return, and tab:
+    \a "alert" or bell
+    \b backspace
+    \f form feed
+    \n newline
+    \r carriage return
+    \t tab
+    \v vertical tab
+    \' single quote (only in the rune literal '\'' )
+    \" double quote (only within "..." literals)
+    \\ backslash
+
+Arbitrary bytes can also be included in literal strings using hexadecimal or octal escapes. A hexadecimal escape is written \xhh, with exactly two hexadecimal
+digits h (in upper or lower case). An octal escape is written \ooo with exactly three octal digits o (0 through 7) not exceeding \377. Both denote a single byte
+with the specified value.
+
+44) A raw string literal is written `...`, using backquotes instead of double quotes. Within a raw string literal, no escape sequences are processed; the contents
+are taken literally, including backslashes and newlines, so a raw string literal may spread over several lines in the program source. The only processing is that
+carriage returns are deleted so that the value of the string is the same on all platforms, including those that conventionally put carriage returns in text files.
+
+Raw string literals are a convenient way to write regular expressions, which tend to have lots of backslashes. They are also useful for HTML templates, JSON
+literals, command usage messages, and the like, which often extend over multiple lines.
+Ex:
+const GoUsage = `Go is a tool for managing Go source code.
+Usage:
+    go command [arguments]
+...`
+
+45) If a slice of runes is converted to a string, it produces the concatenation of the UTF-8 encodings of each rune.
+Converting an integer value to a string interprets the integer as a rune value, and yields the UTF-8 representation of that rune:
+    fmt.Println(string(65)) // "A", not "65"
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
