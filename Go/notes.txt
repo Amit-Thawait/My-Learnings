@@ -417,6 +417,17 @@ Usage:
 Converting an integer value to a string interprets the integer as a rune value, and yields the UTF-8 representation of that rune:
     fmt.Println(string(65)) // "A", not "65"
 
+46) A string contains an array of bytes that, once created, is immutable. By contrast, the elements of a byte slice can be freely modified.
+Strings can be converted to byte slices and back again:
+    s := "abc"
+    b := []byte(s)
+    s2 := string(b)
+
+Conceptually, the []byte(s) conversion allocates a new byte array holding a copy of the bytes of s, and yields a slice that references the entirety of that array.
+An optimizing compiler may be able to avoid the allocation and copying in some cases, but in general copying is required to ensure that the bytes of s remain
+unchanged even if those of b are subsequently modified. The conversion from byte slice back to string with string(b) also makes a copy, to ensure immutability
+of the resulting string s2.
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
