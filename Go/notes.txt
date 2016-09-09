@@ -428,6 +428,60 @@ An optimizing compiler may be able to avoid the allocation and copying in some c
 unchanged even if those of b are subsequently modified. The conversion from byte slice back to string with string(b) also makes a copy, to ensure immutability
 of the resulting string s2.
 
+47) To convert an integer to a string, one option is to use fmt.Sprintf, another is to use the function strconv.Itoa ("integer to ASCII"):
+    x := 123
+    y := fmt.Sprintf("%d", x)
+    fmt.Println(y, strconv.Itoa(x)) // "123 123"
+
+FormatInt and FormatUint can be used to format numbers in a different base:
+    fmt.Println(strconv.FormatInt(int64(x), 2)) // "1111011"
+
+The fmt.Printf verbs %b, %d, %u and %x are often more convenient than Format functions, especially if we want to include additional information besides the number:
+    s := fmt.Sprintf("x=%b", x) // "x=1111011"
+
+To parse a string representing an integer, use the strconv functions Atoi or ParseInt or ParseUint for unsigned integers:
+    x, err := strconv.Atoi("123")             // x is an int
+    y, err := strconv.ParseInt("123", 10, 64) // base 10, up to 64 bits
+The third argument of ParseInt gives the size of the integer type that the result must fit into; for example, 16 implies int16, and the special value of 0
+implies int. In any case, the type of the result y is always int64, which you can then convert to a smaller type.
+
+48) Constants :
+Constants are expressions whose value is known to the compiler and whose evaluation is guaranteed to occur at compile time, not at runtime. The underlying
+type of every constant is a basic type: boolean, string or number.
+Many computations on constants can be completely evaluated at compile time, reducing the work necessary at runtime and enabling other compiler optimizations.
+
+A constant declaration may specify a type as well as a value, but in the absence of an explicit type, the type is inferred from the expression on the right-hand side.
+
+47) Wh en a sequence of con stants is declare d as a gro up, the rig ht-hand side expression may be
+omit ted for all but the firs t of the gro up, imp l ying that the pre vious expression and its typ e
+should be used again. For example:
+const (
+    a = 1
+    b
+    c = 2
+    d
+)
+fmt.Println(a, b, c, d) // "1 1 2 2"
+
+48) The Constant Generator iota :
+A const declaration may use the constant generator iota, which is used to create a sequence of related values without spelling out each one explicitly. In a
+const declaration, the value of iota begins at zero and increments by one for each item in the sequence.
+
+Here's an example from the time package, which defines named constants of type Weekday for the days of the week, starting with zero for Sunday. Types of this
+kind are often called enumerations, or enums for short.
+
+    type Weekday int
+    const (
+        Sunday Weekday = iota
+        Monday
+        Tuesday
+        Wednesday
+        Thursday
+        Friday
+        Saturday
+    )
+This declares Sunday to be 0, Monday to be 1, and so on.
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
