@@ -567,6 +567,44 @@ Multiple slices can share the same underlying array and may refer to overlapping
         fmt.Println(endlessSummer)  // "[Jun Jul Aug Sep Oct]"
     }
 
+54) Unlike arrays, slices are not comparable, so we cannot use == to test whether two slices contain the same elements. The standard library provides the
+highly optimized bytes.Equal function for comparing two slices of bytes ([]byte), but for other types of slice, we must do the comparison ourselves.
+
+    func equal(x, y []string) bool {
+        if len(x) != len(y) {
+            return false
+        }
+        for i := range x {
+            if x[i] != y[i] {
+                return false
+            }
+        }
+        return true
+    }
+
+The only legal slice comparison is against nil, as in
+    if summer == nil { /* ... */ }
+
+The zero value of a slice type is nil. A nil slice has no underlying array. The nil slice has length and capacity zero, but there are also non-nil slices
+of length and capacity zero, such as []int{} or make([]int, 3)[3:]. As with any type that can have nil values, the nil value of a particular slice type can
+be written using a conversion expression such as []int(nil).
+
+    var s []int    // len(s) == 0, s == nil
+    s = nil        // len(s) == 0, s == nil
+    s = []int(nil) // len(s) == 0, s == nil
+    s = []int{}    // len(s) == 0, s != nil
+
+So, if you need to test whether a slice is empty, use len(s) == 0, not s == nil. Other than comparing equal to nil, a nil slice behaves like any other
+zero-length slice; reverse(nil) is perfectly safe.
+
+55) The built-in function make creates a slice of a specified element type, length, and capacity. The capacity argument may be omitted, in which case the capacity equals the length.
+    make([]T, len)
+    make([]T, len, cap) // same as make([]T, cap)[:len]
+Under the hood, make creates an unnamed array variable and returns a slice of it; the array is accessible only through the returned slice. In the first form,
+the slice is a view of the entire array. In the second, the slice is a view of only the array's first len elements, but its capacity includes the entire array.
+The additional elements are set aside for future growth.
+
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
