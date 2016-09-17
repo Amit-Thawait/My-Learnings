@@ -604,6 +604,17 @@ Under the hood, make creates an unnamed array variable and returns a slice of it
 the slice is a view of the entire array. In the second, the slice is a view of only the array's first len elements, but its capacity includes the entire array.
 The additional elements are set aside for future growth.
 
+56) To copy slice from one to another 'copy' function is used :
+    copy(z, x) // z is destination, x is source
+
+57) Usually we don't know whether a given call to append will cause a reallocation, so we can't assume that the original slice refers to the same array as the resulting
+slice, nor that it refers to a different one. Similarly, we must not assume that operations on elements of the old slice will (or will not) be reflected in the new slice.
+As a result, it's usual to assign the result of a call to append to the same slice variable whose value we passed to append:
+    runes = append(runes, r)
+
+58) Updating the slice variable is required not just when calling append, but for any function that may change the length or capacity of a slice or make it refer to a
+different underlying array. To use slices correctly, it's important to bear in mind that although the elements of the underlying array are indirect, the slice's pointer,
+length, and capacity are not.
 
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
