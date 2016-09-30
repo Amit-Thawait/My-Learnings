@@ -693,6 +693,69 @@ the second is a boolean that reports whether the element was present.
 
 64) Just like slices, maps cannot be compared to each other; the only legal comparison is with nil.
 
+65) Structs:
+A struct is an aggregate data type that groups together zero or more named values of arbitrary types as a single entity. Each value is called a field. The
+classic example of a struct from data processing is the employee record, whose fields are a unique ID, the employee's name, address, date of birth, position,
+salary, manager, and the like. All of these fields are collected into a single entity that can be copied as a unit, passed to functions and returned by them,
+stored in arrays, and soon.
+
+These two statements declare a struct type called Employee and a variable called john that is an instance of an Employee :
+
+    type Employee
+        ID        int
+        Name      string
+        Address   string
+        DoB       time.Time
+        Position  string
+        Salary    int
+        ManagerID int
+    }
+
+    var john Employee
+
+It is accessed using dot not ation like john.Name or take its address and access it through a pointer:
+
+    john.Salary -= 5000
+    position := &john.Position
+    *position = "Senior " + *position
+
+If all the fields of a struct are comparable, the struct itself is comparable.
+
+66) Embeded type example :
+    w = Wheel{Circle{Point{8, 8}, 5}, 20}
+    w = Wheel{
+        Circle: Circle{
+            Point: Point{X: 8, Y: 8},
+            Radius: 5,
+        },
+        Spokes: 20, // NOTE: trailing comma necessary here (and at Radius)
+    }
+    fmt.Printf("%#v\n", w)
+    // Output: Wheel{Circle:Circle{Point:Point{X:8, Y:8}, Radius:5}, Spokes:20}
+
+    w.X = 42
+    fmt.Printf("%#v\n", w)
+    // Output: Wheel{Circle:Circle{Point:Point{X:42, Y:8}, Radius:5}, Spokes:20}
+
+The # adverb causes Printf's %v verb to display values in a form similar to Go syntax. For struct values, this form includes the name of each field.
+
+67) Every function call must provide an argument for each parameter, in the order in which the parameters were declared. Go has no concept of default
+parameter values, nor any way to specify arguments by name, so the names of parameters and results don't matter to the caller except as documentation.
+
+Arguments are passed by value, so the function receives a copy of each argument; modifications to the copy do not affect the caller. However, if the
+argument contains some kind of reference, like a pointer, slice, map, function, or channel, then the caller may be affected by any modifications the
+function makes to variables in directly referred to by the argument.
+
+You may occasionally encounter a function declaration without a body, indicating that the function is implemented in a language other than Go. Such a
+declaration defines the function signature.
+
+    package math
+    func Sin(x float64) float64 // implemented in assembly language
+
+68) The golang.org/x/... repositories hold packages designed and maintained by the Go team for applications such as net working, internationalized text
+processing, mobile platforms, image manipulation, cryptography, and developer tools. These packages are not in the standard library because they're still
+under development or because they're rarely needed by the majority of Go programmers.
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
