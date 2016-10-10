@@ -756,6 +756,29 @@ declaration defines the function signature.
 processing, mobile platforms, image manipulation, cryptography, and developer tools. These packages are not in the standard library because they're still
 under development or because they're rarely needed by the majority of Go programmers.
 
+69) Go's garbage collector recycles unused memory, but do not assume it will release unused operating system resources like open files and network connections.
+They should be closed explicitly.
+
+70) Errors:
+A function for which failure is an expected behavior returns an additional result, conventionally the last one. If the failure has only one possible cause,
+the result is a boolean, usually called ok, as in this example of a cache lookup that always succeeds unless there was no entry for that key :
+
+    value, ok := cache.Lookup(key)
+    if !ok {
+        // ...cache[key] does not exist...
+    }
+
+More often, and especially for I/O, the failure may have a variety of causes for which the caller will need an explanation. In such cases, the type of the
+additional result is error.
+
+71) Go's approach sets it apart from many other languages in which failures are reported using exceptions, not ordinary values. Although Go does have an
+exception mechanism of sorts, it is used only for reporting truly unexpected errors that indicate a bug, not the routine errors that a robust program should
+be built to expect.
+
+The reason for this design is that exceptions tend to entangle the description of an error with the control flow required to handle it, often leading to an
+undesirable outcome: routine errors are reported to the end user in the form of an incomprehensible stack trace, full of information about the structure of
+the program but lacking intelligible context about what went wrong.
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
