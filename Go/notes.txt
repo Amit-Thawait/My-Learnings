@@ -779,6 +779,12 @@ The reason for this design is that exceptions tend to entangle the description o
 undesirable outcome: routine errors are reported to the end user in the form of an incomprehensible stack trace, full of information about the structure of
 the program but lacking intelligible context about what went wrong.
 
+72) log.Fatalf("Site is down: %v\n", err). log.Fatalf prefixes the time and date to the error message. All log functions app end a newline if one is not
+already present.
+
+73) Error handling in Go has a particular rhythm. After checking an error, failure is usually dealt with before success. If failure causes the function to
+return, the logic for success is not indented within an else block but follows at the outer level.
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
