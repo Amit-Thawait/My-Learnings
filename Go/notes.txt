@@ -785,6 +785,49 @@ already present.
 73) Error handling in Go has a particular rhythm. After checking an error, failure is usually dealt with before success. If failure causes the function to
 return, the logic for success is not indented within an else block but follows at the outer level.
 
+74) Function Value:
+Functions are first-class values in Go: like other values, function values have types, and they may be assigned to variables or passed to or returned from
+functions. A function value may be called like any other function.
+
+    func square(n int) int     { return n * n }
+    func negative(n int) int   { return -n }
+    func product(m, n int) int { return m * n }
+
+    f := square
+    fmt.Println(f(3)) // "9"
+
+    f = negative
+    fmt.Println(f(3)) // "-3"
+    fmt.Printf("%T\n", f) // "func(int) int"
+
+    f = product // compile error: can't assign f(int, int) int to f(int) int
+
+Function values may be compared with nil, but they are not comparable, so they may not be compared against each other or used as keys in a map.
+
+Function values let us parameterize our functions over not just data, but behavior too. The standard libraries contain many examples. For instance,
+strings.Map applies a function to each character of a string, joining the results to make another string.
+
+    func add1(r rune) rune { return r + 1 }
+
+    fmt.Println(strings.Map(add1, "HAL-9000")) // "IBM.:111"
+    fmt.Println(strings.Map(add1, "VMS"))   // "WNT"
+    fmt.Println(strings.Map(add1, "Admix")) // "Benjy"
+
+75) Anonymous Function
+Named functions can be declared only at the package level, but we can use a function literal to denote a function value within any expression. A function
+literal is written like a function declaration, but without a name following the func keyword. It is an expression, and its value is called an anonymous
+function.
+
+    strings.Map(func(r rune) rune { return r + 1 }, "HAL-9000")
+
+More importantly, functions defined in this way have access to the entire lexical environment, so the inner function can refer to variables from the
+enclosing function.
+Refer Page 135.
+
+76) Function values are not just code but can have state. The anonymous inner function can access and update the local variables of the enclosing function.
+These hidden variable references are why we classify functions as reference types and why function values are not comparable. Function values like these
+are implemented using a technique called closures, and Go programmers often use this term for function values.
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
