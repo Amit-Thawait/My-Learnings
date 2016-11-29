@@ -31,6 +31,8 @@ https://www.youtube.com/watch?v=Dm9NgjR5Jn4
 
 Redux :-
 --------
+https://medium.com/@stowball/a-dummys-guide-to-redux-and-thunk-in-react-d8904a7005d3#.cni1db3ac
+
 https://egghead.io/series/getting-started-with-redux
 
 https://egghead.io/lessons/javascript-redux-the-single-immutable-state-tree
