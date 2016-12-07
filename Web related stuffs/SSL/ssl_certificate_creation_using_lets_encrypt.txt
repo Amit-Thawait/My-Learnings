@@ -80,3 +80,9 @@ sudo chown ubuntu:ubuntu /var/log/cron.log
 
 
 Add --dry-run as option to generate test certificate
+
+===================================================================
+
+For manual creation of SSL certificate follow the below link :
+
+https://isabelcastillo.com/lets-encrypt-ssl-certificate-godaddy-shared-cpanel
