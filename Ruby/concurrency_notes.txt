@@ -1,0 +1,6 @@
+You can get benefits of concurrency in Ruby if you are doing these things :
+- Read/Write from files (such as logs)
+- Interact with databases
+- Listen for inbound network requests (say, HTTP)
+- Connect to external HTTP API's
+- Send email
