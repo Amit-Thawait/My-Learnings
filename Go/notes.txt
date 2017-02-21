@@ -1125,6 +1125,63 @@ nothing about what it is; you know only what it can do, or more precisely, what 
 fmt.Printf, which writes the result to the standard output (a file), and fmt.Sprintf, which returns the result as a string. Both of these functions are,
 in effect, wrappers around a third function, fmt.Fprintf .
 
+95) Interface Types
+An interface type specifies a set of methods that a concrete type must possess to be considered an instance of that interface.
+
+The io.Writer type is one of the most widely used interfaces because it provides an abstraction of all the types to which bytes can be written, which
+includes files, memory buffers, network connections, HTTP clients, archivers, hashers, and so on. The io package defines many other useful interfaces.
+A Reader represents any type from which you can read bytes, and a Closer is any value that you can close, such as a file or a network connection.
+
+    package io
+
+    type Reader interface {
+        Read(p []byte) (n int, err error)
+    }
+
+    type Closer interface {
+        Close() error
+    }
+
+Interface types can also be declared as combinations of existing ones
+
+    type ReadWriter interface {
+        Reader
+        Writer
+    }
+
+    type ReadWriteCloser interface {
+        Reader
+        Writer
+        Closer
+    }
+
+The syntax used above, which resembles struct embedding, is called embedding an interface.
+
+96) Interface Satisfaction
+A type satisfies an interface if it possesses all the methods the interface requires. For example, an *os.File satisfies io.Reader, Writer, Closer and
+ReadWriter . A *bytes.Buffer satisfies Reader, Writer, and ReadWriter, but does not satisfy Closer because it does not have a Close method. As a shorthand,
+Go programmers often say that a concrete type "is a" particular interface type, meaning that it satisfies the interface. For example, a *bytes.Buffer is
+an io.Writer ; an *os.File is an io.ReadWriter .
+
+var w io.Writer
+w = os.Stdout          // OK: *os.File has Write method
+w = new(bytes.Buffer)  // OK: *bytes.Buffer has Write method
+w = time.Second        // compile error: time.Duration lacks Write method
+
+It is legal to call a *T method on an argument of type T so long as the argument is a variable; the compiler implicitly takes its address. But this is
+mere syntactic sugar : a value of type T does not possess all the methods that a *T pointer does, and as a result it might satisfy fewer interfaces.
+
+So what does the type interface{}, which has no methods at all, tell us about the concrete types that satisfy it?
+That's right: nothing. This may seem useless, but in fact the type interface{}, which is called the empty interface type, is indispensable. Because the
+empty interface type places no demands on the types that satisfy it, we can assign any value to the empty interface.
+
+    var any interface{}
+    any = true
+    any = 12.34
+    any = "hello"
+    any = map[string]int{"one": 1}
+    any = new(bytes.Buffer)
+
 1) Go's concurrency support is one of its strongest features. Goroutines are like threads, but use far less memory and require much less code to implement.
 Channels are typed memory queues that let you send messages between goroutines. This facilitates a programming model where you send data between goroutines,
 rather than letting the goroutines fight to use the same data.
