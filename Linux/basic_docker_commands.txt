@@ -1,0 +1,46 @@
+Basic docker commands :
+-----------------------
+docker
+
+docker -v
+
+docker info
+
+docker images
+
+docker ps
+
+docker ps -a
+
+docker run -i -t ubuntu:xenial /bin/bash
+
+docker inspect ubuntu:xenial
+
+docker restart compassionate_bhabha
+
+docker attach compassionate_bhabha
+
+docker run -i -t -d ubuntu:xenial /bin/bash
+docker run -itd ubuntu:xenial /bin/bash
+
+docker inspect <image_name>
+docker inspect compassionate_bhabha
+docker inspect compassionate_bhabha | grep IP
+
+docker stop <image_name>
+docker stop compassionate_bhabha
+
+----------------------------------------------------------------------------------
+Inside docker container if "apt-get update" is not working then follow these steps
+nm-tool | grep DNS
+then go to /etc/default/docker file
+DOCKER_OPTS="--dns <ip1> --dns <ip2>"
+
+OR
+nmcli dev list | grep IP4.DNS
+
+The CentOS equivalent is the /etc/sysconfig/docker
+-----------------------------------------------------------------------------------
+
+docker search <image_name>
+docker search training/sinatra
