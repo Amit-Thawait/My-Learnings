@@ -23,11 +23,11 @@ docker attach compassionate_bhabha
 docker run -i -t -d ubuntu:xenial /bin/bash
 docker run -itd ubuntu:xenial /bin/bash
 
-docker inspect <image_name>
+docker inspect <container_name>
 docker inspect compassionate_bhabha
 docker inspect compassionate_bhabha | grep IP
 
-docker stop <image_name>
+docker stop <container_name>
 docker stop compassionate_bhabha
 
 ----------------------------------------------------------------------------------
@@ -65,3 +65,27 @@ docker build -t="amitthawait/ubuntu-sshdonly:v2" < /location/Dockerfile
 
 The advantage of using a Dockerfile is that it creates an instance of docker container using the base image and then deletes it upon exiting whereas in the case of
 commiting a changes to docker container it doesn't removes the instance there by taking up disk space.
+
+docker logs <container_name>
+docker logs naughty_brown
+
+docker exec <container_name> <command>
+docker exec naughty_brown /bin/cat /etc/profile
+
+For docker exec command : the container in which exec command is fired should be running
+
+docker run ubuntu:xenial echo "Hello from this container"
+The above command just runs the echo command and exits. Even if you restart the above container it will just run the echo command again and will exit.
+
+docker pull nginx:latest
+
+docker run -d -p 8080:80 nginx:latest
+
+docker run -itd docker.io/centos:6 /bin/bash
+Pull a docker image and running it in daemon mode in 1 go
+
+docker rm <container_name>
+docker rm jolly_pare
+
+Naming a container
+docker run -it --name=test_ssh -p 8022:22 docker.io/centos:6 /bin/bash
