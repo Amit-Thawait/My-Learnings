@@ -58,10 +58,16 @@ MAINTAINER Amit Thawait <amit17thawait@gmail.com>
 RUN apt-get update
 RUN apt-get install -y telnet openssh-server
 -----------
+
+With RUN command inside a Dockerfile, whatever command is passed to it, its result becomes part of the base image.
+For ex: For the above docker file, telnet and openssh-server become part of the base image after an image is built from it.
+
 docker build -t="new_image_name" <location of docker_file>
 docker build -t="amitthawait/ubuntu-sshdonly:v2" .
 OR
 docker build -t="amitthawait/ubuntu-sshdonly:v2" < /location/Dockerfile
+OR
+docker build -t "amitthawait/ubuntu-sshdonly:v2" .
 
 The advantage of using a Dockerfile is that it creates an instance of docker container using the base image and then deletes it upon exiting whereas in the case of
 commiting a changes to docker container it doesn't removes the instance there by taking up disk space.
@@ -89,3 +95,10 @@ docker rm jolly_pare
 
 Naming a container
 docker run -it --name=test_ssh -p 8022:22 docker.io/centos:6 /bin/bash
+
+docker rmi <image_id>
+docker rmi 0ef2e08ed3fa
+
+docker exec -u 0 -it <container_name> /bin/bash
+-u 0 signifies user with id 0 which is actually root user
+docker exec -u 0 -it condescending_albattani /bin/bash
