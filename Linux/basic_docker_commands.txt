@@ -99,6 +99,15 @@ docker run -it --name=test_ssh -p 8022:22 docker.io/centos:6 /bin/bash
 docker rmi <image_id>
 docker rmi 0ef2e08ed3fa
 
+With rmi you can also delete a docker image by name
+docker rmi <image_name>
+docker rmi centos/java_8:v1
+
 docker exec -u 0 -it <container_name> /bin/bash
 -u 0 signifies user with id 0 which is actually root user
 docker exec -u 0 -it condescending_albattani /bin/bash
+
+Difference between CMD and RUN
+RUN command is executed while building the base image,
+whereas CMD command is added as configuration for the base image and is executed when the image is instantiated.
+Command stated using CMD directive will not be executed if the container is asked to do something else like connecting to /bin/bash while instanting.
