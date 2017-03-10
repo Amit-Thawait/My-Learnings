@@ -30,6 +30,8 @@ docker inspect compassionate_bhabha | grep IP
 docker stop <container_name>
 docker stop compassionate_bhabha
 
+For exiting without stopping the container type: ctrl+p+q
+
 ----------------------------------------------------------------------------------
 Inside docker container if "apt-get update" is not working then follow these steps
 nm-tool | grep DNS
@@ -117,3 +119,6 @@ ALso, if something else is asked to run while instanting lets say /bin/bash, the
 
 A command can be run on a container having ENTRYPOINT using "docker exec" command
 docker exec apacheweb1 /bin/cat /var/www/html/index.html
+
+-P(High port mapping scheme): expose and remap automatically any ports that are exposed within the container. Port need to exposed from container using EXPOSE command.
+docker run -d --name apacheweb3 -P centos7/apache:v2
