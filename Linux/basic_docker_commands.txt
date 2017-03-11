@@ -122,3 +122,27 @@ docker exec apacheweb1 /bin/cat /var/www/html/index.html
 
 -P(High port mapping scheme): expose and remap automatically any ports that are exposed within the container. Port need to exposed from container using EXPOSE command.
 docker run -d --name apacheweb3 -P centos7/apache:v2
+
+To mount a volume in the container
+docker run -it --name voltest1 -v /mydata centos:latest /bin/bash
+The above /mydata can be found out at _data dir inside volumes in /var/lib/docker/volumes/<hash>/_data which can seen using docker inspect <container_name> command.
+
+docker run -it --name voltest2 -v /home/user/builds/my_host_data_dir:/mydata centos:latest /bin/bash
+This command mount a local file system outside docker file system to /mydata dir.
+
+docker network ls
+
+docker network ls --no-trunc
+
+docker network inspect bridge
+
+All the docker commands are also available as man pages. Just add hyphen for multi word command. For ex: man page for docker run command
+man docker-run
+man docker-network-create
+
+Create a network
+docker network create --subnet 10.1.0.0/24 --gateway 10.1.0.1 mybridge01
+
+docker network inspect mybridge01
+
+docker network rm mybridge01
