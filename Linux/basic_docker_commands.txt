@@ -85,6 +85,11 @@ For docker exec command : the container in which exec command is fired should be
 docker run ubuntu:xenial echo "Hello from this container"
 The above command just runs the echo command and exits. Even if you restart the above container it will just run the echo command again and will exit.
 
+If you want to just create a container and not run it
+docker create -it --name="my_container" ubuntu:latest /bin/bash
+you can start it using
+docker start my_container
+
 docker pull nginx:latest
 
 docker run -d -p 8080:80 nginx:latest
@@ -160,3 +165,9 @@ ifconfig
 
 Assigning a IP to a container
 docker run -it --name nettest2 --net bridge04 --ip 10.1.4.100 centos:latest /bin/bash
+
+docker top <container_name>
+docker top apacheweb1
+
+docker stats <container_name>
+This commands shows the live stats related to CPU, memory etc means realtime view of the resources the container is using.
