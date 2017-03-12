@@ -146,3 +146,17 @@ docker network create --subnet 10.1.0.0/24 --gateway 10.1.0.1 mybridge01
 docker network inspect mybridge01
 
 docker network rm mybridge01
+
+Assigning a IP range to containers
+docker network create --subnet 10.1.0.0/16 --gateway 10.1.0.1 --ip-range=10.1.4.0/24 --driver=bridge --label=host4network bridge04
+docker network ls
+ifconfig
+docker network inspect bridge04
+
+docker run -it --name nettest1 --net bridge04 centos:latest /bin/bash
+yum update
+yum install -y nettools
+ifconfig
+
+Assigning a IP to a container
+docker run -it --name nettest2 --net bridge04 --ip 10.1.4.100 centos:latest /bin/bash
