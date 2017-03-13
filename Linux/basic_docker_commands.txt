@@ -190,3 +190,12 @@ List only container ids
 docker ps -a -q
 
 docker ps -a -q | wc -l
+
+docker events
+Attaches to docker daemon and waits for any event to happen and the lists it
+
+See man docker-events
+
+docker events --filter event=attach
+
+docker events --filter event=attach --filter event=die --filter event=stop
