@@ -199,3 +199,39 @@ See man docker-events
 docker events --filter event=attach
 
 docker events --filter event=attach --filter event=die --filter event=stop
+
+For local backup & restoring of base images :
+Saving a base image
+docker save centos:latest > centos.latest.tar
+OR
+docker save --output centos.latest.tar centos:latest
+
+To check the content of tar file
+tar tvf centos.latest.tar
+
+To further compress the tar file
+gzip centos.latest.tar
+
+To load the container from compressed file
+docker load < centos.latest.tar
+OR
+docker load --input centos.latest.tar
+docker load --input centos.latest.tar.gz
+
+History of image
+docker history centos7:apache/v2
+# for detailed output
+docker history --no-trunc centos7:apache/v2
+
+Tagging a image
+docker tag <image_name> <new_image_name>
+docker tag <image_id> <new_image_name>
+
+docker tag centos:latest centos/7:v1
+
+Pushing a image to docker hub
+First create a repository in hub.docker.com, then create a tag with same name in localhost then push it after login.
+docker tag centos7/apache:v2 amitthawait/mycentosv3
+docker login
+docker push amit17thawait/mycentosv3
+docker logout
