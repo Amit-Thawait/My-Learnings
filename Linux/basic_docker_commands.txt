@@ -20,6 +20,9 @@ docker restart compassionate_bhabha
 
 docker attach compassionate_bhabha
 
+docker rename compassionate_bhabha my_new_container_name
+docker rename <container_id> <new_container_name>
+
 docker run -i -t -d ubuntu:xenial /bin/bash
 docker run -itd ubuntu:xenial /bin/bash
 
@@ -92,7 +95,18 @@ docker start my_container
 
 docker pull nginx:latest
 
+docker run -d -p 80 nginx:latest
+
 docker run -d -p 8080:80 nginx:latest
+This command binds host port 8080 to container port 80
+
+0.0.0.0 means all interfaces including host IP, localhost etc.
+
+You can also pass specfic host IP as well like 127.0.0.1
+docker run -d -p 127.0.0.1:8081:80 nginx:latest
+
+You can also bind only tcp or udp port
+docker run -d -p 127.0.0.1:8081:80/udp nginx:latest
 
 docker run -itd docker.io/centos:6 /bin/bash
 Pull a docker image and running it in daemon mode in 1 go
@@ -171,3 +185,8 @@ docker top apacheweb1
 
 docker stats <container_name>
 This commands shows the live stats related to CPU, memory etc means realtime view of the resources the container is using.
+
+List only container ids
+docker ps -a -q
+
+docker ps -a -q | wc -l
