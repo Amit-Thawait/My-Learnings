@@ -42,7 +42,10 @@ then go to /etc/default/docker file
 DOCKER_OPTS="--dns <ip1> --dns <ip2>"
 
 OR
+nmcli dev show | grep IP4.DNS
+OR
 nmcli dev list | grep IP4.DNS
+
 
 The CentOS equivalent is the /etc/sysconfig/docker
 -----------------------------------------------------------------------------------
