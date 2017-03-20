@@ -238,3 +238,12 @@ docker tag centos7/apache:v2 amitthawait/mycentosv3
 docker login
 docker push amit17thawait/mycentosv3
 docker logout
+
+Creating a bridge adapter :
+ifconfig
+sudo ip link add br10 type bridge
+sudo ip addr add 10.10.100.1/24 dev br10
+sudo ip link set br10 up
+ifconfig
+
+You can also choose 172.something 192.something 10.something 148.something because these network are private IP ranges.
