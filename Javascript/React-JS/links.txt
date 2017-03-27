@@ -74,3 +74,7 @@ Testing :-
 https://egghead.io/lessons/react-testing-setting-up-dependencies?series=react-testing-cookbook
 
 https://medium.com/javascript-inside/testing-in-react-getting-off-the-ground-5f569f3088a#.ulrux6vyc
+
+Performance :-
+--------------
+https://medium.com/dailyjs/react-is-slow-react-is-fast-optimizing-react-apps-in-practice-394176a11fba#.hlvdi0yyx
