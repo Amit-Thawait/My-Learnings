@@ -260,7 +260,7 @@ iii) Service based applications
   Application Services -> Infrastructure services
 
 * Service oriented applications and service based applications
-  https://drive.google.com/file/d/0Bzy6PCmldaXIYW5UWGlCRFFEQWM/view?usp=sharing
+  https://drive.google.com/open?id=0Bzy6PCmldaXIYW5UWGlCRFFEQWM
 
 * Microservices shouldn't always be tiny. It should have proper bounded context. Some microservices are pretty large.
 
@@ -281,6 +281,8 @@ iv) Fewer elements    |
 
 * Reduce state & state mutation
 - State cannot be eliminated, try to reduce it
+
+* 12 Points : https://drive.google.com/file/d/0Bzy6PCmldaXINVV4UVdQcVdLQnM/view
 
 7) HTTP/2 - Scott Davis
 * HTTP/2 and SPDY indicator - chrome extension
