@@ -1,0 +1,306 @@
+Day 1:
+======
+
+1) Top 10 technologies talk - Arun Gupta from Amazon
+* CNCF - Cloud Native Computing Foundation (https://www.cncf.io/)
+
+* Amazon ML & NLP stuffs
+- Amazon Polly (Text in, life like speech out)
+- Amazon Lex (Speech Recognition & Natural language understanding)
+- Amazon Rekognition
+
+* Blockchain
+- Public Blockchain
+  Ethereum, Hyperledger, Monax
+- Private Blockchain
+- Multichain
+
+* CDD - Conversation driver development : ChatOps
+
+* Offline first
+- Lack of connectivity is not an error condition
+- Synchronize when back online
+- Frameworks : Hoodie, Ionic
+
+2) BuildingIntellegent Apps - @rajdeepdua from salesforce
+* Data related to AI (Mobility devices & IOT devices) cannot fit in an RDBMS
+- Einstine (ML as a service) , Watson AI services
+
+3) Build what's next
+* Pokemon-Go - Largest ever deployment of Kubernetes in Google Cloud
+  1X - 5X (their estimated worst case) - 50X (actual load they experienced)
+
+4) Cloud Architectural Design Patterns Blueprints
+* Microsoft threat modelling
+
+* No hardcoded end-points
+- Manage via zookeeper
+
+* Marathon-Mesos
+
+* API management through Proxy
+
+* The twelve factor (https://12factor.net/)
+
+4) Practical examples of Serverless Architecture - Scott Davis
+* AWS, GCE, RackSpace are IaaS
+  AWS BeanStalk, Google AppEngine, Heroku, OpenShift are PaaS
+  Lambda, Google cloud function, Apache OpenWhisk are FaaS
+
+  Function === Taking a can instead of renting a car.
+
+* Apache OpenWhisk is OSS currently works with IBM Bluemix but will be configurable to use any of FaaS.
+
+5) Pro Docker by Ken Sipe
+* docker ps -lq
+  l stand for last and q stand for running processes
+
+* docker diff <container_id>
+  to see the diff between current state and last command
+
+6) Understanding the No in NoSQL : Venkat Subramaniam
+* Earlier data for OOP were saved in OODBMS
+  OODBMS didn't had a query language
+
+* RDBMS killed OODBMS
+
+* Distributed RDBMS is pricy
+
+* NoSQL is mainly "no Schema"
+
+* Two kinds of NoSQL :
+i) Aggregate Oriented
+  - Focused on parent(key) and child(value)
+    Ex: Key-value pairs, user preferences, session data can be stored.
+ii) Aggregate Ignorant
+  - Focused on relationships of data
+    Ex: Graph DB
+
+* 90% of NoSQL are Aggregate Oriented
+
+* Aggregate Oriented DB
+- Key-value
+- Document based (Nested key-value) (logging, blogs, CMS)
+- Column family DB
+- Clustered based on the aggregate
+  Ex: Bucketing the data (Easy to navigate). Alphabetically like (names from A-L in one bucket, M-P in another, Q-Z in another)
+- Hard to perform ad-hoc queries (will have to visit each related node)
+- Provides ACID only on aggregate
+
+* Aggregate Ignorant
+- Graph DB
+  Focused on relationships
+  Easy to add/remove relationships
+  Easy to query
+  Ex: Social networking data, relationships
+
+* Impossible for a distributed system to simultaneously follow all these three :
+i) Consistency
+ii) Availability
+iii) Partition tolerance
+So a balance has to made to achieve this. This is called eventual consistency.
+
+Day 2:
+======
+
+1) Evolutionary Architecture by Neal Ford
+* The world is moving very fast
+  What you design for next 5 years will become obselete.
+  Ex: Docker
+
+* Layered Architecture
+  - Presentation Layer |
+    Business Layer     | -> All are associated with customer checkout functionality
+    Persistance Layer  |
+    Database Layer     |
+
+* Evolutionary architecture should expand to atleast 1 dimension (layer)
+
+* Netflix taught us to monitor not only the features but the paths as well.
+  If the path is not touched - eliminate that feature.
+
+* Book - Refactoring Database : Evolutionary Database Design (By - Scott W. Ambler and Pramod J. Sadalage)
+
+* Microservices === DDD + Continuous Delivery
+  DDD ex: customer checkout feature
+
+* Netflix tool - Choas Monkey - OSS
+  To test resiliency use Choas Monkey
+  If one DC like US-east-1 is down - replicate completely
+
+* For defining architecture :
+  Try to write tests and run them whenever there is a change in the architecture
+
+* Books
+- Continuous Delivery
+- Release IT
+- Infrastructure as a code
+- Refactoring Databases
+
+* Architecture is only abstract untill it is operationalized
+
+* In microservices : prefer duplication over coupling
+
+* The more reusable the code is, the less usable it is - Difficult to use.
+
+* UI          |
+  Server side | -> Domain Driven Design
+  DB          |    Conway's law - wiki
+
+* Sacrificial Architecture
+  Things that you will through down in future.
+
+* Github's scientist project
+
+* http://evolutionaryarchitecture.com/ - Upcoming book in June 2017
+
+2) Where DevOps meets Architecture
+* There is no 1 way of doing things.
+  Ex: Water flowing story -> through land then sand, gets stuck then evaporates, touches hills and then flows again
+
+3) Hypothesis Driven Development - Neal ford
+* https://trunkbaseddevelopment.com/
+
+* Feature toggle : https://martinfowler.com/bliki/FeatureToggle.html
+
+* QA in production
+- Can be done using feature toggle, so that new features are only visible to QA
+  via firewall settings or other techniques
+- Add a story to remove feature toggle
+
+* Don't create a toggle that depends on other toggle
+
+* Toggle configuration
+- Consul https://www.consul.io/
+- Etcd https://github.com/coreos/etcd
+- Zookeeper
+- Parameterize in code or DB or config file
+
+* Feature toggle framework for Rails http://balvig.github.com/chili/
+- Feature toggle framework is there for every framework
+
+* Hypothesis driven UX
+- Analytics tells bigger images gives better conversion for Hotel booking
+- Increase in number of features never converts customers.
+
+* More Listing | Better Structure | Better prioritization
+      X             Important               X
+
+* Github Blog : Move fast and fix things : https://githubengineering.com/move-fast/
+
+* Github Scientist : https://github.com/github/scientist
+- In scientist there are 2 paths : "try" and "use"
+- For 10% use "try" and for 90% use "use" path
+- Always process request using "use", but also return diff output between "try" and "use"
+- Scientist is a specialized feature toggle
+
+* Hypothesis Driven Development
+  (Production)----->(Test in Lab)
+        ^                |
+        |                |
+        |                |
+  (Fix Things)<----------
+
+* For Microservices : build two microservices and use routing to divert
+
+* Feature Toggle requires discipline by the developer to not overdo it
+
+* Sometimes routing is better than feature toggle
+
+4) Core Software Design Principles - Venkat Subramaniam
+* YAGNI
+- Develop only what is required today
+- You will be smarter tomorrow, there will be new tools tomorrow
+
+* Which method is long?
+- It is not decided by the number of lines
+- It depends on the level of abstraction (unit of work)
+- SLAP (single level of abstraction principle)
+
+* Liskov Substitution Principle
+- Use inheritance only for substitutability
+  If an object of a class B should be used anywhere an object of a class A may be used, then use inheritance
+- If an object of a class B may use an object of class A, then use delegation
+
+* To avoid duplication, if you use inheritance then it is bad. Use delegation.
+- Delegate method in Ruby
+
+* Dependency Inversion Principle
+- It should depend upon abstraction rather than concretion
+  Ex: Alarm example
+  Human, TV, Clock -> Alarm
+
+5) Continuous Delivery for Architects - Neal ford
+* Yesterday's best practice may become antipattern tomorrow
+
+* http://structure101.com/ For Java ecosystem to see class dependency
+
+* https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing
+- The network is reliable.
+- Latency is zero.
+- Bandwidth is infinite.
+- The network is secure.
+- Topology doesn't change.
+- There is one administrator.
+- Transport cost is zero.
+- The network is homogeneous.
+
+* Types of Microservices :
+i) Microservices
+ii) SOA (Service oriented applications)
+iii) Service based applications
+
+* Service oriented applications
+  Business
+      |
+  Message Bus
+      |
+  Enterprise services
+      |                       |
+  Application Services -> Infrastructure services
+
+* Service oriented applications and service based applications
+  https://drive.google.com/file/d/0Bzy6PCmldaXIYW5UWGlCRFFEQWM/view?usp=sharing
+
+* Microservices shouldn't always be tiny. It should have proper bounded context. Some microservices are pretty large.
+
+6) 12 ways to make code suck less - Venkat Subramaniam
+* Simple Design
+i) Passes the test    ^
+ii) Reveals intention |
+iii) No Duplication   | Priority order
+iv) Fewer elements    |
+
+* Avoid primitive obsession
+- Use methods provided by the language
+
+* Prefer clean code over clever code
+
+* General Book : On Writing Well
+- http://www.amazon.in/Writing-Wel-Classic-Guide-Nonfiction/dp/0060891548/
+
+* Reduce state & state mutation
+- State cannot be eliminated, try to reduce it
+
+7) HTTP/2 - Scott Davis
+* HTTP/2 and SPDY indicator - chrome extension
+
+* OPTIONS verb tells what verbs webserver supports
+
+* HEAD returns only headers
+
+* Websockets are persistant durable connections
+- No standard verbs in websockets
+- SOAP only allows POST requests
+- What SOAP to REST is, websockets to HTTP is.
+
+* Websockets are secure by default
+- websockets is event driven
+- socket.io NodeJS library
+
+* SPDY connections are secure out of the box
+
+* HTTP/2 supports multiplexed connections
+
+* QUIC : Quick UDP internet connections
+- TCP requires us to acknowledge packets.
