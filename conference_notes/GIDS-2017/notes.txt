@@ -47,7 +47,7 @@ Day 1:
   AWS BeanStalk, Google AppEngine, Heroku, OpenShift are PaaS
   Lambda, Google cloud function, Apache OpenWhisk are FaaS
 
-  Function === Taking a can instead of renting a car.
+  Function === Taking a cab instead of renting a car.
 
 * Apache OpenWhisk is OSS currently works with IBM Bluemix but will be configurable to use any of FaaS.
 
