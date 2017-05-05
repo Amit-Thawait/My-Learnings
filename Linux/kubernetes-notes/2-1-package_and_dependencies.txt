@@ -1,0 +1,43 @@
+Lecture: Packages and Dependencies :
+------------------------------------
+All the steps needs to be done in all the 4 servers (centos-master, centos-minion1, centos-minion2, centos-minion3)
+
+2	 running	54.255.214.211	172.31.26.223	amit-thawait2.mylabserver.com | amit-thawait2b.mylabserver.com
+
+3	 running	54.255.152.117	172.31.20.149	amit-thawait3.mylabserver.com | amit-thawait3b.mylabserver.com
+
+4	 running	52.77.244.89	172.31.18.69	amit-thawait4.mylabserver.com | amit-thawait4b.mylabserver.com
+
+5	 running	54.255.212.75	172.31.24.99	amit-thawait5.mylabserver.com | amit-thawait5b.mylabserver.com
+
+# Time should be same in all the servers
+sudo yum install -y ntp
+
+systemctl enable ntpd && systemctl start ntpd
+systemctl status ntpd
+
+vim /etc/hosts
+
+172.31.26.223 centos-master
+172.31.20.149 centos-minion1
+172.31.18.69  centos-minion2
+172.31.24.99  centos-minion3
+
+sudo vim /etc/yum.repos.d/virt7-docker-common-release.repo
+
+[virt7-docker-common-release]
+name=virt7-docker-common-release
+baseurl=http://cbs.centos.org/repos/virt7-docker-common-release/x86_64/os/
+gpgcheck=0
+
+sudo yum update
+
+sudo systemctl status iptables
+
+sudo systemctl status firewalld
+
+# No iptables or firewall should be running.
+
+# Install Kubernetes and docker
+sudo yum install -y --enablerepo=virt7-docker-common-release kubernetes docker
+

@@ -1,0 +1,69 @@
+Tags, Labels and Selectors :
+============================
+
+In centos-master
+
+cd builds
+
+cp nginx.yaml nginx-pod-label.yaml
+
+vim nginx-pod-label.yaml
+-------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.7.9
+    ports:
+    - containerPort: 80
+-------------------
+
+kubectl create -f nginx-pod-label.yaml
+
+kubectl get pods
+
+In centos-minion1
+
+docker ps
+
+In centos-master
+
+kubectl get pods -l app=nginx
+
+cp nginx-pod-label.yaml nginx2-pod-label.yaml
+
+vim nginx2-pod-label.yaml
+-------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx2
+  labels:
+    app: nginx2
+spec:
+  containers:
+  - name: nginx2
+    image: nginx:1.7.9
+    ports:
+    - containerPort: 80
+-------------------
+
+kubectl create -f nginx2-pod-label.yaml
+
+kubectl get pods
+
+In centos-minion1
+
+docker ps
+# 4 containers
+
+In centos-master
+
+kubectl get pods -l app=nginx2
+
+kubectl describe pods -l app=nginx2

@@ -1,0 +1,98 @@
+Create and deploy pod definitions :
+===================================
+
+In centos-minion2 and centos-minion3 servers
+
+sudo -i
+
+systemctl stop kube-proxy kubelet
+
+From centos-master servers check readiness of minions : only centos-minion1 should be READY
+
+kubectl get nodes
+
+In centos-master
+
+mkdir builds
+
+cd builds
+
+vim nginx.yaml
+-------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.7.9
+    ports:
+    - containerPort: 80
+-------------------
+
+kubectl get pods
+# No pods
+
+In centos-minion1 check
+docker ps
+# There should be no process running
+
+# Back in centos-master
+kubectl create -f ./nginx.yaml
+
+kubectl get pods
+# Displays pods
+
+In centos-minion1 check
+docker ps
+# Will show nginx container
+
+# Back in centos-master
+kubectl describe pods
+# Describes all pods
+
+kubectl describe pod nginx
+
+ping 172.17.0.2
+# No ping since no routing outside
+
+kubectl run busybox --image=busybox --restart=Never --tty -i --generator=run-pod/v1
+
+# In centos-minion1
+docker ps
+
+# Inside busybox
+ls
+
+wget -qO- http://172.17.0.2
+
+exit
+
+# In centos-master
+kubectl delete pod busybox
+
+# In centos-minion1
+docker ps
+# No busybox running
+
+docker ps -a
+# Busybox stopped
+
+# In centos-master
+kubectl get pods
+
+kubectl delete pod nginx
+
+ll
+
+kubectl get pods
+
+kubectl create -f nginx.yaml
+
+kubectl get pods
+
+kubectl port-forward nginx :80 &
+# Note the port assigned in above step
+
+wget -qO- http://localhost:<port-assigned-in-above-step>

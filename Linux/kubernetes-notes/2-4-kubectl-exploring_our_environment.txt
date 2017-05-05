@@ -1,0 +1,21 @@
+Kubectl : Exploring our environment
+-----------------------------------
+Execute the following in centos-master
+
+man kubectl
+
+To get a list of nodes registered with our master server
+
+kubectl get nodes 
+
+man kubectl-get
+
+# Complete description of nodes
+kubectl describe nodes
+
+# To get IP Address of nodes
+kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="ExternalIP")].address}'
+# Expected ouput is blank since nothing is running yet
+
+# To get a list of nodes among 1000's of node that are ready
+kubectl get nodes -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}' | tr ';' "\n" | grep "Ready=True"

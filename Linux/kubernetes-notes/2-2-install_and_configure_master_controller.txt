@@ -1,0 +1,35 @@
+Install and configure Master Controller :
+-----------------------------------------
+All these steps needs to be performed on centos-master
+
+# Distributed key-value store. Etcd is to be run only on master because this is place where all the communication will come for master controller
+sudo yum install etcd
+
+cd /etc/kubernetes
+
+sudo vim config
+
+# Change KUBE_MASTER and add KUBE_ETCD_SERVERS
+KUBE_MASTER="--master=http://centos-master:8080"
+
+KUBE_ETCD_SERVERS="--etcd-servers=http://centos-master:2379"
+
+cd /etc/etcd
+
+sudo vim etcd.conf
+# Replace localhost in ETCD_LISTEN_CLIENT_URLS and ETCD_ADVERTISE_CLIENT_URLS keys to 0.0.0.0
+
+cd /etc/kubernetes
+sudo vim apiserver
+
+# Make the following changes in the above file.
+KUBE_API_ADDRESS="--address=0.0.0.0"
+
+# Uncomment the lines for KUBE_API_PORT and KUBELET_PORT in the above file.
+# Comment out the line for KUBE_ADMISSION_CONTROL since we are not going to apply any restriction for now.
+
+Now start the following services
+
+systemctl enable etcd kube-apiserver kube-controller-manager kube-scheduler
+
+systemctl start etcd kube-apiserver kube-controller-manager kube-scheduler
