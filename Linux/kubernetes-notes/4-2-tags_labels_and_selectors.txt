@@ -1,5 +1,10 @@
 Tags, Labels and Selectors :
 ============================
+In centos-minion2 and centos-minion3 servers
+
+sudo -i
+
+systemctl stop kube-proxy kubelet
 
 In centos-master
 

@@ -1,0 +1,105 @@
+Deployment State :
+==================
+In centos-minion2 and centos-minion3 servers
+
+sudo -i
+
+systemctl stop kube-proxy kubelet
+
+In centos-master
+
+cp nginx-pod-label.yaml nginx-deployment-prod.yaml
+
+vim nginx-deployment-prod.yaml
+------------------------------
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-deployment-prod
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-deployment-prod
+    spec:
+      containers:
+      - name: nginx-deployment-prod
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+------------------------------
+
+kubectl create -f nginx-deployment-prod.yaml
+
+kubectl get pods
+
+kubectl get deployments
+
+cp nginx-deployment-prod.yaml nginx-deployment-dev.yaml
+
+vim nginx-deployment-dev.yaml
+------------------------------
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-deployment-dev
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-deployment-dev
+    spec:
+      containers:
+      - name: nginx-deployment-dev
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+------------------------------
+
+kubectl create -f nginx-deployment-dev.yaml
+
+kubectl get deployments
+
+kubectl describe deployments -l app=nginx-deployment-dev
+
+In centos-minion1
+
+docker ps
+# shows container processes for dev and prod
+
+In centos-master
+
+cp nginx-deployment-dev.yaml nginx-deployment-dev-update.yaml
+
+vim nginx-deployment-dev-update.yaml
+------------------------------
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-deployment-dev
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-deployment-dev
+    spec:
+      containers:
+      - name: nginx-deployment-dev
+        image: nginx:1.8
+        ports:
+        - containerPort: 80
+------------------------------
+
+kubectl apply -f nginx-deployment-dev-update.yaml
+
+kubectl get pods
+
+kubectl describe deployments nginx-deployment-dev
+
+In centos-minion1
+
+docker ps
+# You will see a new container running for nginx 1.8
