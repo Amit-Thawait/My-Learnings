@@ -1,0 +1,75 @@
+Milti-Pod(Container) Replication Controller :
+=============================================
+
+In centos-master
+
+kubectl get pods
+# Delete any pods or deployments if they are appearing
+
+cd builds
+
+vim nginx-multi-label.yaml
+--------------------------
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: nginx-www
+spec:
+  replicas: 3
+  selector:
+    app: nginx
+  template:
+    metadata:
+      name: nginx
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+--------------------------
+
+kubectl get nodes
+# To check all the three nodes are up and READY
+
+kubectl create -f nginx-multi-label.yaml
+
+kubectl get pods
+
+kubectl describe replicationcontroller
+
+kubectl describe pods
+
+In centos-minion1, centos-minion2, centos-minion3 check for containers
+
+docker ps
+
+In centos-master
+
+kubectl get services
+# NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+# kubernetes   10.254.0.1   <none>        443/TCP   4d
+
+kubectl get pods
+
+# Delete one pod from the above list using its NAME
+
+kubectl delete pod <one-pod-name-from-above-list>
+
+kubectl get pods
+# You will see one new pods automatically started
+
+kubectl get replicationcontrollers
+
+kubectl delete replicationcontroller nginx-www
+# Deletes the replicationcontroller nginx-www and all the pods associated with it.
+
+kubectl get pods
+# No pods
+
+In centos-minion1, centos-minion2, centos-minion3 check for containers
+
+docker ps
+# No containers

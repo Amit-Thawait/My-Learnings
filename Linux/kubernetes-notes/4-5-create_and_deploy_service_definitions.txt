@@ -1,0 +1,65 @@
+Create and deploy service definitions :
+=======================================
+
+kubectl get nodes
+# To check all the three nodes are up and READY
+
+kubectl get replicationcontrollers
+# No controllers
+
+kubectl get pods
+# No pods
+
+kubectl create -f nginx-multi-label.yaml
+
+kubectl get pods
+
+vim nginx-service.yaml
+----------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  ports:
+  - port: 8000
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: nginx
+----------------------
+
+kubectl create -f nginx-service.yaml
+
+kubectl get services
+# NAME            CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+# kubernetes      10.254.0.1       <none>        443/TCP    4d
+# nginx-service   10.254.214.186   <none>        8000/TCP   8s
+
+kubectl describe service nginx-service
+# Note the IP mention in the output
+Name:           nginx-service
+Namespace:      default
+Labels:         <none>
+Selector:       app=nginx
+Type:           ClusterIP
+IP:         10.254.214.186
+Port:           <unset> 8000/TCP
+Endpoints:      172.17.0.2:80,172.17.0.2:80,172.17.0.2:80
+Session Affinity:   None
+No events.
+
+kubectl run busybox --generator=run-pod/v1 --image=busybox --restart=Never --tty -i
+
+# Using docker ps confirm that busybox is running in one of the minions
+
+Inside busybox
+/
+wget -qO- http://<ip>:8000
+
+exit
+
+kubectl delete pod busybox
+
+kubectl delete service nginx-service
+# Deleting the service doesn't deletes the individual pods
