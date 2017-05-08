@@ -1,0 +1,38 @@
+Creating temporary pods at the command line :
+=============================================
+In centos-master
+
+kubectl get pods
+# No pods
+
+In centos-minion1 & centos-minion2
+# No containers should be running
+
+kubectl run mysample --image=latest123/apache
+
+kubectl get pods
+# Note the pod name
+
+kubectl get deployments
+
+kubectl describe deployments
+# This doesn't tells in which minion does this pod is running
+
+kubectl describe pod <pod_name>
+
+kubectl delete deployment mysample
+# This will delete the deployment mysample and all the pods & containers associated with it
+
+kubectl get deployments
+
+kubectl get pods
+# If there are pods that are still shown (they may be terminating state) then wait for 10 seconds, they will get deleted.
+
+kubectl run myreplicas --image=latest123/apache --replicas=2 --labels=app=myapache,version=1.0
+# This will create 2 replicas
+
+kubectl describe deployment myreplicas
+
+kubectl get pods
+
+kubectl describe pods -l version=1.0
