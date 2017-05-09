@@ -10,6 +10,8 @@ In centos-minion1 & centos-minion2
 
 kubectl run mysample --image=latest123/apache
 
+Kubectl run command creates deployment
+
 kubectl get pods
 # Note the pod name
 

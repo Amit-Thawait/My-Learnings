@@ -1,0 +1,17 @@
+Logs :
+======
+In centos-master
+
+kubectl get pods
+# myapache pod running
+
+kubectl logs myapache
+
+kubectl logs --tail=1 myapache
+
+kubectl logs --since=24h myapache
+# To get previous 24 hrs logs
+
+kubectl logs -f myapache
+
+# kubectl logs -f -c <container_id_or_container_name> myapache

@@ -1,0 +1,33 @@
+Failure and Recovery :
+======================
+In centos-master
+
+Stop centos-minion3 node using
+systemctl stop docker kubelet kube-proxy
+
+kubectl run myrecovery --image=latest123/apache --port=80 --replicas=2 --labels=app=myrecovery
+
+kubectl get deployments
+
+kubectl get nodes
+
+In centos-minion1
+systemctl stop docker kubelet kube-proxy
+
+Wait for centos-minion1 to come in NotReady state
+
+kubectl get nodes
+
+kubectl get pods
+# Still shows 2 pods running
+
+It will not deploy the pod in any other node besides centos-minion1 because other resource who were interacting with it earlier might not have access to the new node.
+
+As soon as centos-minion1 is up, the containers is created by by kubectl again as part of recovery.
+
+In centos-minion1
+systemctl start docker kubelet kube-proxy
+
+check docker ps in centos-minion1 after kubectl get nodes shows minion1 is in Ready state.
+
+kubectl get pods

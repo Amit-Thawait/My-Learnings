@@ -1,0 +1,51 @@
+Autoscaling and Scaling our Pods :
+==================================
+In centos-master
+
+cd builds
+
+ll
+
+cat nginx-multi-label.yaml
+
+kubectl run myautoscale --image=latest123/apache --port=80 --labels=app=myautoscale
+
+kubectl get deployments
+
+kubectl describe deployment myautoscale
+
+kubectl get deployments
+
+kubectl get pods
+# 1 pod
+
+kubectl autoscale deployment myautoscale --min=2 --max=6
+
+kubectl get pods
+# 2 pods
+
+kubectl get deployments
+
+kubectl autoscale deployment myautoscale --min=4 --max=6
+Error from server (AlreadyExists): horizontalpodautoscalers.autoscaling "myautoscale" already exists
+
+kubectl scale --current-replicas=2 --replicas=4 deployment/myautoscale
+# kubectl scale --current-replicas=2 --replicas=<min_count> deployment/<deployment_name>
+
+kubectl get deployments
+
+kubectl get pods
+
+# Check docker ps in minions
+
+You can only scale down to a number equal to or higher than what was set as min during autoscale creation.
+For the above case, it can't be scaled down to 1 but can be scaled down to 2 or 3.
+
+# kubectl scale --current-replicas=4 --replicas=1 deployment/myautoscale
+# It will terminate 3 pods but will start 1 new pod
+
+kubectl scale --current-replicas=4 --replicas=2 deployment/myautoscale
+
+kubectl get pods
+
+# Check docker ps in minions

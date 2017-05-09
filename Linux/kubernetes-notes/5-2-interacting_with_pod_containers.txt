@@ -1,0 +1,81 @@
+Interacting with Pod containers :
+=================================
+In centos-master
+
+cd builds
+
+kubectl get pods
+# No pods running
+
+# If there is any check
+kubectl get deployments
+kubectl delete deployment <deployment_name>
+
+ll
+
+vim myapache.yaml
+-----------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapache
+spec:
+  containers:
+  - name: myapache
+    image: latest123/apache
+    ports:
+    - containerPort: 80
+-----------------
+
+kubectl create -f myapache.yaml
+
+kubectl describe pod myapache
+
+kubectl get pods
+
+# To run a command in myapache pod
+kubectl exec myapache date
+
+# kubectl exec myapache -c <container_id_or_container_name> <command>
+# If there are multiple containers associated with myapache
+
+kubectl exec myapache -i -t -- /bin/bash
+
+Inside myapache pod
+/
+ps aux | grep apache
+
+cd /var/www/html
+
+ls -al
+
+export TERM=xterm
+
+apt-get update
+
+apt-get install lynx
+# lynx is a text based web browser
+
+lynx http://localhost
+
+mv index.html index.backup
+
+echo "This is a test page" > index.html
+
+lynx http://localhost
+
+exit
+
+In centos-master
+
+kubectl get pods
+
+kubectl exec myapache -i -t -- /bin/bash
+
+Inside container
+/
+lynx http://localhost
+# Enter a terminal type: [vt100] xterm
+# Since session based env variables are not persisted
+
+exit
