@@ -38,14 +38,15 @@ For exiting without stopping the container type: ctrl+p+q
 ----------------------------------------------------------------------------------
 Inside docker container if "apt-get update" is not working then follow these steps
 nm-tool | grep DNS
-then go to /etc/default/docker file
-DOCKER_OPTS="--dns <ip1> --dns <ip2>"
-
 OR
 nmcli dev show | grep IP4.DNS
 OR
 nmcli dev list | grep IP4.DNS
 
+create file /etc/docker/daemon.json
+{
+    "dns": ["172.31.70.12", "172.31.70.13"]
+}
 
 The CentOS equivalent is the /etc/sysconfig/docker
 -----------------------------------------------------------------------------------
@@ -247,3 +248,8 @@ sudo ip link set br10 up
 ifconfig
 
 You can also choose 172.something 192.something 10.something 148.something because these network are private IP ranges.
+
+docker cp <source-file-path> <destination-file-location>
+To copy file from container to localhost and vice-versa.
+docker cp <container_id>:<path-of-file> <destination-in-localhost>
+docker cp test.txt <container_id>:/tmp/
