@@ -1,0 +1,121 @@
+RootConf Notes :-
+=================
+Day 1 :
+-------
+1) State of the open source monitoring landscape
+    - Monitoring is part of your process
+    - Monitoring should be fundamental part of your design
+    - Provide monitoring as a service to API team / service team
+    - Auto-discovery is hard
+
+    Availability and functional monitoring tools
+        1. Nagios
+        2. AWS CloudWatch
+        3. NewRelic
+        4. Icinga
+        5. Sensu
+
+        - Today we have better alternatives than Nagios, don't start with Nagios
+        - Icinga 2
+          - Built-in integrations
+          - CLI
+          - Application based cluster stack
+          - Setup could be complex
+          - REST API
+        - Sensu : Similar to Nagios and Icinga. Open source one in not so good, entreprise one is better
+        - Zabbix : OSS, Full featured logging and graphing
+        - Riemann
+          - Streaming processor
+          - Real time monitoring
+          - Based on Clojure
+        - OpenNMS
+          - Full featured OSS
+          - Based on Java
+          - Built-in Auto-Discovery
+
+    Metrics and time series tools
+        - Graphite
+        - OpenTSDB
+          - Based on Hadoop and HBase
+        - Prometheus * (very good)
+        - InfluxDB
+        - Elastic Stack (Kibana, Elastic search, Logstash|Beats)
+
+    Visualization
+        - Grafana
+        - Grafana Annotations
+
+    Logs & Events
+        - Log means flow of unstructured data with timestamp and message
+          Ex: May 4 16:57:24 web sshd[25828] Received disconnect from 10.10.0.31: 11: disconnected by user 
+        - Events means flow of structured data with identifiable attributes
+          Ex: Event {
+                Time: May 4 16:57:24
+                Process: sshd
+                State: Received disconnect from 10.10.0.31
+                Client: 10.10.0.31
+              }
+
+    - Log > Event > Analyse > Action
+    Tools
+        - ELK
+        - Graylog
+        - Fluentd
+
+    User Experience
+        - Webinject and AutoIT : Both are old
+        - Sakuli (Good)
+        - Alyvix
+
+    - There is no best tool for everything
+    - There are tools that are 
+        - Monolith
+        - Modular
+    - Try to choose the modular tool
+
+    Slides at https://www.slideshare.net/NETWAYS/rootconf-2017-state-of-the-open-source-monitoring-landscape
+
+2) Deployment strategies with Kubernetes
+    - Canary deployment: Route a small amount of traffic to a new host to test functioning.
+    - If new hosts don’t act normal roll back the deployment.
+    - Blue Green Deployment is a procedure to minimize the downtime of the deployment. 
+      The idea is to have two set of machines with identical configuration but one with the latest code, rev 2 and other with rev 1.
+      Once the machines with latest code act correctly, spin down the machines with rev 1 code.
+    - Give same label to route traffic or share traffic
+    - Rolling Deployment
+
+3) A little bot for big cause
+    - https://github.com/moengage/alice
+    - Bot for managing code reviews, revert PR, adding checklist to PR, search for any wiki page or ask questions.
+
+4) Necessary tooling and monitoring for performance critical applications
+    - Monitor database, response time, throughput, requests/second, and measure state of the system
+    - Metrics everywhere! We talk about metrics to decide and diagnose the problem.
+    - Metrics(http://metrics-clojure.readthedocs.io/en/latest/) is a Clojure library to measure and record the data to the external system
+    - The library offers various features like Counter, gauges, meters, timers, histogram percentile.
+    - Logging is about scattered incidents in the system
+    - METRICS help in understanding the STATE OF THE SYSTEM and gain valuable insights...ANYTIME
+    - Collecting data is cheap, but not having it when you need it can be expensive.
+    - Instrument everything and collect useful data
+    - http://docs.influxdata.com/influxdb/v1.2/concepts/storage_engine
+
+    Tools
+        - Oscillator : https://github.com/otto-de/oscillator
+        - Xray : https://github.com/otto-de/tesla-xray
+
+    - Choose the right metrics - Disk Utilization, User Logins etc
+    - Mean can be absurb - Choose wisely
+    - Choose the right tool for the job. Histograms, counters, meters, timers
+
+    CAPTURE -> AGGREGATE -> VISUALIZE -> ALERT
+
+    Metrics, metrics everywhere video
+    https://www.youtube.com/watch?v=czes-oa0yik
+
+    Slides : https://speakerdeck.com/manan/necessary-tooling-and-monitoring-for-performance-critical-applications-rootconf-2017
+
+5) SELinux workshop : Refer selinux_notes.txt
+
+Day 2 :
+-------
+
