@@ -1,0 +1,232 @@
+SELinux Notes :-
+================
+IRC
+rejy
+#fedora, #fedora-selinux, #fedora-india
+
+------------------
+1)
+= Have laptop or VM installed with Fedora 25 Workstation
+
+= Or boot the laptop or VM with Live Fedora Workstation
+
+= Or use any of the Fedora 25 Cloud Base Images to boot VMs
+
+  = Get Fedora 25 Workstation Live ISO images at
+https://getfedora.org/en/workstation/download/
+
+  = Get the Fedora 25 Cloud Base Images (raw/Qcow2/vagrant) at
+https://alt.fedoraproject.org/cloud/
+
+
+2)
+= Fully update Fedora 25 (dnf update)
+
+
+3)
+= Install these additional packages (dnf install)
+  = policycoreutils-python
+  = policycoreutils-gui
+  = setools
+  = selinux-policy-doc
+  = rsyslog
+------------------
+
+Inside docker container
+
+dnf -y install container-selinux
+
+
+Deny everything unless explicitly allowed
+
+Fine grained permissions
+Ex: Web server is always appending to log file but not editing
+
+Principle's of Selinux :
+------------------------
+* Mostly closed
+
+* Layers of security or Deny everything
+  Innermost is selinux
+
+* Always give least privilege
+
+* MAC Mandatory access control
+  Ex: RFID scanner
+
+=> What SELinux can do
+- Confine programs to minimun privilege
+- Reduced vulnerability to privilege escalation attacks
+- Prevent unauthorixed reading and/or modification of data and programs
+- Logging of security breaches
+- Fine granulated access control implementation
+- Role bases Access Control (RBAC)
+- MLS/MCS - Multi-Level Security / Multi-Category Security
+- ..some more check slides
+
+* Not a complete security solution, but only an element in the Security Infrastruture stack
+* .. many more check slides
+
+=> SELinux Architecture
+* SELinux Kernal module
+* SELinux policy
+
+selinux module is loaded by kernal
+Cannot be removed dynamically from kernel (unless you are able to compile kernel)
+
+> ls /etc/selinux
+
+> ls /etc/selinux/targeted
+
+> file /etc/selinux/targeted/policy/policy.30
+
+> cat /etc/selinux/config
+
+> getenforce
+# Enforcing
+
+> setenforce 0
+
+> getenforce
+# Permissive
+
+> setenforce 1
+
+> getenforce
+# Enforcing
+
+> sestatus
+
+whatever is set using setenforce will be gone on reboot.
+For ex: say you have selinux enabled and you set setenforce 0 which means you made selinux permissive then on reboot it be again be enforcing which can seen from sestatus.
+
+SELinux modes
+- Disabled
+- Enabled
+  * Permissive
+  * Enforcing
+
+  * Access Vector Cache (AVC)
+    - caches if something is already checked whether allowed or denied
+
+> avcstat
+
+=> SELinux - Basic Concepts
+- Subjects vs Objects
+- Labeling
+- Type Enforcement (TE)
+- SELinux Booleans
+
+> semanage module -l
+
+> systemctl start httpd
+
+> ps -e | grep httpd
+
+> ps -eZ | grep httpd
+# To see labels of the process
+# Thi is process labels
+> ls /etc/httpd/conf/httpd.conf
+
+> ls -Z /etc/httpd/conf/httpd.conf
+# Shows label of object
+# This is object label
+
+* You can check label using -Z flag
+
+- Every process and object will have label id selinux is enabled.
+
+- Bash process has special label named unconfined_t for which there is a policy which says allow all on all.
+
+> semanage port -l | grep http
+
+> semanage port - (press tab)
+ports can be added, deleted etc
+
+* Labeling
+- The Security Context format :
+  user_identity:role:type:sensitivity:category_level
+
+> seinfo -u
+
+> semanage login -l
+Lists logins with SELinux user
+
+> seinfo -r
+Lists roles
+
+- user:role:type:level(sensitivity:category)
+  system_u:object_r:httpd_config_t:s0
+
+  s0 means sensitivity 0
+  1024 categories are available in your system
+
+> id -Z
+Current users user:role:type:level(sensitivity:category)
+
+Check fedora guide for table that lists roles
+xguest_x has no permissions besides firefox-only for networking
+-  Use case : setting up a kiosk
+
+* chcon - to change file security context
+  -t option for specifying context type
+  --reference to use a reference file's security context rather than
+
+Ex: > chcon -t samba_share_t /var/www/html/index.html
+    > ls -Z /var/www/html/index.html
+    > wget 192.168.124.1
+      Forbidden
+
+If the file is at the default location then you can always restore its label
+> restorecon -vR /var/www/html/
+
+> semanage fcontext -l
+fcontext means find context lists default labels
+Ex: > semanage fcontext -l | grep /var/www
+
+> ls /etc/selinux/targeted/contexts/files
+Files that have paths and their respective labels stored
+These files are not to be edited
+
+> ls -Z /var/www/html/index.html
+
+> mkdir /website
+  ls -Z /website
+  ls -Zd /website
+  #unconfined_u:object_r:default_t:s0 /website/
+
+  chcon --reference /var/www/ /website/
+  ls -Zs /website/
+  #system_u:object_r:default_t:s0
+
+  This is a custom location which might break in future if further changes are made or relabeling is done hence, it has to be written in fcontext
+  > semanage fcontext -a -t httpd_sys_content_t '/website(/.*)?'
+  > restorecon -v /website/
+
+* > systemctl stop httpd
+  > /sbin/httpd
+  > ps -Ze | grep http
+  # type comes as unconfined_t hence processes need not be started like that directly from path
+  > killall httpd
+  > chcon -t sbin_t /sbin/httpd
+  > systemctl start httpd
+  > ps -Ze | grep httpd
+  # still not correct
+  > restorecon -v /sbin/httpd
+
+=> mv is better than cp command in terms of selinux
+   tar and rsync has options to restore context when you take backup
+
+=> > sesearch -A
+   All allow rules
+
+   > sesearch -A -s httpd_t
+
+=> Setting booleans
+   > setsebool <flag_name> on
+   setsebool enable_http_homedir on
+   setsebool -P enable_http_homedir on
+   -P option to persist the flag value after reboot also
+
+=> sVirt for libvert is also available for VM's.
+   Means if 1 VM is affected then your host or other VM's are not compromised.

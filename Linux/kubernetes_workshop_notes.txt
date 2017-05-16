@@ -1,0 +1,117 @@
+https://cloudyuga.gitbooks.io/container-orchestration
+
+Container runtime
+- Docker
+- runc
+- rkt
+
+Overlay Network -> N/w over N/w or say packet over packet
+
+
+gcloud container clusters get-credentials kubernetes-cluster-rootconf \
+    --zone us-central1-a --project kubernetes-workshop-167504
+
+kubectl proxy
+
+vim ~/.kube/config
+
+kubectl cluster-info
+
+https://github.com/kubernetes/kops
+
+https://github.com/cloudyuga/kubernetes101
+
+In kubernetes pod is the smallest unit
+
+pod - collection of containers
+
+kubectl run my-nginx --image=nginx:alpine --replicas=2 --port=80
+
+kubectl get deployments
+
+kubectl get replicasets
+
+kubectl get pods
+
+kubectl get pods -L run
+
+kubectl get pods --selector="run==my-nginx"
+
+kubectl describe deployment my-nginx
+
+kubectl delete deployment my-nginx
+
+nginx.yaml
+------------------------------
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: my-nginx
+    spec:
+      containers:
+      - name: my-nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+------------------------------
+
+kubectl create -f nginx.yaml
+
+kubectl cluster-info
+
+open the kubernetes-master IP
+# Kubernetes master is running at https://104.197.98.78
+
+For UI : append ui in the end of the URL
+https://104.197.98.78/ui
+
+kubectl get pods -o wide
+
+kubectl expose deployment my-nginx --port=80 --type=NodePort
+
+kubectl get svc
+
+kubectl describe svc my-nginx
+
+kubectl edit svc my-nginx
+
+kubectl get nodes
+
+kubectl get nodes -o yaml | grep -B 1 External
+
+gcloud compute firewall-rules create rootconf1 --allow tcp:30502
+
+vim my-nginx-sv-lb.yaml
+-----------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-nginx
+  labels:
+    run: my-nginx
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    run: my-nginx
+-----------------------
+
+kubectl create -f my-nginx-sv-lb.yaml
+
+kubectl describe svc my-nginx
+# Note the LoadBalancer IP
+# LoadBalancer Ingress: 104.154.52.202
+
+Hit this IP in browser
+
+kubectl get svc my-nginx
+
+Monitoring : https://github.com/cloudyuga/kubernetes101/blob/master/12%20-%20Monitor%20the%20Microservice.md
