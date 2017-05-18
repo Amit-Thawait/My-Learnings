@@ -1,121 +1,256 @@
-RootConf Notes :-
+RootConf Notes :- (https://rootconf.in/2017/#schedule)
 =================
 Day 1 :
 -------
 1) State of the open source monitoring landscape
-    - Monitoring is part of your process
-    - Monitoring should be fundamental part of your design
-    - Provide monitoring as a service to API team / service team
-    - Auto-discovery is hard
+- Monitoring is part of your process
+- Monitoring should be fundamental part of your design
+- Provide monitoring as a service to API team / service team
+- Auto-discovery is hard
 
-    Availability and functional monitoring tools
-        1. Nagios
-        2. AWS CloudWatch
-        3. NewRelic
-        4. Icinga
-        5. Sensu
+- Availability and functional monitoring tools
+  1. Nagios
+  2. AWS CloudWatch
+  3. NewRelic
+  4. Icinga
+  5. Sensu
 
-        - Today we have better alternatives than Nagios, don't start with Nagios
-        - Icinga 2
-          - Built-in integrations
-          - CLI
-          - Application based cluster stack
-          - Setup could be complex
-          - REST API
-        - Sensu : Similar to Nagios and Icinga. Open source one in not so good, entreprise one is better
-        - Zabbix : OSS, Full featured logging and graphing
-        - Riemann
-          - Streaming processor
-          - Real time monitoring
-          - Based on Clojure
-        - OpenNMS
-          - Full featured OSS
-          - Based on Java
-          - Built-in Auto-Discovery
+  - Today we have better alternatives than Nagios, don't start with Nagios
+  - Icinga 2
+    - Built-in integrations
+    - CLI
+    - Application based cluster stack
+    - Setup could be complex
+    - REST API
+  - Sensu : Similar to Nagios and Icinga. Open source one in not so good, entreprise one is better
+  - Zabbix : OSS, Full featured logging and graphing
+  - Riemann
+    - Streaming processor
+    - Real time monitoring
+    - Based on Clojure
+  - OpenNMS
+    - Full featured OSS
+    - Based on Java
+    - Built-in Auto-Discovery
 
-    Metrics and time series tools
-        - Graphite
-        - OpenTSDB
-          - Based on Hadoop and HBase
-        - Prometheus * (very good)
-        - InfluxDB
-        - Elastic Stack (Kibana, Elastic search, Logstash|Beats)
+- Metrics and time series tools
+  - Graphite
+  - OpenTSDB
+    - Based on Hadoop and HBase
+  - Prometheus * (very good)
+  - InfluxDB
+  - Elastic Stack (Kibana, Elastic search, Logstash|Beats)
 
-    Visualization
-        - Grafana
-        - Grafana Annotations
+- Visualization
+  - Grafana
+  - Grafana Annotations
 
-    Logs & Events
-        - Log means flow of unstructured data with timestamp and message
-          Ex: May 4 16:57:24 web sshd[25828] Received disconnect from 10.10.0.31: 11: disconnected by user 
-        - Events means flow of structured data with identifiable attributes
-          Ex: Event {
-                Time: May 4 16:57:24
-                Process: sshd
-                State: Received disconnect from 10.10.0.31
-                Client: 10.10.0.31
-              }
+- Logs & Events
+  - Log means flow of unstructured data with timestamp and message
+    Ex: May 4 16:57:24 web sshd[25828] Received disconnect from 10.10.0.31: 11: disconnected by user 
+  - Events means flow of structured data with identifiable attributes
+    Ex: Event {
+          Time: May 4 16:57:24
+          Process: sshd
+          State: Received disconnect from 10.10.0.31
+          Client: 10.10.0.31
+        }
 
-    - Log > Event > Analyse > Action
-    Tools
-        - ELK
-        - Graylog
-        - Fluentd
+- Log > Event > Analyse > Action
 
-    User Experience
-        - Webinject and AutoIT : Both are old
-        - Sakuli (Good)
-        - Alyvix
+- Tools
+  - ELK
+  - Graylog
+  - Fluentd
 
-    - There is no best tool for everything
-    - There are tools that are 
-        - Monolith
-        - Modular
-    - Try to choose the modular tool
+- User Experience
+  - Webinject and AutoIT : Both are old
+  - Sakuli (Good)
+  - Alyvix
 
-    Slides at https://www.slideshare.net/NETWAYS/rootconf-2017-state-of-the-open-source-monitoring-landscape
+- There is no best tool for everything
+
+- There are tools that are
+  - Monolith
+  - Modular
+
+- Try to choose the modular tool
+
+- Slides at https://www.slideshare.net/NETWAYS/rootconf-2017-state-of-the-open-source-monitoring-landscape
 
 2) Deployment strategies with Kubernetes
-    - Canary deployment: Route a small amount of traffic to a new host to test functioning.
-    - If new hosts don’t act normal roll back the deployment.
-    - Blue Green Deployment is a procedure to minimize the downtime of the deployment. 
-      The idea is to have two set of machines with identical configuration but one with the latest code, rev 2 and other with rev 1.
-      Once the machines with latest code act correctly, spin down the machines with rev 1 code.
-    - Give same label to route traffic or share traffic
-    - Rolling Deployment
+- Canary deployment: Route a small amount of traffic to a new host to test functioning.
+- If new hosts don’t act normal roll back the deployment.
+- Blue Green Deployment is a procedure to minimize the downtime of the deployment. 
+  The idea is to have two set of machines with identical configuration but one with the latest code, rev 2 and other with rev 1.
+  Once the machines with latest code act correctly, spin down the machines with rev 1 code.
+- Give same label to route traffic or share traffic
+- Rolling Deployment
 
 3) A little bot for big cause
-    - https://github.com/moengage/alice
-    - Bot for managing code reviews, revert PR, adding checklist to PR, search for any wiki page or ask questions.
+- https://github.com/moengage/alice
+- Bot for managing code reviews, revert PR, adding checklist to PR, search for any wiki page or ask questions.
 
 4) Necessary tooling and monitoring for performance critical applications
-    - Monitor database, response time, throughput, requests/second, and measure state of the system
-    - Metrics everywhere! We talk about metrics to decide and diagnose the problem.
-    - Metrics(http://metrics-clojure.readthedocs.io/en/latest/) is a Clojure library to measure and record the data to the external system
-    - The library offers various features like Counter, gauges, meters, timers, histogram percentile.
-    - Logging is about scattered incidents in the system
-    - METRICS help in understanding the STATE OF THE SYSTEM and gain valuable insights...ANYTIME
-    - Collecting data is cheap, but not having it when you need it can be expensive.
-    - Instrument everything and collect useful data
-    - http://docs.influxdata.com/influxdb/v1.2/concepts/storage_engine
+- Monitor database, response time, throughput, requests/second, and measure state of the system
+- Metrics everywhere! We talk about metrics to decide and diagnose the problem.
+- Metrics(http://metrics-clojure.readthedocs.io/en/latest/) is a Clojure library to measure and record the data to the external system
+- The library offers various features like Counter, gauges, meters, timers, histogram percentile.
+- Logging is about scattered incidents in the system
+- METRICS help in understanding the STATE OF THE SYSTEM and gain valuable insights...ANYTIME
+- Collecting data is cheap, but not having it when you need it can be expensive.
+- Instrument everything and collect useful data
+- http://docs.influxdata.com/influxdb/v1.2/concepts/storage_engine
 
-    Tools
-        - Oscillator : https://github.com/otto-de/oscillator
-        - Xray : https://github.com/otto-de/tesla-xray
+- Tools
+  - Oscillator : https://github.com/otto-de/oscillator
+  - Xray : https://github.com/otto-de/tesla-xray
 
-    - Choose the right metrics - Disk Utilization, User Logins etc
-    - Mean can be absurb - Choose wisely
-    - Choose the right tool for the job. Histograms, counters, meters, timers
+- Choose the right metrics - Disk Utilization, User Logins etc
+- Mean can be absurb - Choose wisely
+- Choose the right tool for the job. Histograms, counters, meters, timers
 
-    CAPTURE -> AGGREGATE -> VISUALIZE -> ALERT
+- CAPTURE -> AGGREGATE -> VISUALIZE -> ALERT
 
-    Metrics, metrics everywhere video
-    https://www.youtube.com/watch?v=czes-oa0yik
+- Metrics, metrics everywhere video
+  - https://www.youtube.com/watch?v=czes-oa0yik
 
-    Slides : https://speakerdeck.com/manan/necessary-tooling-and-monitoring-for-performance-critical-applications-rootconf-2017
+- Slides : https://speakerdeck.com/manan/necessary-tooling-and-monitoring-for-performance-critical-applications-rootconf-2017
 
 5) SELinux workshop : Refer selinux_notes.txt
+- https://github.com/Amit-Thawait/My-Learnings/blob/master/Linux/selinux_notes.txt
 
 Day 2 :
 -------
+1) Failure resilient architecture with microservice dependencies (Circuit breaker mechanism for Microservices based architecture)
+- Your application should not go down if microservices goes down
+- Application should not wait forever for microservice
+- Contain and isolate failure (from propagating to other services/layers)
+- Respect the service when it is slow (when it is having too much load)
+- fail fast and recover fast
 
+-Testing and monitoring microservices
+  - Drop connections from IP Address :
+    iptables -A INPUT -d 202.54.1.22 -j DROP
+  - Drop connections from port :
+    iptables -A INPUT -p tcp --dport 1080 202.54.1.22 -j DROP
+
+2) "Asynchronous" integration tests for microservices
+- Pact https://docs.pact.io/
+
+3) Build, test, deliver latest and safest container images, effortlessly for CentOS
+- https://github.com/CentOS/container-pipeline-service
+
+4) Capacity planning for your data stores
+- Presto - The distributed SQL Query Engine for Big Data https://prestodb.io/
+  - Allows querying data where it lives, including Hive, Cassandra, RDBMS or even proprietary data stores.
+  - A single presto query can combine data from multiple sources, allowing for analytics across your entire organization
+  - Facebook uses presto for interactive queries against several internal data stores.
+
+- Common Problem : bots trying to buy tickets
+
+- PERFORMANCE_SHCHEMA is off by default, turn it ON
+
+- Also turn ON slow query logs
+
+- MySQL world
+  - Operating system
+    - vmstat, netstat, df, ps, iostat, uptime
+  - MySQL
+    - SHOW [TABLE] STATUS
+    - SHOW PROCESSLIST
+    - INFORMATION_SCHEMA
+    - PERFORMANCE_SHCHEMA
+    - slow query log
+    - mytop/innotop
+
+- Database specific watch points
+  - QPS (SELECTs, INSERTSs, UPDATEs, DELETEs)
+  - Open connections
+  - Lag time between masters/slaves
+  - Cache hit rates
+
+- Sharding
+  - Split your data across multiple nodes
+  - Sharding isn't enough, you need ability to split reads/writes
+  - Tools
+    - ProxySQL (Good)
+    - Vitess (used to youtube)
+    - Tumblr JetPants
+    - Tungsten Replicator
+
+- Context based metrics
+  - pt-query-digest https://www.percona.com/doc/percona-toolkit/LATEST/pt-query-digest.html
+    - Analyse queries from logs, processlist, tcpdump
+  - Box Anemometer https://github.com/box/Anemometer
+    - Analyse slow query logs to identify problematic queries
+
+- Percona Monitoring and Management (Open source)
+  - Built on top of other open source tools like : Prometheus, Consul, Grafana, Orchestrator
+  - https://www.percona.com/doc/percona-monitoring-and-management/using.html
+  - Demo at http://pmmdemo.percona.com/
+
+- Query Playback is a tool for replaying the load of one database server to another.
+  - https://github.com/Percona-Lab/query-playback
+
+- ProxySQL (http://proxysql.com/)
+  - Connection pooling and multiplexing
+  - Read/Write split and sharding
+  - Seamless failover (including query rerouting), load balancing
+  - Query Caching
+  - Query re-writing
+  - Query blocking (database firewall)
+  - Query mirroring (cache warming)
+  - Query throttling and timeouts
+  - Runtime reconfigurable
+  - Built-in monitoring
+  - http://proxysql.com/compare
+
+- Prophet : Tool for producing high quality forecasts for time series data that has multiple seasonality with linear or non-linear growth
+  - https://github.com/facebookincubator/prophet
+  - https://facebookincubator.github.io/prophet/static/prophet_paper_20170113.pdf
+  - https://facebookincubator.github.io/prophet/docs/holiday_effects.html
+
+- Auto-scaling frameworks
+  - Scalr (https://www.scalr.com/)
+  - AWS
+    - Vertical : grow the instance
+    - Horizontal : replicas
+    - EC2 : autoscaling + groups
+  - Amazon RDS Aurora, Google Cloud Spanner, Azure Cosmos DB
+
+- Book : The art of capacity planning - scaling web resources by John Allspaw
+  - Online : https://www.safaribooksonline.com/library/view/the-art-of/9780596518578/
+  - EBook : http://www.amazon.in/Art-Capacity-Planning-John-Allspaw/dp/0596518579
+
+- Slides : https://www.slideshare.net/bytebot/capacity-planning-for-your-data-stores
+
+5) Spotswap: running production APIs on spot instances
+- On AWS create a mix of spot and on-demand instances with 2 autoscaling groups
+- Only the spot instance knows about its termination notice
+- To avoid race condition (several instances go down at same time), after a spot instance receives termination notice tag them and then using lambda get the count
+- Autoscaling takes care of replacing dead spot instances with on-demand instances
+- In on-demand setup set autoscaling to scale down if CPU usage is too low
+- Cfconfig to deploy and Cloud formation template from AWS
+
+- AWS Spot fleet
+  - http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-fleet.html
+
+- Mapbox has open sources their implementation named spotswap
+  - https://github.com/mapbox/spotswap
+
+6) Persistent Storage for Containers using Gluster
+- GlusterFS : Storage for your Cloud
+  - https://www.gluster.org/
+
+8) Working with Secrets
+- Hashicorp Vault
+- Slides : https://www.slideshare.net/ShreyAgarwal9/vault-ppt
+- keybase.io
+- Shamir's algorithm : to generate parts of the key
+
+9) Living with SELinux (slides are very good)
+- Slides : http://www.toshaan.com/slides/centosdojobrussels2014-introduction-to-selinux.pdf
+- user:xguest for kiosk related stuffs
+- -Z tells about labels/contect
+- type is the most important part
