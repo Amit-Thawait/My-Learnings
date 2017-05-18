@@ -1,5 +1,7 @@
 https://cloudyuga.gitbooks.io/container-orchestration
 
+https://cloudyuga.gitbooks.io/container-orchestration/content/
+
 Container runtime
 - Docker
 - runc
