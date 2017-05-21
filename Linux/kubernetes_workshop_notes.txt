@@ -9,6 +9,9 @@ Container runtime
 
 Overlay Network -> N/w over N/w or say packet over packet
 
+gcloud components install kubectl
+
+kubectl cluster-info
 
 gcloud container clusters get-credentials kubernetes-cluster-rootconf \
     --zone us-central1-a --project kubernetes-workshop-167504
