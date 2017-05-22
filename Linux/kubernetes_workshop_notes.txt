@@ -11,9 +11,31 @@ Container runtime
 
 Overlay Network -> N/w over N/w or say packet over packet
 
+Install gcloud :
+https://cloud.google.com/sdk/downloads
+
+--------------------------------------
+http://stackoverflow.com/questions/32036989/kubernetes-set-up-on-ubuntu-on-google-compute
+
+sudo apt-get update
+sudo apt-get remove google-cloud-sdk
+curl https://sdk.cloud.google.com | bash
+exec -l $SHELL
+gcloud init
+gcloud components list
+gcloud components install kubectl
+gcloud components list
+--------------------------------------
+
 gcloud components install kubectl
 
 kubectl cluster-info
+
+create a project in GCP
+
+create a container cluster
+
+Once a container cluster is created click on connect
 
 gcloud container clusters get-credentials kubernetes-cluster-rootconf \
     --zone us-central1-a --project kubernetes-workshop-167504
@@ -77,6 +99,8 @@ open the kubernetes-master IP
 
 For UI : append ui in the end of the URL
 https://104.197.98.78/ui
+
+To get the credentials go to edit cluster from GCP
 
 kubectl get pods -o wide
 
