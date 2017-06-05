@@ -146,3 +146,7 @@ Hit this IP in browser
 kubectl get svc my-nginx
 
 Monitoring : https://github.com/cloudyuga/kubernetes101/blob/master/12%20-%20Monitor%20the%20Microservice.md
+
+https://github.com/hobby-kube/guide
+
+https://github.com/kelseyhightower/kubernetes-the-hard-way
