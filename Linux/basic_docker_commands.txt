@@ -9,10 +9,16 @@ docker info
 docker images
 
 docker ps
+== docker container ls
 
 docker ps -a
+== docker container ls -a
+
+docker create -i -t --name=alpine_test alpine sh
+Creates a container
 
 docker run -i -t ubuntu:xenial /bin/bash
+Creates and start a container
 
 docker inspect ubuntu:xenial
 
@@ -21,10 +27,13 @@ docker restart compassionate_bhabha
 docker attach compassionate_bhabha
 
 docker rename compassionate_bhabha my_new_container_name
-docker rename <container_id> <new_container_name>
+docker rename <container_id/container_name> <new_container_name>
 
 docker run -i -t -d ubuntu:xenial /bin/bash
 docker run -itd ubuntu:xenial /bin/bash
+
+--rm flag : If you want to delete the container after exiting
+docker run -it --rm --name=test_ubuntu ubuntu:xenial /bin/bash
 
 docker inspect <container_name>
 docker inspect compassionate_bhabha
@@ -32,6 +41,9 @@ docker inspect compassionate_bhabha | grep IP
 
 docker stop <container_name>
 docker stop compassionate_bhabha
+
+docker pause <container_name>
+docker unpause <container_name>
 
 For exiting without stopping the container type: ctrl+p+q
 
@@ -51,6 +63,12 @@ create file /etc/docker/daemon.json
 The CentOS equivalent is the /etc/sysconfig/docker
 -----------------------------------------------------------------------------------
 
+docker run -it --name=alpine_test -w=/var  alpine sh
+-w option can be used to set working directory
+
+Environment variables can be added to the container using --env or -r option
+docker run -it --env="WEB_HOST=172.168.1.1" apline sh
+
 docker search <image_name>
 docker search training/sinatra
 
@@ -59,6 +77,98 @@ docker commit -m "Installed SSH and created test user" -a "Amit Thawait" flamboy
 
 mkdir build
 cd build
+
+mkdir apline_date_test1 && cd apline_date_test1
+vim Dockerfile
+--------------
+FROM apline
+RUN date > /data
+--------------
+
+docker build -t="amitthawait/apline_date_test1:v1" .
+
+docker run -it amitthawait/apline_date_test1:v1 cat /data
+
+docker build -t="amitthawait/apline_date_test1:v2" .
+#Uses cache
+docker run -it amitthawait/apline_date_test1:v2 cat /data
+
+docker build -t="amitthawait/apline_date_test1:v3" --no-cache .
+docker run -it amitthawait/apline_date_test1:v3 cat /data
+
+mkdir apline_date_test2 && cd apline_date_test2
+date > datefile
+
+vim Dockerfile
+--------------
+FROM apline
+RUN date > /data
+COPY datefile /datefile
+--------------
+
+docker build -t="amitthawait/apline_date_test2:v1" .
+
+docker run -it amitthawait/apline_date_test2:v1 cat /datefile
+
+Instruction format:
+1) Shell form
+   <instruction> <command>
+   CMD echo "This is shell form"
+2) Exec form
+   <instruction> ["executable", "param1", "param2", ...]
+   CMD ["/bin/echo", "This is exec form"]
+
+Instruction can be classified into 2 groups
+1) Build time instructions
+   RUN, ADD, COPY, USER, WORKDIR ..etc
+2) Run time instructions
+   CMD, ENTRYPOINT
+
+CMD vs ENTRYPOINT :
+-------------------
+mkdir cmd_ex && cd cmd_ex
+vim Dockerfile
+--------------
+FROM alpine
+CMD ["/bin/echo", "This is printed using CMD instruction"]
+--------------
+docker build -t alpine_cmd:v1 .
+docker run alpine_cmd:v1
+# Ouputs: This is printed using CMD instruction
+
+docker run alpine_cmd:v1 ls
+# Here the command "ls" overrides the default instruction specified using CMD
+
+mkdir extrypoint_ex && cd entrypoint_ex
+vim Dockerfile
+--------------
+FROM alpine
+ENTRYPOINT ["/bin/echo", "This is printed using ENTRYPOINT instruction"]
+--------------
+docker build -t alpine_ep:v1 .
+docker run apline_ep:v1
+# Outputs: This is printed using ENTRYPOINT instruction
+
+docker run apline_ep:v1 ls
+# Outputs: This is printed using ENTRYPOINT instruction ls
+
+The difference bewteen CMD and ENTRYPOINT is that the default command is not changed and anything passed while instanting the image with ENTRYPOINT command is taken as argument.
+
+Both CMD and ENTRYPOINT can be used together as well, ENTRYPOINT command will be the default command to be executed and whatever is passed via CMD will be passed to CMD as an argument. If something else is passed from command line then it overrides whatever is written in CMD
+vim Dockerfile
+--------------
+FROM alpine
+ENTRYPOINT ["/bin/echo", "We are learning about"]
+CMD ["Dockerfile"]
+--------------
+docker build -t cmd_vs_entrypoint:v1 .
+docker run cmd_vs_entrypoint:v1
+# Prints We are learning about Dockerfile
+
+docker run cmd_vs_entrypoint:v1 ls
+# Prints We are learning about ls
+
+
 vim Dockerfile
 -----------
 # This is a custom ubuntu image with SSH installed
@@ -84,6 +194,7 @@ commiting a changes to docker container it doesn't removes the instance there by
 docker logs <container_name>
 docker logs naughty_brown
 
+# To create a process inside an already running container use docker exec
 docker exec <container_name> <command>
 docker exec naughty_brown /bin/cat /etc/profile
 
@@ -146,6 +257,25 @@ docker exec apacheweb1 /bin/cat /var/www/html/index.html
 -P(High port mapping scheme): expose and remap automatically any ports that are exposed within the container. Port need to exposed from container using EXPOSE command.
 docker run -d --name apacheweb3 -P centos7/apache:v2
 
+While starting the container, we can set its restart policy
+man docker run
+docker run -d --restart=always --name=web1 nginx
+docker run -d --restart=on-failure:3 --name=web2 nginx
+
+Docker copy command
+echo "We are learning docker" > index.html
+cat index.html
+docker start web2
+docker inspect web2 | grep IPA
+curl http://172.17.0.2
+docker cp index.html web2:/usr/share/nginx/html
+elinks http://172.17.0.2
+
+Labelling a container
+docker run -it --name=alpine_test --label=app  alpine sh
+docker ps
+docker ps --filter label=app
+
 To mount a volume in the container
 docker run -it --name voltest1 -v /mydata centos:latest /bin/bash
 The above /mydata can be found out at _data dir inside volumes in /var/lib/docker/volumes/<hash>/_data which can seen using docker inspect <container_name> command.
@@ -161,6 +291,7 @@ docker network inspect bridge
 
 All the docker commands are also available as man pages. Just add hyphen for multi word command. For ex: man page for docker run command
 man docker-run
+man docker run
 man docker-network-create
 
 Create a network
@@ -194,6 +325,9 @@ List only container ids
 docker ps -a -q
 
 docker ps -a -q | wc -l
+
+To remove all stopped containers
+docker container prune
 
 docker events
 Attaches to docker daemon and waits for any event to happen and the lists it
@@ -253,3 +387,103 @@ docker cp <source-file-path> <destination-file-location>
 To copy file from container to localhost and vice-versa.
 docker cp <container_id>:<path-of-file> <destination-in-localhost>
 docker cp test.txt <container_id>:/tmp/
+---------------
+
+https://diveintodocker.com/blog/5-steps-to-take-before-moving-your-applications-into-docker
+
+http://www.johnzaccone.io/entrypoint-vs-cmd-back-to-basics/
+
+https://github.com/moby/moby/issues/28892
+
+https://github.com/moby/moby/pull/29001
+
+https://blog.codeship.com/reduce-docker-image-size/
+
+https://sysdig.com/blog/sysdig-docker-usage-report-2017/
+---------------
+docker volume ls
+
+docker volume create my_data
+
+docker compose
+
+docker run --name wordpress_db -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=wordpress -e MYSQL_USER=wordpress -e MYSQL_PASSWORD=wordpress -p 3307:3306 -d mysql
+
+docker run -d --name local_wordpress -p 9000:80  -e WORDPRESS_DB_HOST=172.17.0.2:3306 -e WORDPRESS_DB_USER=wordpress -e WORDPRESS_DB_PASSWORD=wordpress wordpress
+
+docker run -d --name local_wordpress --link wordpress_db:db -p 9000:80 -e WORDPRESS_DB_HOST=db:3306 -e WORDPRESS_DB_USER=wordpress -e WORDPRESS_DB_PASSWORD=wordpress wordpress
+
+---------------------------------
+version : '2'
+services: 
+  db: 
+    environment: 
+      MYSQL_DATABASE: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_USER: wordpress
+    image: "mysql:latest"
+    ports:
+      - 3307:3306
+    restart: always
+    volumes: 
+      - db_data:/var/lib/mysql
+
+  wordpress: 
+    depends_on: 
+      - db
+    environment: 
+      WORDPRESS_DB_HOST: "db:3306"
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_USER: wordpress
+    image: "wordpress:latest"
+    ports: 
+      - "9000:80"
+    restart: always
+volumes: 
+  db_data:
+   driver: local
+---------------------------------
+docker-compose up
+check
+- docker inspect
+- docker network ls
+- docker volume ls
+
+➜  docker-training-containerization > docker-compose down
+Stopping dockertrainingcontainerization_wordpress_1 ... done
+Stopping dockertrainingcontainerization_db_1 ... done
+Removing dockertrainingcontainerization_wordpress_1 ... done
+Removing dockertrainingcontainerization_db_1 ... done
+Removing network dockertrainingcontainerization_default
+
+docker-compose build
+# Builds the image
+
+======================
+Rkt (Rock-it)
+
+Installation:
+gpg --recv-key 18AD5014C99EF7E3BA5F6CE950BDD3E0FC8A365E
+wget https://github.com/rkt/rkt/releases/download/v1.26.0/rkt_1.26.0-1_amd64.deb
+wget https://github.com/rkt/rkt/releases/download/v1.26.0/rkt_1.26.0-1_amd64.deb.asc
+gpg --verify rkt_1.26.0-1_amd64.deb.asc
+sudo dpkg -i rkt_1.26.0-1_amd64.deb
+
+To fetch an image
+rkt fetch <image_url>
+rkt fetch coreos.com/etcd:v2.0.0
+
+rkt image list
+
+rkt fetch --insecure-options=image docker://busybox
+
+rkt image list
+
+To remove an image
+rkt image rm <image-name>
+
+To list running pods
+rkt list
+
+rkt run --insecure-options=image docker://nginx
