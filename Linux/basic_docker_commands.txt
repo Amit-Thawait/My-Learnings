@@ -106,9 +106,18 @@ RUN date > /data
 COPY datefile /datefile
 --------------
 
+With COPY instruction, we can copy the content from our build context to the intermediate container which would get committed to create the resulting image.
+COPY <src> <dest>
+COPY ["<src>", "<dest>"] # This form is used when source/destination contains a white space.
+
 docker build -t="amitthawait/apline_date_test2:v1" .
 
 docker run -it amitthawait/apline_date_test2:v1 cat /datefile
+
+ADD command is similar to COPY but with more capability:
+1) It can take source(file/picture) as URL
+2) If the source is a tar file then it would untar it at the destination
+
 
 Instruction format:
 1) Shell form
@@ -118,11 +127,31 @@ Instruction format:
    <instruction> ["executable", "param1", "param2", ...]
    CMD ["/bin/echo", "This is exec form"]
 
+Shell form instruction CMD echo "This is shell form" is equivalent to
+/bin/sh -c echo "This is shell form"
+The default shell on Linux is /bin/sh
+We can change the default shell with SHELL instruction in Dockerfile
+
+Exec form is preffered form.
+
 Instruction can be classified into 2 groups
 1) Build time instructions
-   RUN, ADD, COPY, USER, WORKDIR ..etc
+   FROM, MAINTAINER, RUN, ADD, COPY, USER, EXPOSE, WORKDIR ..etc
 2) Run time instructions
    CMD, ENTRYPOINT
+
+CMD:
+This is a runtime instruction means that it would be executed when the container is started from the resulting image.
+There can be only 1 CMD instruction in a Dockerfile.
+If you specify more than 1 CMD instruction then only the last one would be taken into consideration.
+
+If you want to run your <command> without a shell then you must express the command as a JSON array and give the full path to the executable.
+This array form is the preferred format of CMD
+
+CMD ["nginx", "-g", "daemon off;"]
+means that when the container would start from nginx image, it would by default run "nginx -g daemon off;" command to start the nginx daemon.
+We can overwrite the defaults defined by CMD by starting the /bin/sh program instead of nginx daemon at the start time.
+docker run -it nginx /bin/sh
 
 CMD vs ENTRYPOINT :
 -------------------
@@ -168,6 +197,38 @@ docker run cmd_vs_entrypoint:v1
 docker run cmd_vs_entrypoint:v1 ls
 # Prints We are learning about ls
 
+Dangling images : Image with either REPOSITORY or TAG as <none>
+docker images --filter=dangling=true
+
+Dangling images are created due to using same image name in the build command.
+To get only image_id
+docker images --quiet --filter=dangling=true
+
+To remove the dangling images
+docker images -q --filter=dangling=true | xargs docker rmi
+
+WORKDIR : The WORKDIR instruction sets the working directory for any RUN, CMD, ENTRYPOINT, COPY and ADD instructions that follow it in the Dockerfile.
+If the WORKDIR doesn't exist, it will be created even if it's not used in any subsequent Dockerfile instruction.
+
+WORKDIR /a
+WORKDIR b
+WORKDIR c
+RUN pwd
+Output would be /a/b/c
+
+vim Dockerfile
+--------------
+FROM alpine
+RUN mkdir scripts
+COPY scripts/sample.sh scripts
+WORKDIR scripts
+CMD ./sample.sh
+--------------
+
+ENV :
+With ENV instruction we set environment variables which would be available inside the container for future reference.
+ENV <key> <value>
+ENV <key>=<value> <key>=<value>
 
 vim Dockerfile
 -----------
