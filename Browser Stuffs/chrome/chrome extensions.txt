@@ -13,3 +13,4 @@ AdBlock
 Advanced REST client
 Google Docs Offline
 Postman
+octotree - Github tree like visualizer in browser
