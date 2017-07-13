@@ -1,0 +1,95 @@
+psql - To start Postgres SQL prompt
+
+show search_path;
+  search_path   
+----------------
+ "$user",public
+(1 row)
+
+create database twist_experiment;
+
+To use newly created database named twist_experiment :
+\c twist_experiment
+
+To List schemas inside that database
+\dn
+
+Create table accounts(
+  id integer
+);
+
+To see list of relations (table is also a type of relation)
+\dt
+          List of relations
+ Schema |   Name   | Type  |  Owner   
+--------+----------+-------+----------
+ public | accounts | table | synerzip
+(1 row)
+
+insert into accounts values (1);
+
+By default whatever you create goes inside "public" schema
+
+create schema alternative;
+
+create table alternative.accounts(
+  id integer
+);
+
+\dt
+          List of relations
+ Schema |   Name   | Type  |  Owner   
+--------+----------+-------+----------
+ public | accounts | table | synerzip
+(1 row)
+
+Its still showing relations from public schema because the schema search path right now is $user,public , which means that PostgreSQL will look up tables
+in a schema that matches the current user's name, as well as in the "public" schema.
+
+SET search_path = 'alternative';
+
+\dt
+             List of relations
+   Schema    |   Name   | Type  |  Owner   
+-------------+----------+-------+----------
+ alternative | accounts | table | synerzip
+(1 row)
+
+select * from accounts;
+ id 
+----
+(0 rows)
+
+insert into accounts values (2);
+
+Select * from accounts;
+ id 
+----
+  2
+(1 row)
+
+If we were to run a query such as SELECT * FROM public.accounts at this point, it will still return the data from the accounts table within the public schema.
+This is because PostgreSQL is smart enough to know we're being explicit about what schema we're querying from, meaning we don't need to edit the schema search path
+to query a different schema.
+
+Another benefit is the automatic fallback feature of schemas. If a table is missing from one schema in the search path, PostgreSQL will see if the table is
+contained in any of the other schemas (in the order they're listed) and if so, it'll then query that table.
+
+If we set the search path to use the alternative schema first, and then the public schema, we can see both of these benefits in action:
+SET search_path = 'alternative', 'public';
+
+show search_path;
+     search_path     
+---------------------
+ alternative, public
+(1 row)
+
+select * from accounts;
+ id 
+----
+  2
+(1 row)
+
+To quit the SQL session
+\q
+
