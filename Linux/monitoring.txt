@@ -1,0 +1,6 @@
+1) Application monitoring
+   (Uptime - Pingdom
+    Performance Monitoring - Scout APM
+    Log Monitoring - ELK Stack
+    Exception Monitoring - Sentry
+    Scheduled Job Monitoring - Deadman's Snitch)
