@@ -1,0 +1,17 @@
+Int is a member of package scala, "Int" is the class's simple name, and "scala.Int" is its full name
+
+Scala has two kinds of variables, val s and var s. A val is similar to a final variable in Java. Once initialized, a val can never be reassigned.
+A var, by contrast, is similar to a non-final variable in Java. A var can be reassigned throughout its lifetime.
+
+Function definitions start with def. The function's name, in this case max, is followed by a comma-separated list of parameters in parentheses.
+A type annotation must follow every function parameter, preceded by a colon, because the Scala compiler does not infer function parameter types.
+scala> def max(x: Int, y: Int): Int = {
+     | if (x > y) x
+     | else y
+     | }
+max: (x: Int, y: Int)Int
+
+scala> max(5, 8)
+res12: Int = 8
+
+In Java, the type of the value returned from a method is its return type. In Scala, that same concept is called result type.
