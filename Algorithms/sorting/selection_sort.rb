@@ -7,7 +7,7 @@ def selection_sort(numbers)
     smallest_num_index = index
 
     ((index + 1)..numbers_length-1).each do |i|
-      smallest_num_index = i if numbers[i] < numbers[index]
+      smallest_num_index = i if numbers[i] < numbers[smallest_num_index]
     end
     
     numbers[index], numbers[smallest_num_index] = numbers[smallest_num_index], numbers[index] if smallest_num_index != index
@@ -17,4 +17,7 @@ def selection_sort(numbers)
 end
 
 numbers = [33, 2, 52, 106, 73]
+selection_sort(numbers)
+
+numbers = [3, 2, 99, 2, 3, 5, 6]
 selection_sort(numbers)
