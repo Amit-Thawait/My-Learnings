@@ -3,7 +3,7 @@
 def selection_sort(numbers)
   numbers_length = numbers.length
 
-  numbers_length.times do |index|
+  (numbers_length - 1).times do |index|
     smallest_num_index = index
 
     ((index + 1)..numbers_length-1).each do |i|
