@@ -12,9 +12,9 @@ def bubble_sort(numbers)
   numbers
 end
 
-Total number of iterations = (n * (n-1))/2
-Time Complexity  = O(n^2)
-Space Complexity = O(n)
+# Total number of iterations = (n * (n-1))/2
+# Time Complexity  = O(n^2)
+# Space Complexity = O(n)
 
 numbers = [9, 7, 4, 1, 2]
 bubble_sort(numbers)
