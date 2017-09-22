@@ -16,6 +16,10 @@ def selection_sort(numbers)
   numbers
 end
 
+# Total number of iterations = (n-1) * (n-2)
+# Time Complexity  = O(n^2)
+# Space Complexity = O(n)
+
 numbers = [33, 2, 52, 106, 73]
 selection_sort(numbers)
 
