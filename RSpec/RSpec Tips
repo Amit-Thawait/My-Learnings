@@ -7,3 +7,23 @@ RSpec Tips :-
 3) https://github.com/thoughtbot/factory_girl/blob/master/GETTING_STARTED.md
 
 4) http://myronmars.to/n/dev-blog/2012/06/rspecs-new-expectation-syntax
+
+5) For FactoryGirl (now FactoryBot)
+   create(:user) -> creates object in test DB with all the associations as well (creates associated records as well)
+   build(:user)  -> build object in memory with all the associations as well (creates associated objects in memory)
+   build_stubbed -> just build that specific object in memory
+   Ex: user = build_stubbed(:user)
+
+6) Another option to create a fake object is using RSpec doubles
+   double(User, is_active?: true)
+   but this kind of double object just responds_to is_active? method which may or may not be present in User model.
+   There is another method that prevents this sort of issue from happening : "instance_double" which checks the presence of specified method in User model.
+   Ex: instance_double(User, is_active?: true)
+
+7) Most authentication libraries will let you fake having signed into your app.
+   This can save substantial time, since most app functionality is tested through a signed-in user.
+   Ex: visit posts_path(post, as: admin)
+   The "as: admin" bit will set the session correctly so that our 'admin' user is signed in.
+
+8) "match_array" method matches expected and actual array independent of their position.
+   Ex: expect(users).to match_array(actual_users)
