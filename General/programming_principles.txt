@@ -1,0 +1,18 @@
+1) Things should be simple instead of easy
+
+2) Programming is about making computers effective in the world.
+
+3) Make implicit things explicit like for ex:
+   wrap a conditional into a meaningful method with proper name so that the purpose of that conditional is clear.
+   def good_candidate_for_featuring?
+     created_at < 10.days.ago && user.has_confirmed_email?
+   end
+
+   To go even further
+   def not_too_old?
+     created_at < 10.days.ago
+   end
+
+   def low_spam_risk?
+     user.has_confirmed_email?
+   end
