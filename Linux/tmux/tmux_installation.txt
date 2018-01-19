@@ -1,0 +1,19 @@
+1) Download libevent and curses (both are dependency of tmux)
+ 1.1) Install libevent
+ sudo apt-get install libevent-dev
+
+ 1.2) Install curses
+ sudo apt-get install libncurses5-dev
+
+2) Download tmux from this link :
+https://github.com/tmux/tmux/releases/download/2.3/tmux-2.3.tar.gz
+
+3) Install tmux
+cd Downloads
+tar xvzf tmux-2.3.tar.gz
+cd tmux-2.3
+./configure && make
+sudo make install
+sudo mv tmux-2.3 /opt/
+
+$ tmux

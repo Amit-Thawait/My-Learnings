@@ -1,0 +1,5 @@
+Tmux Commands :
+----------------
+
+New tmux pane -> ctrl b then %
+Split pane -> ctrl b then 
