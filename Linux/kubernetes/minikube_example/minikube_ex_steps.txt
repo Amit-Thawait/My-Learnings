@@ -1,0 +1,196 @@
+minikube start
+
+kubectl cluster-info
+
+minikube dashboard
+
+kubectl proxy
+curl http://localhost:8001/
+curl http://localhost:8001/ui
+
+kubectl describe secret
+
+kubectl get secrets
+
+APISERVER=$(kubectl config view | grep https | cut -f 2- -d ":" | tr -d " ")
+TOKEN=$(kubectl describe secret $(kubectl get secrets | grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t')
+
+echo $APISERVER
+
+kubectl cluster-info
+
+APISERVER=https://192.168.99.100:8443
+curl $APISERVER --header "Authorization: Bearer $TOKEN" --insecure
+
+kubectl get deployments
+
+kubectl get replicasets
+
+kubectl get pods
+
+kubectl describe pod nginx-webserver-89d9cc9f-h8w75
+
+kubectl get pods -L app
+
+kubectl get pods -L app,label2
+
+kubectl get pods -l app=nginx-webser
+
+kubectl get pods -l app=nginx-webserver
+
+kubectl get deployments
+
+kubectl delete deployments nginx-webserver
+
+kubectl get deployments
+
+kubectl get replicasets
+
+kubectl get pods
+
+vim webserver.yaml
+------------------
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: webserver
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: webserver
+    spec:
+      containers:
+      - name: nginx-webserver
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+------------------
+
+kubectl create -f webserver.yaml
+
+kubectl get deployments
+
+kubectl get replicasets
+
+kubectl get pods
+
+vim nginx-webserver-svc.yaml
+----------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-web-service
+  labels:
+    run: web-service
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: webserver
+----------------------------
+
+kubectl create -f nginx-webserver-svc.yaml
+
+kubectl get svc
+
+vim nginx-webserver-svc.yaml
+
+kubectl describe svc nginx-web-service
+
+minikube ip
+
+minikube service nginx-web-service --url
+
+kubectl get svc
+
+minikube service nginx-web-service
+
+kubectl describe svc nginx-web-service
+
+kubectl get pods -L
+
+kubectl get pods -L app
+
+vim nginx-webserver-svc.yaml
+
+kubectl get svc
+
+kubectl delete svc nginx-web-service
+
+=============================================
+
+Attaching volume to pods:
+-------------------------
+
+minikube ssh
+
+$ ls
+$ mkdir -p vol
+$ cd vol/
+$ echo "Welcome to Kubernetes MOOC" > index.html
+$ cat index.html
+Welcome to Kubernetes MOOC
+$ pwd
+/home/docker/vol
+$ exit
+
+vim webserver-vol.yaml
+----------------------
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: webserver
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: webserver
+    spec:
+      containers:
+      - name: nginx-webserver
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: hostvol
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: hostvol
+        hostPath:
+          path: /home/docker/vol
+----------------------
+
+kubectl create -f webserver-vol.yaml
+
+vim nginx-webserver-svc.yaml
+------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-web-service
+  labels:
+    run: web-service
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: webserver
+------------------
+
+kubectl create -f nginx-webserver-svc.yaml
+
+kubectl get svc nginx-web-service
+
+check
+minikube ip
+
+hit minikube_ip:svc_port_no
+
+kubectl exec -it webserver-6b5bf77586-f5hdn /bin/sh
