@@ -1,0 +1,1036 @@
+PUT /product
+
+POST /product/default
+{
+  "name": "Ruby",
+  "instructor": {
+    "firstName": "Amit",
+    "lastName": "Thawait"
+  }
+}
+
+POST /product/default/1
+{
+  "name": "Rails",
+  "instructor": {
+    "firstName": "Amit",
+    "lastName": "Thawait"
+  }
+}
+
+POST /product/default/2
+{
+  "name": "Rails",
+  "instructor": { "Name": "Amit Thawait" },
+  "price": 50
+}
+
+POST /product/default/2/_update
+{
+  "doc": {"price": 100, "tags": ["Elasticsearch"]}
+}
+
+GET /product/default/_search
+
+GET /product/default/2
+
+GET _search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+GET /
+
+POST /product/default/3/_update
+{
+  "script": "ctx._source.price += 5",
+  "upsert": {
+    "price": 100
+  }
+}
+
+GET product/default/3
+
+POST product/default
+{
+  "name": "The Art of Scalability",
+  "category": "book"
+}
+
+POST /product/_delete_by_query
+{
+  "query": {
+    "match": {
+      "category": "book"
+    }
+  }
+}
+
+GET product/default/_mapping
+
+GET product/default/1/_source
+
+GET /_cat/health?v
+
+GET _cat/nodes?v
+
+
+PUT product/default/_mapping
+{
+  "properties": {
+    "discount": {
+      "type": "double"
+    }
+  }
+}
+
+GET product/default/_search?q=*
+
+GET product/default/_search?q=name:ruby
+
+GET product/default/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+GET product/default/_search?explain
+{
+  "query": {
+    "term": {
+      "name": "railssashgds"
+    }
+  }
+}
+
+DELETE /product
+
+# Explain works only for 1 object
+GET product/default/1/_explain
+{
+  "query": {
+    "term": {
+      "name": "lobster"
+    }
+  }
+}
+
+GET product/default/_search
+{
+  "query": {
+    "term": {
+      "is_active": true
+    }
+  }
+}
+
+# term level queries are not analysed
+# Ideal for keywords, numbers and date field
+# Should not be used for full text search fields
+# Accepts both true and "true" (string) as valid values
+GET product/default/_search
+{
+  "query": {
+    "term": {
+      "is_active": {
+        "value": "true"
+      }
+    }
+  }
+}
+
+# term level query is case-sensitive
+GET product/default/_search
+{
+  "query": {
+    "terms": {
+      "tags.keyword": [
+        "Cake",
+        "Soup"
+      ]
+    }
+  }
+}
+
+# Retrieving products whose ids are known beforehand
+GET product/default/_search
+{
+  "query": {
+    "ids": {
+      "values": [1, 2, 3]
+    }
+  }
+}
+
+# Matching documents with range values
+GET product/default/_search
+{
+  "query": {
+    "range": {
+      "in_stock": {
+        "gte": 1,
+        "lte": 5
+      }
+    }
+  }
+}
+
+GET product/default/_search
+{
+  "query": {
+    "range": {
+      "created": {
+        "gte": "2010/01/01",
+        "lte": "2010/12/31"
+      }
+    }
+  }
+}
+
+GET product/default/_search
+{
+  "query": {
+    "range": {
+      "created": {
+        "gte": "01-01-2010",
+        "lte": "31-12-2010",
+        "format": "dd-MM-yyyy"
+      }
+    }
+  }
+}
+
+GET product/default/_search
+{
+  "query": {
+    "range": {
+      "created": {
+        "gte": "2010/01/01||-1y-1d"
+      }
+    }
+  }
+}
+
+# Matching documents with non-null values
+GET product/default/_search
+{
+  "query": {
+    "exists": {
+      "field": "tags"
+    }
+  }
+}
+
+GET product/default/_search
+{
+  "query": {
+    "prefix": {
+      "tags.keyword": "Vege"
+    }
+  }
+}
+
+# Query with wildcard
+# * for multiple characters
+# ? for one character
+GET product/default/_search
+{
+  "query": {
+    "wildcard": {
+      "tags.keyword": "Vege??ble"
+    }
+  }
+}
+
+GET product/default/_search
+{
+  "query": {
+    "wildcard": {
+      "name": "past?"
+    }
+  }
+}
+
+GET recipe/default/_mapping
+
+# Match query example
+GET recipe/default/_search
+{
+  "query": {
+    "match": {
+      "title": "Receipes with pasta or spaghetti"
+    }
+  }
+}
+
+GET recipe/default/_search
+{
+  "query": {
+    "match": {
+      "title": {
+        "query": "pasta spaghetti",
+        "operator": "and"
+      }
+    }
+  }
+}
+
+# Matching phrases
+GET recipe/default/_search
+{
+  "query": {
+    "match_phrase": {
+      "title": "spaghetti puttanesca"
+    }
+  }
+}
+
+# Order of term matters in match_phrase query unlike match query
+GET recipe/default/_search
+{
+  "query": {
+    "match_phrase": {
+      "title": "puttanesca spaghetti"
+    }
+  }
+}
+
+# Searching multiple fields for a query string
+GET recipe/default/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "pasta",
+      "fields": ["title", "description"]
+    }
+  }
+}
+
+GET recipe/default/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "pasta pesto",
+      "fields": ["title", "description"]
+    }
+  }
+}
+
+GET recipe/default/_search
+{
+  "query": {
+    "match_phrase": {
+      "title": "carbonara pasta"
+    }
+  }
+}
+
+GET recipe/default/_search
+{
+  "query": {
+    "match_phrase": {
+      "title": "pasta carbonara"
+    }
+  }
+}
+
+# Query with boolean logic
+# Whenever a range is matched in must array, they also affect the relevance score on the basis of how well they matched the query
+GET recipe/default/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "ingredients.name": "parmesan"
+          }
+        },
+        {
+          "range": {
+            "preparation_time_minutes": {
+              "lte": 15
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+# But often the condition inside range filter is something that we either want or don't want and we really don't care how well they have match.
+# Hence it is better to move the range query into a filter object.
+# Boolean query with filter object
+# Filter queries are for matching in either yes or no format and there is no such thing for how well that match. They have a edge in performance.
+# Filter query is run in filter context as opposed to query context which is why scoring is ignored. That's why we can even cache these queries.
+GET recipe/default/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "ingredients.name": "parmesan"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "preparation_time_minutes": {
+              "lte": 15
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+# paramteres inside must_not are excuted under filter context so they acts just like filter object.
+# Scoring is there ignored and hence they can also be cached.
+GET recipe/default/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "ingredients.name": "parmesan"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "match": {
+            "ingredients.name": "tuna"
+          }
+        }
+      ], 
+      "filter": [
+        {
+          "range": {
+            "preparation_time_minutes": {
+              "lte": 15
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Caching is internally handled by elasticsearch itself.
+# In all the above cases it is said that filter and must_not params are considered for caching but there is no guarantee although chances are, they will.
+
+# should query:
+# should parameters are used for telling preferences.
+# It is not guaranteed that the results that match should param will be ranked higher but if they match they get a boost in the score.
+
+GET recipe/default/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "ingredients.name": "parmesan"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "match": {
+            "ingredients.name": "tuna"
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "ingredients.name": "parsley"
+          }
+        }
+      ], 
+      "filter": [
+        {
+          "range": {
+            "preparation_time_minutes": {
+              "lte": 15
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Behaviour of should query depends on bool query as a whole and what else it contains.
+# If the bool query is in a query context and contains a must and a filter object then should query do not need to match for document to match the bool query as a whole. If this is the case, the only purpose of the should query is to influence the relevance score of matching documents.
+# On the other hand, if the bool query is in the filter context or if doesn't have a must or filter object then atleast one of the should queries should match
+
+
+
+#Aggregations:
+#-------------
+GET order/default/_mapping
+
+DELETE order
+
+PUT order
+
+PUT order/default/_mapping
+{
+  "properties": {
+    "lines": {
+      "type": "nested"
+    }
+  }
+}
+
+# Bulk Import
+# curl -H "Content-Type: application/json" -XPOST "http://localhost:9200/order/default/_bulk?pretty" --data-binary "@orders-bulk.json"
+
+GET order/default/_search
+
+# Generally to perform aggregation you need all the data, so either you can use match_all query or by leaving out query object itself.
+
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "total_sales": {
+      "sum": {
+        "field": "total_amount"
+      }
+    }
+  }
+}
+
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "total_sales": {
+      "sum": {
+        "field": "total_amount"
+      }
+    },
+    "avg_sales": {
+      "avg": {
+        "field": "total_amount"
+      }
+    },
+    "min_sale": {
+      "min": {
+        "field": "total_amount"
+      }
+    },
+    "max_sale": {
+      "max": {
+        "field": "total_amount"
+      }
+    }
+  }
+}
+
+# All distinct salesman
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "total_salesman": {
+      "cardinality": {
+        "field": "salesman.id"
+      }
+    }
+  }
+}
+
+# Cardinality aggregation produces approximate results. To get accurate results refer documentation.
+
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "values_count": {
+      "value_count": {
+        "field": "total_amount"
+      }
+    }
+  }
+}
+
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "amount_stats":{
+      "stats": {
+        "field": "total_amount"
+      }
+    }
+  }
+}
+
+# Bucket aggregation
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "status_terms": {
+      "terms": {
+        "field": "status.keyword"
+      }
+    }
+  }
+}
+
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "status_terms": {
+      "terms": {
+        "field": "total_amount"
+      }
+    }
+  }
+}
+
+# Handling missing/null values for bucket aggregation
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "status_terms": {
+      "terms": {
+        "field": "status.keyword",
+        "missing": "N/A",
+        "min_doc_count": 0
+      }
+    }
+  }
+}
+
+# Order by
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "status_terms": {
+      "terms": {
+        "field": "status.keyword",
+        "missing": "N/A",
+        "min_doc_count": 0,
+        "order": {
+          "_term": "asc"
+        }
+      }
+    }
+  }
+}
+
+# Nested aggregation inside a bucket aggregation
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "status_terms": {
+      "terms": {
+        "field": "status.keyword"
+      },
+      "aggs": {
+        "status_agg": {
+          "stats": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+# Filtering out documents in a bucket aggregation
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "low_value_docs": {
+      "filter": {
+        "range": {
+          "total_amount": {
+            "lt": 50
+          }
+        }
+      },
+      "aggs": {
+        "avg_amount": {
+          "avg": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+# Bucket rules with filters
+GET recipe/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "my_filter": {
+      "filters": {
+        "filters": {
+          "pasta": {
+            "match": {
+              "title": "pasta"
+            }
+          },
+          "spaghetti": {
+            "match": {
+              "title": "spaghetti"
+            }
+          }
+        }
+      },
+      "aggs": {
+        "avg_rating": {
+          "avg": {
+            "field": "ratings"
+          }
+        }
+      }
+    }
+  }
+}
+
+# The filters is the aggregation type while the second one is the query parameter.
+
+# Range Aggregations
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "amount_distribution": {
+      "range": {
+        "field": "total_amount",
+        "ranges": [
+          {
+            "to": 50
+          },
+          {
+            "from": 50,
+            "to": 100
+          },
+          {
+            "from": 100
+          }
+        ]
+      }
+    }
+  }
+}
+
+# Date range aggregation
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "purchased_range": {
+      "date_range": {
+        "field": "purchased_at",
+        "ranges": [
+          {
+            "from": "2016-01-01",
+            "to": "2016-01-01||+6M"
+          },
+          {
+            "from": "2016-01-01||+6M",
+            "to": "2016-01-01||+1y"
+          }
+        ]
+      }
+    }
+  }
+}
+
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "purchased_range": {
+      "date_range": {
+        "field": "purchased_at",
+        "format": "yyyy-MM-dd",
+        "keyed": true,
+        "ranges": [
+          {
+            "from": "2016-01-01",
+            "to": "2016-01-01||+6M",
+            "key": "first_half"
+          },
+          {
+            "from": "2016-01-01||+6M",
+            "to": "2016-01-01||+1y",
+            "key": "second_half"
+          }
+        ]
+      },
+      "aggs": {
+        "bucket_stats": {
+          "stats": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+# Histograms : For dynamic bucketing
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "amount_distribution": {
+      "histogram": {
+        "field": "total_amount",
+        "interval": 25
+      }
+    }
+  }
+}
+
+# Histogram bucket with query
+GET order/default/_search
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "total_amount": {
+        "gte": 100
+      }
+    }
+  },
+  "aggs": {
+    "amount_distribution": {
+      "histogram": {
+        "field": "total_amount",
+        "interval": 25,
+        "min_doc_count": 1
+      }
+    }
+  }
+}
+
+# Extended bounds
+GET order/default/_search
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "total_amount": {
+        "gte": 100
+      }
+    }
+  },
+  "aggs": {
+    "amount_distribution": {
+      "histogram": {
+        "field": "total_amount",
+        "interval": 25,
+        "extended_bounds": {
+          "min": 0,
+          "max": 500
+        }
+      }
+    }
+  }
+}
+
+# Date Histogram
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "orders_over_time": {
+      "date_histogram": {
+        "field": "purchased_at",
+        "interval": "month"
+      }
+    }
+  }
+}
+
+# Global Aggregation
+# Global Aggregation is not influenced by the search query. Implicitly, its a match_all query. 
+GET order/default/_search
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "total_amount": {
+        "gte": 100
+      }
+    }
+  },
+  "aggs": {
+    "all_order_stats": {
+      "global": {},
+      "aggs": {
+        "stats_amount": {
+          "stats": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+GET order/default/_search
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "total_amount": {
+        "gte": 100
+      }
+    }
+  },
+  "aggs": {
+    "expensive_order_stats":{
+      "stats": {
+        "field": "total_amount"
+      }
+    },
+    "all_order_stats": {
+      "global": {},
+      "aggs": {
+        "stats_amount": {
+          "stats": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+# Aggregation on missing values
+POST order/default/1001
+{
+  "total_amount": 100
+}
+
+POST order/default/1002
+{
+  "total_amount": 200,
+  "status": null
+}
+
+GET order/default/_search
+{
+  "size": 0,
+  "aggs": {
+    "orders_without_status": {
+      "missing": {
+        "field": "status.keyword"
+      },
+      "aggs": {
+        "sum_of_orders_without_status": {
+          "sum": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+DELETE order/default/1001
+
+DELETE order/default/1002
+
+# =================================
+
+GET order/default/_search
+
+GET recipe/default/14
+
+GET recipe/default/14/_termvectors
+{
+  "fields": ["description"],
+  "per_field_analyzer" : {
+    "description.keyword": ""
+  }
+}
+
+GET recipe/default/_termvectors
+{
+  "fields": ["steps"]
+}
+
+GET recipe/default/_search
+
+GET recipe/default/_search
+{
+  "query": {
+    "match": {
+      "steps": "pasta"
+    }
+  },
+  "highlight" : {
+    "fields": {
+      "steps": {
+         "fragment_size" : 100
+      }
+    }
+  }
+}
+
+# Get ids of all the docs
+GET order/default/_search
+{
+  "size": 100,
+  "query": {
+    "match_all": { }
+  },
+  "_source": "{id}"
+}
+
+GET /_mtermvectors
+{
+   "docs": [
+      {
+         "_index": "recipe",
+         "_type": "default",
+         "_id": "19",
+         "term_statistics": true
+      },
+      {
+         "_index": "recipe",
+         "_type": "default",
+         "_id": "19",
+         "fields": [
+            "steps"
+         ]
+      }
+   ]
+}
+
+GET recipe/default/_mtermvectors
+{
+    "ids" : ["14", "19"],
+    "parameters": {
+        "fields": [
+            "steps"
+        ],
+        "term_statistics": true
+    }
+}
