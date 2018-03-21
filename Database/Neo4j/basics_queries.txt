@@ -1,0 +1,32 @@
+Create a node:
+CREATE (n)
+
+Neo4j assigns id to each created node starting from 0.
+
+Get node (Returns all the nodes):
+MATCH (n) RETURN n
+
+Creating multiple nodes:
+CREATE (n), (m)
+
+MATCH (n) RETURN n limit 2
+
+Select a node based on id
+MATCH (n) WHERE id(n)=60 RETURN n
+
+MATCH (n) WHERE id(n) > 10 RETURN n
+
+MATCH (n) WHERE id(n) IN [0, 20, 41] RETURN n
+
+Delete a node:
+MATCH (n) WHERE id(n) = 41 DELETE n
+Delete query deletes all the nodes that match the where clause.
+
+Adding a label to a new node:
+CREATE (n:Person)
+
+Return a node of matching label:
+MATCH (n) WHERE n:Person RETURN n
+
+Adding multiple labels:
+CREATE (n:Person:Indian)
