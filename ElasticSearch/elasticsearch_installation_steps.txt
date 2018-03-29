@@ -1,0 +1,36 @@
+Elasticsearch installation steps:
+=================================
+1) Install JAVA8
+----------------
+   sudo add-apt-repository ppa:webupd8team/java
+   sudo apt-get update
+   sudo apt-get install oracle-java8-installer
+
+2) Add the elasticsearch repository
+-----------------------------------
+   wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+   sudo apt-get install apt-transport-https
+   echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
+
+3) Install Elasticsearch
+------------------------
+   sudo apt-get update
+   sudo apt-get install elasticsearch
+
+4) Config changes for Elasticsearch in /etc/elasticsearch/elasticsearch.yml
+---------------------------------------------------------------------------
+   Variables that needs to be updated:
+   i)  cluster.name (Set it to synerbot_production)
+   ii) network.host (The value of this variable should be Private IP of the machine)
+   For Ex:
+   cluster.name: <cluster_name_production>
+   network.host: 10.0.0.198
+
+5) Install elasticsearch plugin named "ingest-attachment"
+---------------------------------------------------------
+   cd /usr/share/elasticsearch/bin
+   ./elasticsearch-plugin install ingest-attachment
+
+6) Restart elasticsearch service
+--------------------------------
+   sudo systemctl restart elasticsearch.service
