@@ -1,3 +1,13 @@
 file-icons
 go-plus
-
+go-to-file
+go-to-view
+define-jump
+ctrl-last-tab => ctrl-tab of sublime
+autocomplete-ruby
+atom-beautify
+minimap
+color-picker
+file-icons
+highlight-selected
+autocomplete-paths
