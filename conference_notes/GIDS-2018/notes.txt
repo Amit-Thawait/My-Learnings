@@ -1,0 +1,58 @@
+GIDS Day 3 : DATA & Cloud
+=========================
+
+1) An Architect's guide to evaluating cloud services :
+------------------------------------------------------
+- Many times best of 1 + best of 2 + best of 3 (cloud service provider) = worst
+
+- Non functional requirements is a terrible term because it doesn't matter if functional requirements are met without NFR.
+
+- Availability         | ->
+  Consistency          | -> Pick 1 among these two
+  Partition tolerance  * Pick this
+
+- Durability
+
+- Security
+  - If the system is not tolerant and not highly available then it doesn't matter how secure it is.
+  - Security is not a binary thing.
+
+- Authentication
+
+- Authorization
+
+- Encryption
+  - Data at rest (This is alno not a binary thing)
+  - Data in flight
+
+- Certifications required
+  - PCI, HIPPA .. these are also not binary
+
+- Economics
+
+- FAAS is costlier than dedicated servers if the number of requests is too large (when you scale)
+
+- Scalability
+
+- Multiple providers
+
+2) Productionalizing ElasticSearch at scale :
+---------------------------------------------
+- Use bulk insert instead of single insert
+
+- Async translog flush
+
+- Keep higher refresh interval
+
+- Routing
+  - For a bulk insert send the bulk insert statement to single shard.
+    It performs better compared to sending it to all the shards because of latency.
+
+- Resiliency
+  - Timeouts
+  - Retries
+  - Back pressuring incoming requests
+  - Circuit breaker
+
+- Back pressure
+  -
