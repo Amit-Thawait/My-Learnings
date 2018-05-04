@@ -1,39 +1,3 @@
-PUT /product
-
-POST /product/default
-{
-  "name": "Ruby",
-  "instructor": {
-    "firstName": "Amit",
-    "lastName": "Thawait"
-  }
-}
-
-POST /product/default/1
-{
-  "name": "Rails",
-  "instructor": {
-    "firstName": "Amit",
-    "lastName": "Thawait"
-  }
-}
-
-POST /product/default/2
-{
-  "name": "Rails",
-  "instructor": { "Name": "Amit Thawait" },
-  "price": 50
-}
-
-POST /product/default/2/_update
-{
-  "doc": {"price": 100, "tags": ["Elasticsearch"]}
-}
-
-GET /product/default/_search
-
-GET /product/default/2
-
 GET _search
 {
   "query": {
@@ -41,9 +5,72 @@ GET _search
   }
 }
 
-GET /
+# Create index
+PUT /product?pretty
 
-POST /product/default/3/_update
+# Add a document to a index
+POST product/default
+{
+  "name": "Processing Events with Logstash",
+  "instructor": {
+    "firstName": "Amit",
+    "lastName": "Thawait"
+  }
+}
+
+# Add a document to a index with explicit id
+POST product/default/1
+{
+  "name": "Docker",
+  "instructor": {
+    "firstName": "Amit",
+    "lastName": "Thawait"
+  }
+}
+
+# Get all the records
+GET product/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+# Override a document in a index
+PUT product/default/1
+{
+  "name": "Docker",
+  "instructor": {
+    "firstName": "Amit",
+    "lastName": "Thawait"
+  },
+  "price": 100
+}
+
+GET product/default/1
+
+# Update a document in a index
+POST product/default/1/_update
+{
+  "doc": {
+    "price": 200,
+    "tags": ["DevOps"]
+  }
+}
+
+# Documents in elasticsearch are immutable.
+# On update a copy is of old object taken modified and re-indexed.
+
+GET product/default/1
+
+# Update with reference to old value
+POST product/default/1/_update
+{
+  "script": "ctx._source.price += 10"
+}
+
+# Create if not exists otherwise update
+POST product/default/2/_update
 {
   "script": "ctx._source.price += 5",
   "upsert": {
@@ -51,15 +78,14 @@ POST /product/default/3/_update
   }
 }
 
-GET product/default/3
-
+# Delete by query
 POST product/default
 {
   "name": "The Art of Scalability",
   "category": "book"
 }
 
-POST /product/_delete_by_query
+GET product/default/_search
 {
   "query": {
     "match": {
@@ -68,14 +94,37 @@ POST /product/_delete_by_query
   }
 }
 
-GET product/default/_mapping
+POST product/_delete_by_query
+{
+  "query": {
+    "match": {
+      "category": "book"
+    }
+  }
+}
 
-GET product/default/1/_source
+# Delete index
+DELETE /product
+
+# Bulk import
+POST product/default/_bulk
+{ "index": { "_id": 100 } }
+{ "price": 100 }
+{ "index": { "_id": 101 } }
+{ "price": 110 }
+
+# Bulk import command
+# POST /product/default/_bulk?pretty --data-binary @/Users/amo/Downloads/product_data.json
 
 GET /_cat/health?v
 
-GET _cat/nodes?v
+GET /_cat/nodes?v
 
+GET /_cat/indices?v
+
+GET /_cat/allocation?v
+
+GET /_cat/shards?v
 
 PUT product/default/_mapping
 {
