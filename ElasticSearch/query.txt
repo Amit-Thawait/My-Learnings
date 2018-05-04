@@ -146,14 +146,17 @@ GET product/default/_search
   }
 }
 
-GET product/default/_search?explain
+# Use explain for detailed explanation of the query
+GET product/default/_search?explain=true
 {
   "query": {
     "term": {
-      "name": "railssashgds"
+      "name": "lobster"
     }
   }
 }
+
+# Term queries are case sensitive where as full-text (match) queries are not.
 
 DELETE /product
 
