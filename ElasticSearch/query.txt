@@ -170,11 +170,23 @@ GET product/default/1/_explain
   }
 }
 
+# Term query for single term
 GET product/default/_search
 {
   "query": {
     "term": {
       "is_active": true
+    }
+  }
+}
+# OR
+GET product/default/_search
+{
+  "query": {
+    "term": {
+      "is_active": {
+        "value": true
+      }
     }
   }
 }
@@ -195,6 +207,21 @@ GET product/default/_search
 }
 
 # term level query is case-sensitive
+
+# Term query for multiple terms
+GET product/default/_search
+{
+  "query": {
+    "terms": {
+      "tags": [
+        "soup",
+        "cake"
+      ]
+    }
+  }
+}
+# In the above query tags field is analysed(meaning it is broken up into distinct words when stored, and allows for free-text searches on one or more words in the field) and the search is similar to full text search.
+
 GET product/default/_search
 {
   "query": {
@@ -206,6 +233,13 @@ GET product/default/_search
     }
   }
 }
+# Above query uses keyword field and these are not analysed. They search for exact match.
+# The .keyword field takes the same input and keeps as one large string, meaning it can be aggregated on, and you can use wildcard searches on it.
+# Aggregatable means you can use it in aggregations in elasticsearch, which resembles a sql group by.
+# You would probably use the .keyword field with aggregations to count distinct values etc.
+
+# Related read: Text vs. keyword
+# https://www.elastic.co/blog/strings-are-dead-long-live-strings
 
 # Retrieving products whose ids are known beforehand
 GET product/default/_search
