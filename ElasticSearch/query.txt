@@ -114,7 +114,7 @@ POST product/default/_bulk
 { "price": 110 }
 
 # Bulk import command
-# POST /product/default/_bulk?pretty --data-binary @/Users/amo/Downloads/product_data.json
+# curl -H "Content-Type: application/json" -XPOST /product/default/_bulk?pretty --data-binary @/Users/amo/Downloads/product_data.json
 
 GET /_cat/health?v
 
