@@ -387,9 +387,13 @@ GET product/default/_search
   }
 }
 
+# Full text Queries
+# =================
+
 GET recipe/default/_mapping
 
 # Match query example
+# Google like search query
 GET recipe/default/_search
 {
   "query": {
@@ -399,6 +403,12 @@ GET recipe/default/_search
   }
 }
 
+# Default operator is "or"
+# For the above query, all the terms are queried with or operator. It is not that efficient.
+# Match queries are analysed.
+
+# Search for only the terms that you want in your search result and add the appropriate operator.
+# Order of the words in query doesn't matter here.
 GET recipe/default/_search
 {
   "query": {
@@ -411,7 +421,8 @@ GET recipe/default/_search
   }
 }
 
-# Matching phrases
+# For match queries if you want the order of words to be maintained while searching then use match_phrase.
+# match_phrase searches for phrases i.e; sequence of words
 GET recipe/default/_search
 {
   "query": {
@@ -422,6 +433,7 @@ GET recipe/default/_search
 }
 
 # Order of term matters in match_phrase query unlike match query
+# This query retuns no result because of the sequence of terms.
 GET recipe/default/_search
 {
   "query": {
@@ -442,12 +454,22 @@ GET recipe/default/_search
   }
 }
 
+# Write a query searching for the sentence "pasta with parmesan and spinach" within the "title" field, simulating that this sentence was entered by a user within a search field.
 GET recipe/default/_search
 {
   "query": {
-    "multi_match": {
-      "query": "pasta pesto",
-      "fields": ["title", "description"]
+    "match": {
+      "title": "pasta with parmesan and spinach"
+    }
+  }
+}
+
+# Write a query searching for phrase "pasta carbonara" within the "title" field.
+GET recipe/default/_search
+{
+  "query": {
+    "match_phrase": {
+      "title": "pasta carbonara"
     }
   }
 }
@@ -461,11 +483,13 @@ GET recipe/default/_search
   }
 }
 
+# Write a query searching for the terms "pasta" or "pesto" within the "title" and "description" fields.
 GET recipe/default/_search
 {
   "query": {
-    "match_phrase": {
-      "title": "pasta carbonara"
+    "multi_match": {
+      "query": "pasta pesto",
+      "fields": ["title", "description"]
     }
   }
 }
