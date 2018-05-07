@@ -251,7 +251,7 @@ GET product/default/_search
   }
 }
 
-# Matching documents with range values
+# Matching document for a field within range of values
 GET product/default/_search
 {
   "query": {
@@ -300,6 +300,18 @@ GET product/default/_search
   }
 }
 
+# Rounding of dates
+GET product/default/_search
+{
+  "query": {
+    "range": {
+      "created": {
+        "gte": "2010/01/01||+1y/M"
+      }
+    }
+  }
+}
+
 # Matching documents with non-null values
 GET product/default/_search
 {
@@ -310,6 +322,7 @@ GET product/default/_search
   }
 }
 
+# Matching based on prefixes
 GET product/default/_search
 {
   "query": {
@@ -319,8 +332,17 @@ GET product/default/_search
   }
 }
 
-# Query with wildcard
+# Searching with wildcards
 # * for multiple characters
+GET product/default/_search
+{
+  "query": {
+    "wildcard": {
+      "tags.keyword": "Vege*ble"
+    }
+  }
+}
+
 # ? for one character
 GET product/default/_search
 {
@@ -331,11 +353,36 @@ GET product/default/_search
   }
 }
 
+# Wildcards queries are extremely slow.
+# If * is placed at the start of the term then it is the slowest because it has to iterate over all the terms.
+# Write a query matching documents containing one of the terms "Tomato" and "Paste" within the "name" field.
+GET /product/default/_search
+{
+  "query": {
+    "terms": {
+      "name": [ "tomato", "paste" ]
+    }
+  }
+}
+
+# Please write a query that matches products with a "title" field including “pasta”, “paste”, or similar.
+# The query should be dynamic and not use the "terms" query clause.
 GET product/default/_search
 {
   "query": {
     "wildcard": {
-      "name": "past?"
+      "name": "past?" 
+    }
+  }
+}
+
+# Please write a query that matches products that contain a number within their "name" field
+# Hint: You can use the following regular expression for this: [0-9]+
+GET product/default/_search
+{
+  "query": {
+    "regexp": {
+      "name": "[0-9]+"
     }
   }
 }
