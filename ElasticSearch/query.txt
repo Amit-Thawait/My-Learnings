@@ -494,8 +494,9 @@ GET recipe/default/_search
   }
 }
 
-# Query with boolean logic
-# Whenever a range is matched in must array, they also affect the relevance score on the basis of how well they matched the query
+# Bool queries can be used both at query context and filter context.
+
+# Query for a recipe which must have parmesan and which can be prepared in less than 15 mins.
 GET recipe/default/_search
 {
   "query": {
@@ -518,11 +519,13 @@ GET recipe/default/_search
   }
 }
 
-# But often the condition inside range filter is something that we either want or don't want and we really don't care how well they have match.
-# Hence it is better to move the range query into a filter object.
+# must array(object) also contributes to the relevance score.
+# For range objects ES is smart enough to assign a score of 1 since for range objects it is either yes or no,
+# Because often the condition inside range filter is something that we either want or don't want and we really don't care how well they have match.
+# hence it is better to move the range query into a filter object for performance reasons.
+# Further filter queries are good candidate for caching.
+
 # Boolean query with filter object
-# Filter queries are for matching in either yes or no format and there is no such thing for how well that match. They have a edge in performance.
-# Filter query is run in filter context as opposed to query context which is why scoring is ignored. That's why we can even cache these queries.
 GET recipe/default/_search
 {
   "query": {
@@ -547,8 +550,7 @@ GET recipe/default/_search
   }
 }
 
-# paramteres inside must_not are excuted under filter context so they acts just like filter object.
-# Scoring is there ignored and hence they can also be cached.
+# Query to exclude tuna from the ingredients
 GET recipe/default/_search
 {
   "query": {
@@ -566,7 +568,7 @@ GET recipe/default/_search
             "ingredients.name": "tuna"
           }
         }
-      ], 
+      ],
       "filter": [
         {
           "range": {
@@ -579,12 +581,14 @@ GET recipe/default/_search
     }
   }
 }
-
+# The query clauses inside must_not object are executed inside filter context same as that of filter object.
+# Scoring is therefore ignored and a score of 0 is retured.
+# Queries inside must_not are also considered for caching which is handled internally by ES.
 # Caching is internally handled by elasticsearch itself.
 # In all the above cases it is said that filter and must_not params are considered for caching but there is no guarantee although chances are, they will.
 
 # should query:
-# should parameters are used for telling preferences.
+# should parameters are used for telling preferences(which need not me mandatory).
 # It is not guaranteed that the results that match should param will be ranked higher but if they match they get a boost in the score.
 
 GET recipe/default/_search
@@ -626,10 +630,154 @@ GET recipe/default/_search
 }
 
 # Behaviour of should query depends on bool query as a whole and what else it contains.
-# If the bool query is in a query context and contains a must and a filter object then should query do not need to match for document to match the bool query as a whole. If this is the case, the only purpose of the should query is to influence the relevance score of matching documents.
+# If the bool query is in a query context and contains a must and a filter object then should query do not need to match for document to match the bool query as a whole.
+# If this is the case, the only purpose of the should query is to influence the relevance score of matching documents.
 # On the other hand, if the bool query is in the filter context or if doesn't have a must or filter object then atleast one of the should queries should match
+# In short, in the presence of must query, should query becomes optional and in the absence of must query, should becomes mandatory.
 
+GET recipe/default/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "match": {
+            "ingredients.name": "parmesan"
+          }
+        }
+      ]
+    }
+  }
+}
 
+# Debugging bool queries with named queries
+# Generally must, must_not and filter queries doesnot require debugging but should query requires it.
+GET recipe/default/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "ingredients.name": {
+              "query": "parmesan",
+              "_name": "parmesan_must"
+            }
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "match": {
+            "ingredients.name": {
+              "query": "tuna",
+              "_name": "tune_must_not"
+            }
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "ingredients.name": {
+              "query": "parsley",
+              "_name": "parsley_should"
+            }
+          }
+        }
+      ], 
+      "filter": [
+        {
+          "range": {
+            "preparation_time_minutes": {
+              "lte": 15,
+              "_name": "prep_time_filter"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+# After running this query you will see that there is a "matched_queries" array in every matched resultset which basically tells what all queries(query name) 
+# were matched for that result.
+
+# How the match query works
+# -------------------------
+# match query constructs a bool query internally
+# match queries are just a convenient wrapper around bool query that simplifies writing common query.
+
+GET recipe/default/_search
+{
+  "query": {
+    "match": {
+      "title": "pasta carbonara"
+    }
+  }
+}
+
+# Equivalent bool query of the above query
+GET recipe/default/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "term": {
+            "title": "pasta"
+          }
+        },
+        {
+          "term": {
+            "title": "carbonara"
+          }
+        }
+      ]
+    }
+  }
+}
+# Everything is same for both the queries : max_source, _score.
+
+# Bool query for match query with "and" operator
+GET recipe/default/_search
+{
+  "query": {
+    "match": {
+      "title": {
+        "query": "pasta carbonara",
+        "operator": "and"
+      }
+    }
+  }
+}
+
+GET recipe/default/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "title": "pasta"
+          }
+        },
+        {
+          "term": {
+            "title": "carbonara"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# When you send a match query to ES, it analyses the query and adds a term query clause to a bool query for each term that comes out of the analysis process.
+# If the boolean operator is "or" which is the default then the terms are added as term query clauses within the should object, meaning atleast one of them should match.
+# If the boolean operator is set to "and" then the term queries are added within the must object, meaning all of them should be present for the given field 
+# for a document to match.
+
+# If a match query receives a query consisting of a single term, in that case it doesn't make much sense to use a bool query so instead a single term query
+# is used i.e; a term query which is not nested within a bool query and that's how the match query works internally.
 
 #Aggregations:
 #-------------
