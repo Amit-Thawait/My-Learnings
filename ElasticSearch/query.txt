@@ -779,6 +779,201 @@ GET recipe/default/_search
 # If a match query receives a query consisting of a single term, in that case it doesn't make much sense to use a bool query so instead a single term query
 # is used i.e; a term query which is not nested within a bool query and that's how the match query works internally.
 
+# Controlling Query Results :
+# ---------------------------
+# Getting the result in yaml format
+GET recipe/default/_search?format=yaml
+{
+  "query": {
+    "match": {
+      "title": "pasta"
+    }
+  }
+}
+
+# Source filtering (_source)
+# _source field is used to limit the parameters that we want to fetch in the query.
+# Limiting the field reduces the resultset to be transferred over the network thereby improving performance.
+# Disable _source field alltogether if you only want ids of the documents.
+
+# Disable _source field
+GET recipe/default/_search
+{
+  "_source": false, 
+  "query": {
+    "match": {
+      "title": "pasta"
+    }
+  }
+}
+
+# Fetching only some fields from _source
+GET recipe/default/_search
+{
+  "_source": ["title", "ingredients.name"], 
+  "query": {
+    "match": {
+      "title": "pasta"
+    }
+  }
+}
+# You can also use wildcard matchers for a nested object like ingredients.* to fetch all fields of ingredients.
+
+# To exclude some fields
+GET recipe/default/_search
+{
+  "_source": {
+    "excludes": "steps"
+  }, 
+  "query": {
+    "match": {
+      "title": "pasta"
+    }
+  }
+}
+
+# To only some fields of an object.
+GET recipe/default/_search
+{
+  "_source": {
+    "includes": "ingredients.*",
+    "excludes": "ingredients.quantity"
+  }, 
+  "query": {
+    "match": {
+      "title": "pasta"
+    }
+  }
+}
+
+# To specify number of records in the query use size query parameter or request body
+GET recipe/default/_search?size=2
+{
+  "_source": false, 
+  "query": {
+    "match": {
+      "title": "pasta"
+    }
+  }
+}
+# OR
+GET recipe/default/_search
+{
+  "size": 2, 
+  "_source": false, 
+  "query": {
+    "match": {
+      "title": "pasta"
+    }
+  }
+}
+# The default no of records is 10.
+
+# You can mention offset in the query as well either as request param or in request body using "from" key.
+GET recipe/default/_search
+{
+  "size": 2,
+  "from": 2, 
+  "_source": false, 
+  "query": {
+    "match": {
+      "title": "pasta"
+    }
+  }
+}
+
+# Just like SQL limit can be mentioned using "size" key and offset using "from" key. 
+
+# Pagination
+# total_pages = ceil(total_hits / page_size)
+# Ex: 14 = ceil(137 / 10)
+# To calculate offset use the formula :
+# from = (page_size * (page_number - 1))
+
+# This process of using size and from is limited to 10000 because requests take up more and more heap memory.
+# This also results in slow query there affecting the stability of the cluster. Hence the limit acts as safeguard.
+# If you still need to crawl deeper, you can use a parameter named search_after.
+
+# Sorting :
+# ---------
+# Sorting in elasticsearch is similar to order_by clause in SQL.
+
+# Sort recipes based on preparation_time in ascending order.
+GET recipe/default/_search
+{
+  "_source": false,
+  "query": {
+    "match_all": {}
+  },
+  "sort": [
+    "preparation_time_minutes"
+  ]
+}
+
+# Get the latest recipes
+GET recipe/default/_search
+{
+  "_source": "created",
+  "query": {
+    "match_all": {}
+  }
+  , "sort": [
+    { "created": "desc" }
+  ]
+}
+
+# Sorting based on two parameters
+GET recipe/default/_search
+{
+  "_source": ["preparation_time_minutes", "created"],
+  "query": {
+    "match_all": {}
+  }
+  , "sort": [
+    { "preparation_time_minutes": "asc"},
+    { "created": "desc" }
+  ]
+}
+
+# Sorting for fields that contain multiple values.
+GET recipe/default/_search
+{
+  "_source": "ratings",
+  "query": {
+    "match_all": {}
+  },
+  "sort": [
+    {
+      "ratings": {
+        "order": "desc"
+        , "mode": "avg"
+      }
+    }
+  ]
+}
+
+GET recipe/default/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "title": "pasta"
+          }
+        }
+      ],
+      "filter": {
+        "range": {
+          "preparation_time_minutes": {
+            "lte": 15
+          }
+        }
+      }
+    }
+  }
+}
+
 #Aggregations:
 #-------------
 GET order/default/_mapping
