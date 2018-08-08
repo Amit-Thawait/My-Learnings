@@ -11,11 +11,6 @@ cd /var/lib/docker
 disconnect that session but leave it open in background
 Ctrl-a d
 
-To terminate a screen session
-Ctrl-Shift-a
-then type
-:quit
-
 screen -ls
 list that session that's still running in background
 
@@ -29,6 +24,10 @@ To terminate a screen session
 Ctrl-Shift-a
 then type
 :quit
+
+To terminate screen of specific id
+screen -X -S 5056 quit
+where screen name is 5056.ttys001.in-thamit
 
 Option 2 (Connect using a container that gives access to the VM): (Easy)
 ------------------------------------------------------------------------
