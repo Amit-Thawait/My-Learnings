@@ -1,0 +1,35 @@
+Connect docker VM in Mac :-
+===========================
+
+Option 1 (Connecting using Screen): (Hard)
+------------------------------------------
+screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/tty
+
+Inside tty
+cd /var/lib/docker
+
+disconnect that session but leave it open in background
+Ctrl-a d
+
+To terminate a screen session
+Ctrl-Shift-a
+then type
+:quit
+
+screen -ls
+list that session that's still running in background
+
+screen -r
+reconnect to that session (don't open a new one)
+
+Ctrl-a k
+kill this session (window) and exit
+
+To terminate a screen session
+Ctrl-Shift-a
+then type
+:quit
+
+Option 2 (Connect using a container that gives access to the VM): (Easy)
+------------------------------------------------------------------------
+docker run -it --rm --privileged --pid=host justincormack/nsenter1
