@@ -1,0 +1,131 @@
+1) Install aws cli
+
+2) Install kops
+
+3) Create a user with following permissions :
+
+AmazonEC2FullAccess
+AmazonRoute53FullAccess
+AmazonS3FullAccess
+IAMFullAccess
+AmazonVPCFullAccess
+
+https://console.aws.amazon.com/iam/home
+user name : kops_26082018
+role name : kubernetes_role_26082018
+
+https://github.com/kubernetes/kops/blob/master/docs/aws.md
+
+4) Login to AWS CLI
+aws configure
+
+5) Test awscli
+aws iam list-users
+aws ec2 describe-instances
+
+5) Configure a new hosted zone under Route53
+$ aws route53 list-hosted-zones | jq '.HostedZones[] | select(.Name=="amit-thawait.click.") | .Id'
+"/hostedzone/Z3J9EZW7QCJ3DQ"
+
+
+vim subdomain.json
+
+{
+  "Comment": "Create a subdomain NS record in the parent domain",
+  "Changes": [
+    {
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "k8s-0309201802.amit-thawait.click",
+        "Type": "NS",
+        "TTL": 300,
+        "ResourceRecords": [
+          {
+            "Value": "ns-1866.awsdns-41.co.uk"
+          },
+          {
+            "Value": "ns-198.awsdns-24.com"
+          },
+          {
+            "Value": "ns-618.awsdns-13.net"
+          },
+          {
+            "Value": "ns-1095.awsdns-08.org"
+          }
+        ]
+      }
+    }
+  ]
+}
+
+
+
+aws route53 change-resource-record-sets \
+ --hosted-zone-id /hostedzone/Z3J9EZW7QCJ3DQ \
+ --change-batch file://subdomain.json
+
+
+
+6) Create an AWS S3 bucket for kops to persist its state
+
+bucket_name=kubernetes-26082018-kops-state-store
+
+aws s3api create-bucket \
+--bucket ${bucket_name} \
+--region us-east-1
+
+7) Enable versioning for the above S3 bucket
+aws s3api put-bucket-versioning --bucket ${bucket_name} --versioning-configuration Status=Enabled
+
+8) Provide a name for the Kubernetes cluster and set the S3 bucket URL in the following environment variables:
+export KOPS_CLUSTER_NAME=kubernetes-26082018.k8s.local
+export KOPS_STATE_STORE=s3://${bucket_name}
+
+9) Check availability zones where you want to launch the cluster by passing the region you selected
+aws ec2 describe-availability-zones --region us-east-1
+
+10) SSH public key must be specified when running with AWS
+
+Setup SSH key pair in AWS EC2 Key Pairs
+EC2 > Under Network & Security > Key Pairs > Create a key pair
+
+AWS with give you the .pem key as downloaded attachment.
+
+name it as kubernetes_26082018.pem
+Save it at ~/Documents/ssh_keys/
+
+Create a public key using the .pem file downloaded from above step
+
+But first change permission for the .pem file
+chmod 400 ~/Documents/ssh_keys/kubernetes_26082018.pem
+
+cd ~/.ssh/kubernetes
+
+ssh-keygen -y
+enter path as ~/Documents/ssh_keys/kubernetes_26082018.pem
+
+vim kuberenetes_26082018.pub
+paste the output of ssh-keygen -y command in this file
+
+
+11) Check for all the RHEL images
+aws ec2 describe-images --region=us-east-1 --owner=309956199498 --filters Name=virtualization-type,Values=hvm
+
+11) Create a Kubernetes cluster definition using kops
+kops create cluster \
+--node-count=3 \
+--node-size=t2.micro \
+--master-size=t2.micro \
+--zones=us-east-1a \
+--name=${KOPS_CLUSTER_NAME} \
+--image=redhat.com/RHEL-7.6_HVM_BETA-20180814-x86_64-0-Hourly2-GP2 \
+--ssh-public-key=/Users/amo/.ssh/kubernetes/kubernetes_26082018.pub
+
+12) kops update cluster --yes
+
+
+
+
+kops create secret sshpublickey admin -i ~/.ssh/kubernetes/kubernetes_28062018.pub \
+--name ${KOPS_CLUSTER_NAME} --state s3://${bucket_name}
+
