@@ -78,7 +78,7 @@ aws s3api create-bucket \
 aws s3api put-bucket-versioning --bucket ${bucket_name} --versioning-configuration Status=Enabled
 
 8) Provide a name for the Kubernetes cluster and set the S3 bucket URL in the following environment variables:
-export KOPS_CLUSTER_NAME=kubernetes-26082018.k8s.local
+export KOPS_CLUSTER_NAME=cluster1.k8s-0309201802.amit-thawait.click
 export KOPS_STATE_STORE=s3://${bucket_name}
 
 9) Check availability zones where you want to launch the cluster by passing the region you selected
@@ -123,8 +123,28 @@ kops create cluster \
 
 12) kops update cluster --yes
 
+13) kops validate cluster
 
+14) kubectl get nodes
+    kubectl get nodes --show-labels
+    kubectl get nodes -o wide
+    kubectl get pods # No resources found.
+    kubectl get pods -o wide --all-namespaces
 
+15) Deploying the Dashboard UI
+    kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
+
+secret/kubernetes-dashboard-certs created
+serviceaccount/kubernetes-dashboard created
+role.rbac.authorization.k8s.io/kubernetes-dashboard-minimal created
+rolebinding.rbac.authorization.k8s.io/kubernetes-dashboard-minimal created
+deployment.apps/kubernetes-dashboard created
+service/kubernetes-dashboard created
+
+16) Accessing the Dashboard UI
+    kubectl get nodes -o wide
+    will tell you external master IP
+    https://<master-ip>:<apiserver-port>/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
 
 kops create secret sshpublickey admin -i ~/.ssh/kubernetes/kubernetes_28062018.pub \
 --name ${KOPS_CLUSTER_NAME} --state s3://${bucket_name}
