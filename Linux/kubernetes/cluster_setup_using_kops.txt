@@ -74,6 +74,10 @@ aws s3api create-bucket \
 --bucket ${bucket_name} \
 --region us-east-1
 
+		OR
+aws s3 mb s3://${bucket_name}
+
+
 7) Enable versioning for the above S3 bucket
 aws s3api put-bucket-versioning --bucket ${bucket_name} --versioning-configuration Status=Enabled
 
@@ -145,6 +149,15 @@ service/kubernetes-dashboard created
     kubectl get nodes -o wide
     will tell you external master IP
     https://<master-ip>:<apiserver-port>/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+
+17) kubectl config view
+
+18) Get the token using the command
+
+kubectl -n kube-system describe secrets \
+   `kubectl -n kube-system get secrets | awk '/clusterrole-aggregation-controller/ {print $1}'` \
+       | awk '/token:/ {print $2}'
+
 
 kops create secret sshpublickey admin -i ~/.ssh/kubernetes/kubernetes_28062018.pub \
 --name ${KOPS_CLUSTER_NAME} --state s3://${bucket_name}
