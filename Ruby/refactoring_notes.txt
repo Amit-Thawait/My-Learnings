@@ -1,1 +1,627 @@
 With principles it is too easy to make generalizations, too hard to figure out how to apply things. An example helps make things clear.
+
+Program : Customer's charge at a video store.
+In addition to calculating charge also calculates frequent renter point
+
+# Movie is just a simple data class
+class Movie
+  REGULAR = 0
+  NEW_RELEASE = 1
+  CHILDRENS = 2
+
+  attr_reader :title
+  attr_accessor :price_code
+
+  def initialize(title, price_code)
+    @title, @price_code = title, price_code
+  end
+end
+
+
+# Rental class represents a customer renting a movie
+class Rental
+  attr_reader :movie, :days_rented
+
+  def initialize(movie, days_rented)
+    @movie, @days_rented = movie, days_rented
+  end
+end
+
+
+# Customer class represents the customer of the store
+class Customer
+  attr_reader :name
+
+  def initailize(name)
+    @name = name
+    @rentals = []
+  end
+
+  def add_rental(arg)
+    @rentals << arg
+  end
+end
+
+A Customer has many rentals. A Rental belongs to movie.
+
+# statement method in Customer class
+def statement
+  total_amount, frequent_renter_points = 0, 0
+  result = "Rental Record for #{@name}\n"
+
+  @rentals.each do |element|
+    this_amount = 0
+    # determine amounts for each line
+    case element.movie.price_code
+    when Movie::REGULAR
+      this_amount += 2
+      this_amount += (element.days_rented - 2) * 1.5 if element.days_rented > 2
+    when Movie::NEW_RELEASE
+      this_amount += element.days_rented * 3
+    when Movie::CHILDRENS
+      this_amount += 1.5
+      this_amount += (element.days_rented - 3) * 1.5 if element.days_rented > 3
+    end
+
+    # add frequent renter points
+    frequent_renter_points += 1
+    # add bonus for a two day new release rental
+    if element.movie.price_code == Movie.NEW_RELEASE && element.days_rented > 1
+      frequent_renter_points += 1
+    end
+
+    # show figures for this rental
+    result += "\t" + element.movie.title + "\t" + this_amount.to_s + "\n"
+    total_amount += this_amount
+  end
+
+  # add footer lines
+  result += "Amount owed is #{total_amount}\n"
+  result += "You earned #{frequent_renter_points} frequent renter points"
+  result
+end
+
+The program works. The interpreter doesn’t care whether the code is ugly or clean. But when we change the system, there is a human involved, and humans do care.
+
+A poorly designed system is hard to change. Hard because it is hard to figure out where the changes are needed.
+If it is hard to figure out what to change, there is a strong chance that the program- mer will make a mistake and introduce bugs.
+
+Lets say you want a statement printed in HTML. Now, of course, this is not too onerous. You can just copy the state- ment method and make whatever changes you need.
+But what happens when the charging rules change? You have to fix both statement and html_statement and ensure the fixes are consistent.
+If you are writing a program that you don’t expect to change, then cut and paste is fine. If the program is long lived and likely to change, then cut and paste is a menace.
+
+Chiesel Refactoring:
+When you find you have to add a feature to a program, and the program’s code is not structured in a convenient way to add the feature, first refactor the program to make it easy to add the feature, then add the feature.
+
+First step in refactoring : Whenever I do refactoring, the first step is always the same. I need to build a solid set of tests for that section of code.
+
+Decomposing and Redistributing the Statement Method
+---------------------------------------------------
+Smaller pieces of code tend to make things more manage- able. They are easier to work with and move around.
+
+Use Extract Method:
+You have a code fragment that can be grouped together.
+Turn the fragment into a method whose name explains the purpose of the method.
+
+Look for any variables that are local in scope to the method we are looking at; the local variables and parameters.
+
+Any non-modified variable I can pass in as a parameter(rental). Modified variables(this_amount) need more care. If there is only one, I can return it.
+
+def statement
+  total_amount, frequent_renter_points = 0, 0
+  result = "Rental Record for #{@name}\n"
+  @rentals.each do |element|
+    this_amount = amount_for(element)
+    ...
+  end
+end
+
+def amount_for(element)
+  this_amount = 0
+  case element.movie.price_code
+  when Movie::REGULAR
+    this_amount += 2
+    this_amount += (element.days_rented - 2) * 1.5 if element.days_rented > 2
+  when Movie::NEW_RELEASE
+    this_amount += element.days_rented * 3
+  when Movie::CHILDRENS
+    this_amount += 1.5
+    this_amount += (element.days_rented - 3) * 1.5 if element.days_rented > 3
+  end
+  this_amount
+end
+
+Refactoring changes the programs in small steps. If you make a mistake, it is easy to find the bug.
+
+Since naming variable is very important here is the renamed code:
+
+def amount_for(rental)
+  result = 0
+  case rental.movie.price_code
+  when Movie::REGULAR
+    result += 2
+    result += (rental.days_rented - 2) * 1.5 if rental.days_rented > 2
+  when Movie::NEW_RELEASE
+    result += rental.days_rented * 3
+  when Movie::CHILDRENS
+    result += 1.5
+    result += (rental.days_rented - 3) * 1.5 if rental.days_rented > 3
+  end
+  result
+end
+
+Good code should communicate what it is doing clearly, and variable names are a key to clear code. Never be afraid to change the names of things to improve clarity.
+Code that communicates its purpose is very important.
+Any fool can write code that a computer can understand. Good programmers write code that humans can understand.
+
+In most cases a method should be on the object whose data it uses; thus the method should be moved to the rental. To do this we will use:
+
+Move Method :
+Create a new method with a similar body in the class it uses most. Either turn the old method into a simple delegation, or remove it altogether.
+
+class Rental
+  def charge
+    result = 0
+    case movie.price_code
+    when Movie::REGULAR
+      result += 2
+      result += (days_rented - 2) * 1.5 if days_rented > 2
+    when Movie::NEW_RELEASE
+      result += days_rented * 3
+    when Movie::CHILDRENS
+      result += 1.5
+      result += (days_rented - 3) * 1.5 if days_rented > 3
+    end
+    result
+  end
+end
+
+Also, I replace the body of Customer's amount_for to delegate to the new method.
+class Customer
+  def amount_for(rental)
+    rental.charge
+  end
+end
+
+The next thing is to remove the old method. The tests should tell me whether I missed or broke anything.
+Sometimes I leave the old method to delegate to the new method. This is useful if it is a public method and I don’t want to change the interface of the other class.
+
+class Customer
+  def statement
+    total_amount, frequent_renter_points = 0, 0
+    result = "Rental Record for #{@name}\n"
+    @rentals.each do |element|
+      this_amount = element.charge
+      ...
+    end
+    ...
+  end
+end
+
+Next we can eliminate this_amount by using
+
+Replace Temp with Query:
+Extract the expression into a method. Replace all references to the temp with the expression. The new method can then be used in other methods.
+
+result += "\t" + each.movie.title + "\t" + element.charge.to_s + "\n"
+total_amount += element.charge
+
+Once I’ve made that change I test to make sure I haven’t broken anything.
+
+Some people would avoid making this change solely for that rea- son. However this kind of thinking about performance isn’t a good way to get good performance.
+While refactoring you should focus on clarity, and then later focus on performance as a separate activity.
+Indeed by refactoring you often get opportunities to make better performance improvements.
+
+Extracting Frequent Renter Points
+---------------------------------
+
+The next step is to do a similar thing for the frequent renter points.
+
+class Customer
+  def statement
+    total_amount, frequent_renter_points = 0, 0
+    ...
+    @rentals.each do |element|
+      ...
+      # add frequent renter points
+      frequent_renter_points += 1
+      # add bonus for a two day new release rental
+      if element.movie.price_code == Movie.NEW_RELEASE && element.days_rented > 1
+        frequent_renter_points += 1
+      end
+      ...
+    end
+  end
+end
+
+    @rentals.each do |element|
+      frequent_renter_points += element.frequent_renter_points
+      ...
+    end
+
+class Rental
+  def frequent_renter_points
+    (movie.price_code == Movie.NEW_RELEASE && days_rented > 1) ? 2 : 1
+  end
+end
+
+Removing Temps
+--------------
+I like to use Replace Temp with Query to replace total_amount and frequent_renter_points with query methods.
+Queries are accessible to any method in the class and thus encourage a cleaner design without long, complex methods:
+
+class Customer
+  def statement
+    total_amount, frequent_renter_points = 0, 0
+    ...
+    @rentals.each do |element|
+      frequent_renter_points += element.frequent_renter_points
+      ...
+      total_amount += element.charge
+    end
+    # add footer lines
+    result += "Amount owed is #{total_amount}\n"
+    result += "You earned #{frequent_renter_points} frequent renter points"
+    result
+  end
+end
+
+class Customer
+
+  private
+
+  def total_charge
+    result = 0
+    @rentals.each do |element|
+      result += element.charge
+    end
+    result
+  end
+end
+
+def total_charge
+  @rentals.inject(0) { |sum, rental| sum + rental.charge }
+end
+
+Same can be done for frequent_renter_points:
+
+def total_frequent_renter_points
+  @rentals.inject(0) { |sum, rental| sum + rental.frequent_renter_points }
+end
+
+As with Replace Temp With Query, this change can cause performance wor- ries to inexperienced programmers.
+The same advice applies; make the code clean first and then use a profiler to deal with performance issues.
+
+By extracting the calculations I can create the html_statement method and reuse all of the calculation code that was in the original statement method.
+
+class Customer
+  def html_statement
+    result = "<h1>Rentals for <em>#{@name}</em></h1><p>\n"
+    @rentals.each do |element|
+      # show figures for this rental
+      result += "\t" + each.movie.title + ": " + element.charge.to_s + "<br>\n"
+    end
+    # add footer lines
+    result += "<p>You owe <em>#{total_charge}</em><p>\n"
+    result += "On this rental you earned " +
+           "<em>#{total_frequent_renter_points}</em> " +
+           "frequent renter points<p>"
+    result
+  end
+end
+
+Some code is copied from the ASCII version, mainly due to setting up the loop. Further refactoring could clean that up.
+Extracting methods for header, footer, and detail line are one route I could take.
+You can see how to do this in the example for Form Template Method (https://refactoring.com/catalog/formTemplateMethod.html).
+That's basically breaking a long method with same name in two different class to multiple smaller methods with same name.
+
+Now lets say the movie store is going to make some changes:
+They are getting ready to change the classification of the movies in the store.
+The charges and frequent renter point allocations for these classifications are to be decided.
+
+Replacing the Conditional Logic on Price Code with Polymorphism
+---------------------------------------------------------------
+class Rental
+  def charge
+    result = 0
+    case movie.price_code
+    when Movie::REGULAR
+      result += 2
+      result += (days_rented - 2) * 1.5 if days_rented > 2
+    when Movie::NEW_RELEASE
+      result += days_rented * 3
+    when Movie::CHILDRENS
+      result += 1.5
+      result += (days_rented - 3) * 1.5 if days_rented > 3
+    end
+    result
+  end
+end
+
+It is a bad idea to do a case based on an attribute of another object. If you must use a case statement, it should be on your own data, not on someone else’s.
+This implies that the charge method should move onto movie:
+
+class Movie
+  def charge(days_rented)
+    result = 0
+    case price_code
+    when REGULAR
+     result += 2
+      result += (days_rented - 2) * 1.5 if days_rented > 2
+    when NEW_RELEASE
+      result += days_rented * 3
+    when CHILDRENS
+      result += 1.5
+      result += (days_rented - 3) * 1.5 if days_rented > 3
+    end
+    result
+  end
+end
+
+The method effectively uses two pieces of data, the length of the rental and the type of the movie.
+Why do I prefer to pass the length of rental to the movie rather than the movie type to the rental? It’s because the proposed changes are all about adding new types.
+Type information generally tends to be more volatile. If I change the movie type, I want the least ripple effect, so I prefer to calculate the charge within the movie.
+
+class Rental
+  def charge
+    movie.charge(days_rented)
+  end
+end
+
+The same applies to frequent renter point calculation.
+
+class Rental
+  def frequent_renter_points
+    (movie.price_code == Movie::NEW_RELEASE && days_rented > 1) ? 2 : 1
+  end
+end
+
+becomes
+
+class Rental
+  def frequent_renter_points
+    movie.frequent_renter_points(days_rented)
+  end
+end
+
+class Movie
+  def frequent_renter_points(days_rented)
+    (price_code == NEW_RELEASE && days_rented > 1) ? 2 : 1
+  end
+end
+
+Last part: Replace Type Code with State/Strategy
+-----------------------------------------------
+Inheritance won't work because a movie can change its classification dur- ing its lifetime. An object cannot change its class during its lifetime.
+
+class Movie
+  attr_reader :price_code
+
+  def price_code=(value)
+    @price_code = value
+    # Infact this case can be eliminated by initailizing movie object with its Price strategy
+    @price = case price_code
+      when REGULAR: RegularPrice.new
+      when NEW_RELEASE: NewReleasePrice.new
+      when CHILDRENS: ChildrensPrice.new
+    end
+  end
+
+  def initialize(title, the_price_code)
+    @title, self.price_code = title, the_price_code
+  end
+end
+
+class RegularPrice
+  def charge(days_rented)
+    result = 2
+    result += (days_rented - 2) * 1.5 if days_rented > 2
+    result
+  end
+end
+
+class NewReleasePrice
+  def charge(days_rented)
+    days_rented * 3
+  end
+end
+
+class ChildrensPrice
+  def charge(days_rented)
+    result = 1.5
+    result += (days_rented - 3) * 1.5 if days_rented > 3
+    result
+  end
+end
+
+class Movie
+  def charge(days_rented)
+    @price.charge(days_rented)
+  end
+end
+
+We want frequent_renter_points to be the same for ChildrensPrice and RegularPrice, but be different for NewReleasePrice.
+
+I use Extract Module and include the module into RegularPrice and ChildrensPrice. I then implement the special frequent_renter_points on NewReleasePrice.
+
+module DefaultPrice
+  def frequent_renter_points(days_rented)
+    1
+  end
+end
+
+class RegularPrice
+  include Price
+  ...
+end
+
+class NewReleasePrice
+  def frequent_renter_points(days_rented)
+    days_rented > 1 ? 2 : 1
+  end
+  ...
+end
+
+class ChildrensPrice
+  include Price
+  ...
+end
+
+Like charge, frequent_renter_points on Movie now becomes a simple delegator.
+
+class Movie
+  def frequent_renter_points(days_rented)
+    @price.frequent_renter_points(days_rented)
+  end
+end
+
+I can make the callers pass in an instance of the type themselves.
+# calling code
+movie = Movie.new("The Watchmen", NewReleasePrice.new)
+# and later...
+movie.price = RegularPrice.new
+
+which basically helps me remove the case statement from the price_code setter method.
+
+class Movie
+  attr_writer :price
+  ...
+end
+
+The gain of using state pattern is that if I change any of price’s behavior, add new prices, or add extra price dependent behavior, the change will be much easier to make.
+The rest of the application does not know about the use of the state pattern.
+
+Rhythm of refactoring: test, small change, test, small change, test, small change. It is that rhythm that allows refactoring to move quickly and safely.
+
+Bad Smells in Code :
+====================
+Deciding when to start refactoring, and when to stop, is just as important to refactoring as knowing how to operate the mechanics of a refactoring.
+
+1) Duplicated Code:
+The simplest duplicated code problem is when you have the same expression in two methods of the same class or other/sibling class.
+Another possibility is that the method really belongs only in one of the classes and should be invoked by the other class.
+
+2) Long Method:
+The real key to making it easy to understand small methods is good naming. If you have a good name for a method you don’t need to look at the body.
+whenever we feel the need to com- ment something, we write a method instead, named after the intention of the code rather than how it does it.
+We do this even if the method call is longer than the code it replaces, provided the method name explains the purpose of the code.
+Conditionals and loops also give signs for extractions.
+
+3) Large Class:
+Extract Class to bundle a number of the variables. Choose vari- ables to go together in the component that makes sense for each. Ex: Address
+If the component makes sense as a subclass, you’ll find Extract Subclass often is easier. Another option if the component doesn’t make sense as a delegate is Extract Module.
+
+4) Long Parameter list:
+With objects you don’t pass in everything the method needs; instead you pass enough so that the method can get to everything it needs.
+Long parameter lists are hard to understand, because they become inconsistent and difficult to use, and because you are forever changing them as you need more data.
+Most changes are removed by passing objects because you are much more likely to need to make only a couple of requests to get at a new piece of data.
+Use Replace Parameter with Method, Pre- serve Whole Object, Introduce Parameter Object, Introduce Named Parameter.
+
+5) Divergent Change:
+Divergent change occurs when one class is commonly changed in different ways for different reasons.
+Ex: every time I get a new database, every time when there is a new financial instrument
+We often discover this only after we have added a few databases or financial instruments.
+Any change to handle a variation should change a single class or module, and all the typing in the new class/module should express the variation.
+Use Extract class for this.
+
+6) Shotgun Surgery:
+Shotgun surgery is similar to divergent change but is the opposite.
+You whiff this when every time you make a kind of change, you have to make a lot of little changes to a lot of different classes.
+Divergent change is one class that suffers many kinds of changes, and shotgun surgery is one change that alters many classes.
+Either way you want to arrange things so that, ideally, there is a one-to-one link between common changes and classes.
+
+7) Feature Envy:
+This is when a method that seems more interested in a class other than the one it actually is in.
+When a method invokes half a dozen getting methods on another object to calculate some value, then the method clearly wants to be elsewhere, so you use Move Method.
+Sometimes only part of the method suffers from envy; in that case use Extract Method on the jealous bit and Move Method to give it a dream home.
+Often a method uses features of several classes, so which one should it live with?
+The heuristic we use is to determine : which class has most of the data and put the method with that data.
+The fundamental rule of thumb is to put things together that change together.
+
+8) Data Clumps:
+Data items tend to be like children; they enjoy hanging around in groups together.
+Bunches of data that hang around together really ought to be made into their own object.
+
+9) Primitive Obsession:
+In case of primitives in parameter lists, try a civilizing dose of Introduce Parameter Object. If you find yourself picking apart an array, use Replace Array with Object.
+Ex: money classes that combine number and currency, Address class.
+
+10) Case Statements:
+Most times when you see a case statement you should consider polymorphism.
+Use Replace Type Code with Polymorphism, Replace Type Code with Module Extension, or Replace Type Code with State/Strategy.
+
+11) Parallel Inheritance Hierarchies:
+Parallel inheritance hierarchies is really a special case of shotgun surgery.
+In this case, every time you make a subclass of one class, you also have to make a subclass of another.
+
+12) Lazy Class:
+Each class you create costs money to maintain and understand. A class that isn’t doing enough to pay for itself should be eliminated.
+Often this might be a class that used to pay its way but has been downsized with refactoring.
+Or it might be a class that was added because of changes that were planned but not made.
+
+13) Speculative Generality:
+This happens when we think we need the ability to do this kind of thing someday and thus want all sorts of hooks and special cases to handle things that aren’t required.
+The result often is harder to understand and maintain.
+Speculative generality can be spotted when  a method, a code branch, or an entire class are only called by test cases and not the actual program.
+
+14) Temporary Field:
+When an instance variable is set only in certain circumstances. Such code is difficult to understand, because you expect an object to need all of its variables.
+Use Extract Class to create a home for the poor orphan variables. Put all the code that concerns the variables into the component.
+
+15) Messgage Chains:
+You see message chains when a client asks one object for another object, which the client then asks for yet another object and so on.
+Navigating this way means the client is coupled to the structure of the navigation. Any change to the intermediate relationships causes the client to have to change.
+See what the resulting object is used for. See whether you can use Extract Method to take a piece of the code that uses it and then Move Method to push it down the chain.
+
+16) Middle Man:
+In a class’s interface when you find half the methods are delegating to this other class.
+After a while it is time to use Remove Middle Man and talk to the object that really knows what’s going on.
+If only a few methods aren’t doing much, use Inline Method to inline them into the caller.
+If there is additional behavior, you can use Replace Delegation with Hierarchy to turn the real object into a module and include it in the middle man.
+That allows you to extend behavior without chasing all that delegation.
+
+17) Inappropriate Intimacy:
+If the classes do have common interests, use Extract Class to put the commonality in a safe place and make honest classes of them.
+Or use Hide Delegate to let another class act as go-between.
+Inheritance often can lead to over-intimacy. Subclasses are always going to know more about their parents than their parents would like them to know.
+If it’s time to leave home, apply Replace Inheritance with Delegation.
+
+18) Alternative Classes with Different Interfaces:
+Use Rename Method on any methods that do the same thing but have different signatures for what they do.
+
+19) Incomplete Library Class:
+Builders of library classes are rarely omniscient. We don’t blame them for that; after all, we can rarely figure out a design until we’ve mostly built it, so library builders have a really tough job.
+Ruby’s open classes make this easy to fix using Move Method to move the behavior needed directly to the library class.
+
+20) Data Class:
+These are classes that have attributes, and nothing else.
+Look for where these getting and setting methods are used by other classes. Try to use Move Method to move behavior into the data class.
+If you can’t move a whole method, use Extract Method to create a method that can be moved.
+Data classes are like children. They are okay as a starting point, but to participate as a grownup object, they need to take some responsibility.
+
+21) Refused Bequest(legacy/parental):
+Subclassing to reuse a bit of behavior all the time, and we find it a perfectly good way of doing business.
+There is a smell, we can’t deny it, but usually it isn’t a strong smell. Nine times out of ten this smell is too faint to be worth cleaning.
+The smell of refused bequest is much stronger if the subclass is reusing behav- ior but does not want to support the public methods of the superclass.
+Apply Replace Inheritance with Delegation.
+
+22) Comments:
+If you need a comment to explain what a block of code does, try Extract Method.
+If the method is already extracted but you still need a comment to explain what it does, use Rename Method.
+If you need to state some rules about the required state of the system, use Introduce Assertion.
+A comment is a good place to say why you did something. This kind of information helps future modifiers, especially forgetful ones.
+
+23) Metaprogramming Madness:
+Some metaprogramming techniques can result in unclear code. The method_missing hook, for example, often results in code that is difficult to understand.
+I use Replace Dynamic Receptor with Dynamic Method Definition or even a simple Extract Method to remove the method_missing definition.
+If the method_missing definition is truly needed, I might use Isolate Dynamic Receptor to separate concerns.
+
+24) Disjointed API:
+More often than not, an individual project will not take advantage of all the configuration options. The same configuration options will be used over and over.
+If this is the case, use Introduce Gateway to interact with the API in a simplified way.
+Introduce Expression Builder can be applied to both internal and external APIs to interact with the public interface in a more fluent manner.
+Ex: Bill.com
+
+25) Repetitive Boilerplate:
+Implementing attribute readers(attr_reader) is so common in object-oriented languages that the author of Ruby decided to provide a succinct way to declare them.
+Attributes API of AR.
