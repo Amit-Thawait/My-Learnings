@@ -1,0 +1,143 @@
+1) Virtual Kubelet :
+   It allows Kubernetes Nodes to be backed by other services, such as serverless container platform.
+   https://github.com/virtual-kubelet/virtual-kubelet
+
+2) CNCF Landscape (All CNCF Projects)
+   https://landscape.cncf.io/
+
+3) K8s is also termed as distributed operating system.
+
+4) $ id
+   Tells you information about current user and group
+
+5) To fetch information about whether I can do anything
+   kubectl auth can-i create pods --as=amit
+   kubectl auth can-i list pods --as=amit
+
+   cli for getting who all has permission to do what (Related to RBAC)
+   https://github.com/aquasecurity/kubectl-who-can
+
+6) Kubernetes Security Book from Aquasecurity
+   https://info.aquasec.com/kubernetes-security
+
+7) Lightweight containers:
+   - Hyper-v containers
+     - https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-containers/hyperv-container
+     - https://searchservervirtualization.techtarget.com/tip/Windows-Server-containers-and-Hyper-V-containers-explained
+   - kata containers
+     - https://katacontainers.io/
+   - AWS Firecracker
+     - https://aws.amazon.com/about-aws/whats-new/2018/11/firecracker-lightweight-virtualization-for-serverless-computing/
+     - https://aws.amazon.com/blogs/aws/firecracker-lightweight-virtualization-for-serverless-computing/
+
+8) Deploying on kubernetes can be done in 2 ways
+   1) Directly from code using
+     i)  Draft
+         https://draft.sh/
+     ii) Skaffold
+         https://github.com/GoogleContainerTools/skaffold
+         https://cloud.google.com/blog/products/gcp/introducing-skaffold-easy-and-repeatable-kubernetes-development
+   2) Using Manifest files using
+     i)  Helm
+     ii) ksonnet
+         Taken over VMWare. No longer maintained.
+         https://ksonnet.io/
+         https://github.com/ksonnet/ksonnet
+     iii)kustomize
+         https://kustomize.io/
+         https://kubernetes.io/blog/2018/05/29/introducing-kustomize-template-free-configuration-customization-for-kubernetes/
+
+9) Nobody deploys manually in kubernetes
+   GitOps and Kubernetes
+   kubectl + Git
+   Committing a change on git => Deploys or updates the app on kubernetes.
+   This can achieved using:
+   - ArgoCD
+     https://github.com/argoproj/argo-cd
+   - Jenkinx X
+     https://jenkins.io/blog/2018/03/19/introducing-jenkins-x/
+   - Weaveworks/flux
+     https://github.com/weaveworks/flux
+   - Hasura/gitkube
+     https://github.com/hasura/gitkube
+
+10) Kubernetes secret can be more effective if we use an encryption provider
+    https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
+
+11) Katacoda -> Docker and Kubernetes Learning Platform
+    https://katacoda.com/
+
+12) Kubernetes command completion
+    source <(kubectl completion bash)
+
+13) To check the rolling update status, you can use rollout command
+    kubectl rollout status deployment.v1.apps/nginx-deployment
+
+14) HEY - HTTP load generator tool
+    https://github.com/rakyll/hey
+
+15) ACI - Azure Container Instances
+    On demand containerization billed per second
+    https://azure.microsoft.com/en-in/services/container-instances/
+
+16) How to secure your kubernetes cluster
+    https://static.sched.com/hosted_files/kdi19/18/Securing%20K8s%20CBlake.pdf
+
+    Watch : https://www.rsaconference.com/speakers/jay-beale
+
+    Security can leak from neighbouring containers.
+    Retrict container communication only to one's that they are supposed to communicate.
+
+    Simplicity and intregration of your security tool is very important.
+
+17) Botkube
+    A bot that watches kubernetes cluster and gives recommendations.
+    https://www.botkube.io
+
+18) AWS Cloudmap (This is not specific to kubernetes)
+    Serice discovery service from AWS
+
+19) Vitess
+    Vitess is a database clustering system for horizontal scaling of MySQL
+    https://vitess.io/
+
+20) Notary - For software distribution
+    https://github.com/theupdateframework/notary/
+    https://github.com/theupdateframework/notary/blob/master/docs/service_architecture.md#threat-model
+
+21) Kubernetes for JAVA developers
+    https://github.com/aws-samples/kubernetes-for-java-developers
+    Video course : https://www.linkedin.com/learning/kubernetes-for-java-developers/applying-java-skills-to-kubernetes
+
+22) Docker for Desktop in mac can give you 1 node kubernetes cluster. Just enable kubernetes from preferences.
+
+23) Weaveworks created eksctl (like kubectl) to create kubernetes cluster using single line command in Amazon EKS.
+    https://github.com/weaveworks/eksctl
+
+    Ex: eksctl create cluster --name myeks --nodes 4
+
+24) JAVA_OPTS can be used in Dockerfile to connect to a remote JVM
+    https://github.com/aws-samples/kubernetes-for-java-developers/blob/e9f75bf66ef23621b1b5abbd748c411d44ea3976/app/Dockerfile
+
+25) kubeedge
+    https://github.com/kubeedge/kubeedge
+    https://kubeedge.io/en/
+    https://kubernetes.io/blog/2019/03/19/kubeedge-k8s-based-edge-intro/
+
+26) k3s
+    Lightweight kubernetes from Rancher. Ideal to run single app cluster.
+    https://k3s.io/
+    https://github.com/rancher/k3s
+
+27) Robotics platform using kubernetes.
+    https://www.rapyuta-robotics.com/
+    Try it out at : https://console.rapyuta.io/
+
+28) Guidelines for contributing to kubernetes
+    https://github.com/kubernetes/community
+
+29) India specific Kubernetes slack channels
+    http://slack.k8s.io/
+    #in-dev
+    #in-users
+    #in-events
