@@ -1,0 +1,92 @@
+Vault :-
+========
+1) Install Vault
+   https://www.vaultproject.io/downloads/
+
+2) Install command line autocompletion
+   vault -autocomplete-install
+
+3) Start the vault server in dev mode (Not recommended for production)
+   vault server -dev
+
+   Note down :
+   i) vault address
+   ii) unseal key
+   iii) vault dev root token ID
+
+4) Vault command to create/get secret
+   In a new terminal
+
+   export VAULT_ADDR='http://127.0.0.1:8200'
+   echo "SI/tlVqoEHG88VxsIwvMBAFIK4Q/2nltr5Qa3aGgTjg=" > vault_unseal.key
+   export VAULT_DEV_ROOT_TOKEN_ID=s.v0fxmZd5VQnNTU6o6o4C3aBB
+
+   To create a secret in path secret/name
+   vault kv put secret/name name=Amit
+
+   To get a secret stored in path secret/name
+   vault kv get secret/name
+
+5) Create a secret
+
+   Multiple key-values can also be created at a single path
+
+   vault kv put secret/name name=Amit foo=bar
+
+6) Get a secret
+
+   To retrieve a specific key from a path
+
+   vault kv get -field=foo secret/name
+
+   vault kv get -format=json secret/name
+
+{
+  "request_id": "1fabe0ce-29e4-5ff9-e8e2-411340398d80",
+  "lease_id": "",
+  "lease_duration": 0,
+  "renewable": false,
+  "data": {
+    "data": {
+      "foo": "bar",
+      "name": "Amit"
+    },
+    "metadata": {
+      "created_time": "2020-02-11T09:52:56.26422Z",
+      "deletion_time": "",
+      "destroyed": false,
+      "version": 4
+    }
+  },
+  "warnings": null
+}
+
+  To get data from json response
+  vault kv get -format=json secret/name | jq -r .data.data.foo
+
+7) Delete a secret (Soft delete but can't be read with a get call)(Deletes the latest version of the key)
+   vault kv delete secret/name
+
+   Older version of secret can still be retrieved by providing the version option in command line
+
+   vault kv get -format=json -version=2 secret/name
+
+8) Destroy a secret (Hard deletes a specific version)
+   vault kv destroy secret/name
+
+9) Enabling secret storing at path other than secret/
+   vault secrets enable -path=foo kv
+
+   vault kv put foo/bar a=b
+
+   vault kv get foo/bar
+
+10) To list secret engines
+    vault secrets list
+
+11) Enable AWS secrets engine
+    vault secrets enable -path=aws aws
+
+    With the secrets engine enabled, learn about it with the vault path-help command:
+
+    vault path-help aws
