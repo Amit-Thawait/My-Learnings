@@ -1,0 +1,3 @@
+Delete mutiple docker images matching a pattern:
+
+for i in `docker images | grep confluent | awk '{print $1 ":" $2}'` ; do ; docker rmi $i ; done
