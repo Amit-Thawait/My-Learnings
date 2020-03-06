@@ -90,3 +90,412 @@ Vault :-
     With the secrets engine enabled, learn about it with the vault path-help command:
 
     vault path-help aws
+
+12) Creating a role
+
+	vault write aws/roles/my-ec2-full-access \
+
+	> credential_type=iam_user \
+	> policy_document=-<<EOF
+	heredoc> {
+		"Version": "2012-10-17",
+		"Statement": [
+			{
+				"Action": "ec2:*",
+				"Effect": "Allow",
+				"Resource": "*"
+			}
+		]
+	}
+	heredoc> EOF
+	Success! Data written to: aws/roles/my-ec2-full-access
+
+13) vault read aws/creds/my-ec2-full-access
+
+	Key                Value
+	---                -----
+	lease_id           aws/creds/my-ec2-full-access/Nsk5dMTBwxWOvFEnV66e0nda
+	lease_duration     768h
+	lease_renewable    true
+	access_key         AKIAY5UKWS73JXFIFIXZ
+	secret_key         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
+	security_token     <nil>
+
+14) vault policy list
+
+	default
+	root
+
+	vault policy write my-policy -<<EOF
+# Dev servers have version 2 of KV secrets engine mounted by default, so will
+# need these paths to grant permissions:
+path "secret/data/*" {
+  capabilities = ["create", "update"]
+}
+
+path "secret/data/foo" {
+  capabilities = ["read"]
+}
+EOF
+
+Success! Uploaded policy: my-policy
+
+	vault policy list
+
+	default
+	my-policy
+	root
+
+15) vault token create -policy=my-policy
+
+	Key                  Value
+	---                  -----
+	token                s.3RLCDlfoEG2K4Y5d1d7TXkl1
+	token_accessor       x6GspfUG4kAeAMYwtdl3Urft
+	token_duration       768h
+	token_renewable      true
+	token_policies       ["default" "my-policy"]
+	identity_policies    []
+	policies             ["default" "my-policy"]
+
+16) vault login s.3RLCDlfoEG2K4Y5d1d7TXkl1
+	Success! You are now authenticated. The token information displayed below
+	is already stored in the token helper. You do NOT need to run "vault login"
+	again. Future Vault requests will automatically use this token.
+
+	Key                  Value
+	---                  -----
+	token                s.3RLCDlfoEG2K4Y5d1d7TXkl1
+	token_accessor       x6GspfUG4kAeAMYwtdl3Urft
+	token_duration       767h59m8s
+	token_renewable      true
+	token_policies       ["default" "my-policy"]
+	identity_policies    []
+	policies             ["default" "my-policy"]
+
+	Verify that you can write any data to secret/data/, but only read from secret/data/foo.
+
+	NOTE: When you access the KV v2 secrets engine using the vault kv CLI commands, you can omit /data in the secret path.
+
+	vault kv put secret/creds password=my-secret-password
+	Key              Value
+	---              -----
+	created_time     2020-03-04T05:07:00.639167Z
+	deletion_time    n/a
+	destroyed        false
+	version          1
+
+	vault kv put secret/foo lang=en
+	Error writing data to secret/data/foo: Error making API request.
+
+	URL: PUT http://127.0.0.1:8200/v1/secret/data/foo
+	Code: 403. Errors:
+
+	* 1 error occurred:
+		* permission denied
+
+17) Authentication
+	When starting the Vault server in dev mode, it automatically logs you in as the root user with admin permissions. In a non-dev setup, you would have had to authenticate first.
+
+	Vault supports many different authentication mechanisms, but they all funnel into a single "session token", which we call the "Vault token".
+
+	Authentication is simply the process by which a user or machine gets a Vault token.
+
+	Tokens
+	------
+	Token authentication is enabled by default in Vault and cannot be disabled.
+
+	vault token create
+
+	Key                  Value
+	---                  -----
+	token                s.Zd6npWiW8UpR66kfyRfocYpE
+	token_accessor       sZW1FCtd4t7ENXiuVYQHqqYY
+	token_duration       ∞
+	token_renewable      false
+	token_policies       ["root"]
+	identity_policies    []
+	policies             ["root"]
+
+	By default, this will create a child token of your current token that inherits all the same policies. The "child" concept here is important: tokens always have a parent, and when that parent token is revoked, children can also be revoked all in one operation. This makes it easy when removing access for a user, to remove access for all sub-tokens that user created as well.
+
+	Recommended Patterns
+	In practice, operators should not use the token create command to generate Vault tokens for users or machines. Instead, those users or machines should authenticate to Vault using any of Vault's configured auth methods such as GitHub, LDAP, AppRole, etc.
+
+	Supported Auth methods by vault :
+	https://www.vaultproject.io/docs/auth/
+
+	vault auth enable (press tab)
+	app-id    approle   aws       cert      gcp       github    ldap      okta      plugin    radius    userpass
+
+	vault auth help (press tab)
+	alicloud  aws       centrify  cert      cf        gcp       github    ldap      oci       oidc      okta      pcf       radius    token     userpass
+
+	vault auth enable -path=github github
+	Success! Enabled github auth method at: github/
+
+	vault auth list
+	Path       Type      Accessor                Description
+	----       ----      --------                -----------
+	github/    github    auth_github_31489e7c    n/a
+	token/     token     auth_token_f2a5f1e1     token based credentials
+
+	vault auth disable github/
+	Success! Disabled the auth method (if it existed) at: github/
+
+	vault auth list
+	Path      Type     Accessor               Description
+	----      ----     --------               -----------
+	token/    token    auth_token_f2a5f1e1    token based credentials
+
+18) Authentication using github
+
+	vault login -method=github
+	GitHub Personal Access Token (will be hidden):
+	Error authenticating: Error making API request.
+
+	URL: PUT http://127.0.0.1:8200/v1/auth/github/login
+	Code: 400. Errors:
+
+	* configuration has not been set
+
+	vault write auth/github/config organization=rubylearnings
+Success! Data written to: auth/github/config
+
+	vault read auth/github/config
+Key                        Value
+---                        -----
+base_url                   n/a
+organization               rubylearnings
+token_bound_cidrs          []
+token_explicit_max_ttl     0s
+token_max_ttl              0s
+token_no_default_policy    false
+token_num_uses             0
+token_period               0s
+token_policies             []
+token_ttl                  0s
+token_type                 default
+
+	vault login -method=github token=30afa441834271504cd00ccca50330db0a04022e
+Success! You are now authenticated. The token information displayed below
+is already stored in the token helper. You do NOT need to run "vault login"
+again. Future Vault requests will automatically use this token.
+
+Key                    Value
+---                    -----
+token                  s.qifiRD8O2IWMLS3p0lfkUcLO
+token_accessor         KjisR0JgT3N8ouXO4jWm9yx0
+token_duration         768h
+token_renewable        true
+token_policies         ["default"]
+identity_policies      []
+policies               ["default"]
+token_meta_org         rubylearnings
+token_meta_username    Amit-Thawait
+
+	vault write auth/github/config organization=
+Error writing data to auth/github/config: Error making API request.
+
+	vault login s.DEiD27FELgP9EntVkyUSLeev
+Success! You are now authenticated. The token information displayed below
+is already stored in the token helper. You do NOT need to run "vault login"
+again. Future Vault requests will automatically use this token.
+
+Key                  Value
+---                  -----
+token                s.DEiD27FELgP9EntVkyUSLeev
+token_accessor       YY07hpJtn5dtofbrhq6imEkJ
+token_duration       ∞
+token_renewable      false
+token_policies       ["root"]
+identity_policies    []
+policies             ["root"]
+
+	vault write auth/github/config organization=
+Success! Data written to: auth/github/config
+
+	vault read auth/github/config
+Key                        Value
+---                        -----
+base_url                   n/a
+organization               n/a
+token_bound_cidrs          []
+token_explicit_max_ttl     0s
+token_max_ttl              0s
+token_no_default_policy    false
+token_num_uses             0
+token_period               0s
+token_policies             []
+token_ttl                  0s
+token_type                 default
+
+	vault login -method=github token=30afa441834271504cd00ccca50330db0a04022e
+Error authenticating: Error making API request.
+
+URL: PUT http://127.0.0.1:8200/v1/auth/github/login
+Code: 400. Errors:
+
+* organization not found in configuration
+
+
+URL: PUT http://127.0.0.1:8200/v1/auth/github/config
+Code: 403. Errors:
+
+* 1 error occurred:
+	* permission denied
+
+	vault auth disable github/
+Success! Disabled the auth method (if it existed) at: github/
+
+	vault auth enable -path=github github
+Success! Enabled github auth method at: github/
+
+	vault write auth/github/config organization=
+Success! Data written to: auth/github/config
+
+	vault read auth/github/config
+Key                        Value
+---                        -----
+base_url                   n/a
+organization               n/a
+token_bound_cidrs          []
+token_explicit_max_ttl     0s
+token_max_ttl              0s
+token_no_default_policy    false
+token_num_uses             0
+token_period               0s
+token_policies             []
+token_ttl                  0s
+token_type                 default
+
+	vault login -method=github token=30afa441834271504cd00ccca50330db0a04022e
+Success! You are now authenticated. The token information displayed below
+is already stored in the token helper. You do NOT need to run "vault login"
+again. Future Vault requests will automatically use this token.
+
+Key                    Value
+---                    -----
+token                  s.OJ0XD7W4SkTfTFs8aTwFkBSv
+token_accessor         vOaMEyReyIXBu09GGMBpVpUT
+token_duration         768h
+token_renewable        true
+token_policies         ["default"]
+identity_policies      []
+policies               ["default"]
+token_meta_org         rubylearnings
+token_meta_username    Amit-Thawait
+
+	Login with root token
+	vault login s.DEiD27FELgP9EntVkyUSLeev
+
+	vault token revoke -mode path auth/github
+Success! Revoked token (if it existed)
+
+	vault login -method=github token=30afa441834271504cd00ccca50330db0a04022e
+Success! You are now authenticated. The token information displayed below
+is already stored in the token helper. You do NOT need to run "vault login"
+again. Future Vault requests will automatically use this token.
+
+Key                    Value
+---                    -----
+token                  s.IleOs8QfFrHZEaC88yAMwJdL
+token_accessor         qtNRhRsBq24uIZ74EdEzQXzJ
+token_duration         768h
+token_renewable        true
+token_policies         ["default"]
+identity_policies      []
+policies               ["default"]
+token_meta_org         rubylearnings
+token_meta_username    Amit-Thawait
+
+
+Deploy Vault Production grade :
+===============================
+1) Install Consul (https://learn.hashicorp.com/consul/getting-started/install.html) and run it
+	consul agent -dev
+
+2) Start the vault server
+
+	vault server -config=config.hcl
+
+	config.hcl
+	----------
+storage "consul" {
+  address = "127.0.0.1:8500"
+  path    = "vault/"
+}
+
+listener "tcp" {
+ address     = "127.0.0.1:8200"
+ tls_disable = 1
+}
+
+3) Initializing the Vault
+
+	vault operator init
+
+Unseal Key 1: gOZoSgbPtbDHc6hSnH7gVC1ZTaVCVs3DvYvSNKUwqU0j
+Unseal Key 2: RqPYlz1OnrOj4I9j81+8y+Zy4vAYopZiUous3l0RgcUc
+Unseal Key 3: eLsRDi/Y2rKKYg2vagbIE0F4fXsXJd6ZuwAH20rL/xwV
+Unseal Key 4: WUMEZo3vfmyP6IlvXkLFUcSo4wMaQkfVG/JqQWmEXncw
+Unseal Key 5: yJ7GoyDT5RD/cGk7WBwOZn9ZqhFYt2360mGB/bReM4uZ
+
+Initial Root Token: s.gY4j0zj95XgUCuHP14A3MjQq
+
+Vault initialized with 5 key shares and a key threshold of 3. Please securely
+distribute the key shares printed above. When the Vault is re-sealed,
+restarted, or stopped, you must supply at least 3 of these keys to unseal it
+before it can start servicing requests.
+
+Vault does not store the generated master key. Without at least 3 key to
+reconstruct the master key, Vault will remain permanently sealed!
+
+It is possible to generate new unseal keys, provided you have a quorum of
+existing unseal keys shares. See "vault operator rekey" for more information.
+
+	Initialization outputs two incredibly important pieces of information: the unseal keys and the initial root token. This is the only time ever that all of this data is known by Vault, and also the only time that the unseal keys should ever be so close together.
+
+	For the purpose of this getting started guide, save all of these keys somewhere, and continue. In a real deployment scenario, you would never save these keys together. Instead, you would likely use Vault's PGP and Keybase.io support to encrypt each of these keys with the users' PGP keys. This prevents one single person from having all the unseal keys. Please see the documentation on using PGP, GPG, and Keybase for more information.
+
+4) AppRole auth method
+
+	vault auth enable approle
+	Success! Enabled approle auth method at: approle/
+
+	vault auth list
+Path        Type       Accessor                 Description
+----        ----       --------                 -----------
+approle/    approle    auth_approle_ac181452    n/a
+token/      token      auth_token_17250e29      token based credentials
+
+	Create a named role:
+
+	vault write auth/approle/role/my-role \
+> secret_id_ttl=10m \
+    token_num_uses=10 \
+    token_ttl=20m \
+    token_max_ttl=30m \
+    secret_id_num_uses=40
+Success! Data written to: auth/approle/role/my-role
+
+	Fetch the RoleID of the AppRole:
+
+	vault read auth/approle/role/my-role/role-id
+Key        Value
+---        -----
+role_id    76b4a195-af57-0a4b-d542-d77a0becff75
+
+	Get a SecretID issued against the AppRole:
+
+	vault write -f auth/approle/role/my-role/secret-id
+Key                   Value
+---                   -----
+secret_id             4a85ebf8-1232-e1b5-1146-04c1f07f407c
+secret_id_accessor    ebf7ec68-45d0-aab0-2b2f-3e5eae3680ee
+
+	More Info : https://www.vaultproject.io/docs/auth/approle/
+
+Accessing Secrets via the REST APIs
+-----------------------------------
+https://learn.hashicorp.com/vault/getting-started/apis
