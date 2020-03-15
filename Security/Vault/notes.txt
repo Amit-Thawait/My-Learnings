@@ -499,3 +499,78 @@ secret_id_accessor    ebf7ec68-45d0-aab0-2b2f-3e5eae3680ee
 Accessing Secrets via the REST APIs
 -----------------------------------
 https://learn.hashicorp.com/vault/getting-started/apis
+
+Shipyard:
+---------
+https://shipyard.demo.gs/
+Shipyard allows you to create local Kubernetes clusters bootstrapped with and Consul and Vault.
+
+Instruqt:
+---------
+https://instruqt.com/
+Provides environment with kubernetes and vault in a web browser.
+https://instruqt.com/hashicorp
+
+----------------------------------------------------------------------------------------------------------------
+
+Vault static and dynamic secrets demo
+=====================================
+Prerequisite:
+Kubernetes cluster with vault installed using Shipyard (https://shipyard.demo.gs/).
+
+Clone repo : https://github.com/nicholasjackson/demo-vault.git
+
+Static secrets example :
+------------------------
+cd static_secrets
+
+export VAULT_ADDR='http://127.0.0.1:8200'
+
+export KUBECONFIG="$HOME/.shipyard/yards/shipyard/kubeconfig.yml"
+
+vault login root
+
+Run the steps mentioned in static_secrets/configure_vault.sh
+
+# Enable and configure Kubernetes Authentication
+vault auth enable kubernetes
+
+kubectl exec $(kubectl get pods --selector "app.kubernetes.io/instance=vault,component=server" -o jsonpath="{.items[0].metadata.name}") -c vault -- \
+  sh -c ' \
+    vault write auth/kubernetes/config \
+       token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+       kubernetes_host=https://${KUBERNETES_PORT_443_TCP_ADDR}:443 \
+       kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+
+# Write a secret to the database
+vault kv put secret/web api_key=abc123fd
+
+vault kv get secret/web
+
+vault kv get --format=json secret/web
+
+# Write policy allowing read access to that secret
+vault policy write web-static ./config/web-policy.hcl
+
+# Assign the policy to users who authenticate with Kubernetes service accounts called web
+vault write auth/kubernetes/role/web \
+    bound_service_account_names=web \
+    bound_service_account_namespaces=default \
+    policies=web-static \
+    ttl=1h
+
+kubectl apply -f config/web.yml
+
+yard expose --service-name svc/web-service --port 9090:9090
+
+docker ps
+
+kubectl exec -it $(kubectl get pods --selector "app=web" -o jsonpath="{.items[0].metadata.name}") -c web -- cat /vault/secrets/web
+
+kubectl exec -it $(kubectl get pods --selector "app=web" -o jsonpath="{.items[0].metadata.name}") -c vault-agent sh
+env | grep VAULT
+echo $VAULT_CONFIG | base64 -d
+cat /home/vault/.token
+
+export VAULT_ADDR='http://vault.default.svc:8200'
+vault login `cat /home/vault/.token`
