@@ -513,6 +513,8 @@ https://instruqt.com/hashicorp
 
 ----------------------------------------------------------------------------------------------------------------
 
+Reference: https://www.youtube.com/watch?v=KIAXQr17-WQ
+
 Vault static and dynamic secrets demo
 =====================================
 Prerequisite:
@@ -570,7 +572,141 @@ kubectl exec -it $(kubectl get pods --selector "app=web" -o jsonpath="{.items[0]
 kubectl exec -it $(kubectl get pods --selector "app=web" -o jsonpath="{.items[0].metadata.name}") -c vault-agent sh
 env | grep VAULT
 echo $VAULT_CONFIG | base64 -d
+{"auto_auth":{"method":{"type":"kubernetes","config":{"role":"web"}},"sink":[{"type":"file","config":{"path":"/home/vault/.token"}}]},"exit_after_auth":false,"pid_file":"/home/vault/.pid","vault":{"address":"http://vault.default.svc:8200","tls_skip_verify":true},"template":[{"destination":"/vault/secrets/web","contents":"{\n{{ with secret \"secret/data/web\" -}}\n  \"api_key\": \"{{ .Data.data.api_key }}\"\n{{- end }}\n}\n","left_delimiter":"{{","right_delimiter":"}}"}]}
+
 cat /home/vault/.token
+s.h2DjXdoKVjXm9FmHTb61GSyj
 
 export VAULT_ADDR='http://vault.default.svc:8200'
 vault login `cat /home/vault/.token`
+
+Dynamic Secrets Example :
+-------------------------
+Reference : https://www.hashicorp.com/blog/dynamic-database-credentials-with-vault-and-kubernetes/
+
+cd dynamic-secrets-k8s
+
+export VAULT_ADDR='http://127.0.0.1:8200'
+
+export KUBECONFIG="$HOME/.shipyard/yards/shipyard/kubeconfig.yml"
+
+# Enable and configure Kubernetes Authentication
+vault auth enable kubernetes
+
+Reference about auth with kubernetes :
+https://www.vaultproject.io/docs/auth/kubernetes/
+
+kubectl get clusterrolebindings.rbac.authorization.k8s.io
+kubectl get clusterrolebindings.rbac.authorization.k8s.io vault-server-binding -o yaml
+
+kubectl exec $(kubectl get pods --selector "app.kubernetes.io/instance=vault,component=server" -o jsonpath="{.items[0].metadata.name}") -c vault -- \
+  sh -c ' \
+    vault write auth/kubernetes/config \
+       token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+       kubernetes_host=https://${KUBERNETES_PORT_443_TCP_ADDR}:443 \
+       kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+
+# Enable and configure PostgresSQL Dynamic secrets
+vault secrets enable database
+
+vault write database/config/wizard \
+    plugin_name=postgresql-database-plugin \
+    verify_connection=false \
+    allowed_roles="*" \
+    connection_url="postgresql://{{username}}:{{password}}@postgres:5432/wizard?sslmode=disable" \
+    username="postgres" \
+    password="password"
+
+vault read database/config/wizard
+
+Key                                   Value
+---                                   -----
+allowed_roles                         [*]
+connection_details                    map[connection_url:postgresql://{{username}}:{{password}}@postgres:5432/wizard?sslmode=disable username:postgres]
+plugin_name                           postgresql-database-plugin
+root_credentials_rotate_statements    []
+
+kubectl apply -f config/postgres.yml
+
+kubectl exec -it $(kubectl get pods --selector "app=postgres" -o jsonpath="{.items[0].metadata.name}") -c postgres bash
+
+root@postgres-9cb85bc58-t2z57:/# psql -U postgres
+
+postgres=# \l
+                                 List of databases
+   Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges
+-----------+----------+----------+------------+------------+-----------------------
+ postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 |
+ template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ wizard    | postgres | UTF8     | en_US.utf8 | en_US.utf8 |
+(4 rows)
+
+postgres=# \c wizard;
+You are now connected to database "wizard" as user "postgres".
+
+wizard=# \dt
+Did not find any relations.
+
+wizard=# \q
+
+# Rotate the database root password
+vault write --force database/rotate-root/wizard
+
+kubectl exec -it $(kubectl get pods --selector "app=postgres" -o jsonpath="{.items[0].metadata.name}") -c postgres bash
+
+root@postgres-9cb85bc58-4cl9b:/# psql -U postgres
+Password for user postgres:
+psql: FATAL:  password authentication failed for user "postgres"
+
+# Create a role allowing credentials to be created with access for all tables in the DB
+vault write database/roles/db-app \
+    db_name=wizard \
+    creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; \
+        GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"{{name}}\";" \
+    revocation_statements="ALTER ROLE \"{{name}}\" NOLOGIN;"\
+    default_ttl="1h" \
+    max_ttl="24h"
+
+You can test the generation of credentials for your application by using the command
+vault read database/creds/<role>
+
+vault read database/creds/db-app
+Key                Value
+---                -----
+lease_id           database/creds/db-app/jpqIKK3ksF46Sn6YWTueVu9Y
+lease_duration     1h
+lease_renewable    true
+password           A1a-fhCVIKQcBunH3XZf
+username           v-token-db-app-qsyEfMAn0zDhC5wDazcF-1584516154
+
+You can see a randomly generated username and passwordand a lease equal to the default_ttl you configured when creating the role.
+
+kubectl apply -f config/web.yml
+
+kubectl get pods
+
+kubectl exec -it $(kubectl get pods --selector "app=web" -o jsonpath="{.items[0].metadata.name}") -c web sh
+/ # cat /vault/secrets/db-creds
+{
+"db_connection": "host=postgres port=5432 user=v-kubernet-db-app-695onSCAhUH622RfCxKz-1584535173 password=A1a-c1e5tDvGarXy7Sy4 dbname=wizard sslmode=disable"
+}
+
+kubectl exec -it $(kubectl get pods --selector "app=web" -o jsonpath="{.items[1].metadata.name}") -c web sh
+/ # cat /vault/secrets/db-creds
+{
+"db_connection": "host=postgres port=5432 user=v-kubernet-db-app-RMxOaUWz800URwU7VDFG-1584535174 password=A1a-3zmzBtyFLOixEnj0 dbname=wizard sslmode=disable"
+}
+
+kubectl exec -it $(kubectl get pods --selector "app=postgres" -o jsonpath="{.items[0].metadata.name}") -c postgres bash
+
+root@postgres-9cb85bc58-t2z57:/# psql -U v-kubernet-db-app-695onSCAhUH622RfCxKz-1584535173 -d wizard
+wizard=> \l
+
+wizard=> CREATE DATABASE abc;
+ERROR:  permission denied to create database
+
+wizard=> DROP DATABASE wizard;
+ERROR:  must be owner of database wizard
