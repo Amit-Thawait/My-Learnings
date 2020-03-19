@@ -1,0 +1,70 @@
+Infrastructure as code:
+=======================
+Reference:
+Doing Infrastructure as Code? You Can Do Better - Shohre Mansouri and Effy Elden
+https://www.youtube.com/watch?v=NgwosUBuRAc
+
+DoBetterAsCode: https://dobetterascode.com/
+
+Yaml lint (https://github.com/adrienverge/yamllint)
+
+Choose a CI that provides running pipeline locally before pushing the pipeline as code for faster feedback.
+CI that provide this feature:
+1) Buildkite (https://github.com/buildkite/cli)
+2) CircleCI (https://circleci.com/docs/2.0/local-cli/)
+3) Gitlab (https://docs.gitlab.com/ee/ci/)
+4) Codefresh (https://codefresh.io/)
+
+For Terraform
+-------------
+terraform fmt
+terraform validate
+terraform plan
+
+terraform apply may still fail if you say choose t2.verytiny instance type because that doesn't exist in AWS and the above 3 steps would fail to recognize that error.
+
+There are 3rd party tools that can help us validate your infrastructure code:
+1) tflint (https://github.com/terraform-linters/tflint)
+2) cfn_nag (https://github.com/stelligent/cfn_nag)
+
+You can configure a pre-commit hook to incorporate these checks.
+But often these hooks are slow, people bypass it or it runs for things that doesn't affect the code.
+
+Pre-commit hooks should be:
+1) selective (shouldn't run if I am updating a README file)
+2) fast
+3) Consistent (should run same as it runs in a dev machine or in a pipeline)
+4) Helpful (should point specifically to whether the problem is)
+
+Smart hook helpers:
+1) Therapist (https://github.com/rehandalal/therapist)
+2) pre-commit (https://pre-commit.com/)
+3) Overcommit (https://github.com/sds/overcommit)
+
+DRY - terraform modules
+Readable and maintainable code
+Write tests in different levels
+
+Testing your IaaC
+-----------------
+Unit Tests
+Integration Tests
+E2E tests
+
+Unit test for IaaC is not something that you run in an isolated env than your cloud provider. It will not give you that confidence.
+Infact there are tools that provide cloud provider mocking
+1) localstack (https://github.com/localstack/localstack)
+2) moto (https://github.com/spulec/moto)
+
+You can also do unit testing with actual cloud provider.
+
+But then someone may arugue isn't that a intergration test.
+
+Integration test with cloud provider can be done by :
+1) Test kitchen (https://github.com/test-kitchen/test-kitchen)
+2) awspec (https://github.com/k1LoW/awspec)
+3) terratest (https://github.com/gruntwork-io/terratest)
+4) InSpec (https://github.com/inspec/inspec)
+
+Lots of other tools and sample project with testing can be found out at:
+dobetterascode.com
