@@ -21,8 +21,12 @@ Vault :-
    echo "SI/tlVqoEHG88VxsIwvMBAFIK4Q/2nltr5Qa3aGgTjg=" > vault_unseal.key
    export VAULT_DEV_ROOT_TOKEN_ID=s.v0fxmZd5VQnNTU6o6o4C3aBB
 
+   vault (enter)
+
+   vault secrets list
+
    To create a secret in path secret/name
-   vault kv put secret/name name=Amit
+   vault kv put secret/name first_name=Amit last_name=Thawait
 
    To get a secret stored in path secret/name
    vault kv get secret/name
@@ -72,7 +76,7 @@ Vault :-
    vault kv get -format=json -version=2 secret/name
 
 8) Destroy a secret (Hard deletes a specific version)
-   vault kv destroy secret/name
+   vault kv destroy -versions=1 secret/name
 
 9) Enabling secret storing at path other than secret/
    vault secrets enable -path=foo kv
@@ -91,13 +95,22 @@ Vault :-
 
     vault path-help aws
 
+    Configure the AWS secrets engine
+
+    AWS Console >> IAM >> Users >> Create a demo user >> Add permission frome existing policy 
+
+    vault write aws/config/root \
+    access_key=AKISLQPBXCENIQ \
+    secret_key=z1Pdn03TnpG+9jpPSOlAsuQw99PUW+eB \
+    region=us-east-1
+
+
 12) Creating a role
 
 	vault write aws/roles/my-ec2-full-access \
-
-	> credential_type=iam_user \
-	> policy_document=-<<EOF
-	heredoc> {
+	credential_type=iam_user \
+	policy_document=-<<EOF
+	{
 		"Version": "2012-10-17",
 		"Statement": [
 			{
@@ -107,7 +120,8 @@ Vault :-
 			}
 		]
 	}
-	heredoc> EOF
+
+	EOF
 	Success! Data written to: aws/roles/my-ec2-full-access
 
 13) vault read aws/creds/my-ec2-full-access
@@ -120,6 +134,8 @@ Vault :-
 	access_key         AKIAY5UKWS73JXFIFIXZ
 	secret_key         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
 	security_token     <nil>
+
+    Check IAM >> Users
 
 14) vault policy list
 
@@ -231,6 +247,8 @@ Success! Uploaded policy: my-policy
 	vault auth help (press tab)
 	alicloud  aws       centrify  cert      cf        gcp       github    ldap      oci       oidc      okta      pcf       radius    token     userpass
 
+	vault auth list
+
 	vault auth enable -path=github github
 	Success! Enabled github auth method at: github/
 
@@ -276,6 +294,9 @@ token_period               0s
 token_policies             []
 token_ttl                  0s
 token_type                 default
+
+	Generate new token
+	Github >> Settings >> Developer settings >> Personal access tokens >> Generate new token
 
 	vault login -method=github token=30afa441834271504cd00ccca50330db0a04022e
 Success! You are now authenticated. The token information displayed below
@@ -520,6 +541,22 @@ Vault static and dynamic secrets demo
 Prerequisite:
 Kubernetes cluster with vault installed using Shipyard (https://shipyard.demo.gs/).
 
+   yard up --help
+
+   yard up
+
+   docker ps
+
+   export KUBECONFIG="$HOME/.shipyard/yards/shipyard/kubeconfig.yml"
+
+   kubectl get nodes
+
+   kubectl get pods
+
+   kubectl get svc
+
+   export VAULT_ADDR='http://127.0.0.1:8200'
+
 Clone repo : https://github.com/nicholasjackson/demo-vault.git
 
 Static secrets example :
@@ -579,6 +616,7 @@ s.h2DjXdoKVjXm9FmHTb61GSyj
 
 export VAULT_ADDR='http://vault.default.svc:8200'
 vault login `cat /home/vault/.token`
+vault kv get secret/web
 
 Dynamic Secrets Example :
 -------------------------
@@ -683,6 +721,16 @@ password           A1a-fhCVIKQcBunH3XZf
 username           v-token-db-app-qsyEfMAn0zDhC5wDazcF-1584516154
 
 You can see a randomly generated username and passwordand a lease equal to the default_ttl you configured when creating the role.
+
+Write the policy to allow read access to the role
+vault policy write web-dynamic ./config/web-policy.hcl
+
+Assign the policy to users who authenticate with Kubernetes service accounts called web
+vault write auth/kubernetes/role/web \
+    bound_service_account_names=web \
+    bound_service_account_namespaces=default \
+    policies=web-dynamic \
+    ttl=1h
 
 kubectl apply -f config/web.yml
 
