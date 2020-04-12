@@ -1,3 +1,9 @@
+Introduction :
+==============
+Cloud Native Computing foundation(CNCF) incubating project.
+Harbor is an open source cloud native registry that stores, signs and scans container images for vulnerabilities.
+
+
 Harbor Components :
 ===================
 
@@ -16,6 +22,10 @@ SQL Database -> Metadata and configurations related to Harbor
 Harbor can also use clair in an offline environment where during the 1st install DB will be filled and then upon request the vulnerability DB can be updated.
 
 
+Harbor Docs:
+------------
+https://goharbor.io/docs/1.10/
+
 Intro to Harbor
 ---------------
 https://www.youtube.com/watch?v=Rs3zByxI8aY
@@ -23,6 +33,10 @@ https://www.youtube.com/watch?v=Rs3zByxI8aY
 Security and Day 2 Operations with Harbor
 -----------------------------------------
 https://www.youtube.com/watch?v=hG1YSlfVTqY
+
+Youtube Playlist with individual feature demo
+---------------------------------------------
+https://www.youtube.com/playlist?list=PLgInP-D86bCxyIEeRypVC2EDzx2hoph5a
 
 Helm Registries
 ---------------
@@ -255,6 +269,10 @@ Pushing metabase-0.9.4.tgz to myharboramit...
 Done.
 
 Helm 3 maintains repositories.yaml at ~/Library/Preferences/helm/repositories.yaml and not in ~/.helm directory.
+
+Helm 3 local cache is stored at $HOME/Library/Caches/helm
+vim $HOME/Library/Caches/helm/repository/myharborabc-index.yaml
+
 
 Installing helm chart from harbor helm repo :
 ---------------------------------------------
