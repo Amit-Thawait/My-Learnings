@@ -1,0 +1,17 @@
+https://learn.hashicorp.com/vault/operations/raft-reference-architecture
+
+https://linux.die.net/man/2/mlock
+
+https://cloudacademy.com/course/hashicorp-vault/hashicorp-vault-intro/
+
+https://www.udemy.com/course/hashicorp-vault/
+
+https://github.com/hashicorp/vault-helm
+
+https://www.hashicorp.com/blog/injecting-vault-secrets-into-kubernetes-pods-via-a-sidecar/
+
+https://play.instruqt.com/hashicorp/topics/vault
+
+https://play.instruqt.com/hashicorp/tracks/vault-encryption-as-a-service
+
+https://play.instruqt.com/hashicorp/tracks/kubernetes-secrets-with-vault/

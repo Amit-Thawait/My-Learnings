@@ -1,0 +1,448 @@
+Open questions
+1) How to handle pem files?
+
+2) In static_secrets load the new secret that has been written to vault in the web container.
+
+Vault :-
+========
+1) Install Vault
+   https://www.vaultproject.io/downloads/
+
+2) Install command line autocompletion
+   vault -autocomplete-install
+
+3) Start the vault server in dev mode (Not recommended for production)
+   vault server -dev
+
+   Note down :
+   i) vault address
+   ii) unseal key
+   iii) vault dev root token ID
+
+4) Vault command to create/get secret
+   In a new terminal
+
+   export VAULT_ADDR='http://127.0.0.1:8200'
+   echo "SI/tlVqoEHG88VxsIwvMBAFIK4Q/2nltr5Qa3aGgTjg=" > vault_unseal.key
+   export VAULT_DEV_ROOT_TOKEN_ID=s.v0fxmZd5VQnNTU6o6o4C3aBB
+
+   vault (enter)
+
+   vault secrets list
+
+   To create a secret in path secret/name
+   vault kv put secret/name first_name=Amit last_name=Thawait
+
+   To get a secret stored in path secret/name
+   vault kv get secret/name
+
+5) Get a secret
+
+   To retrieve a specific key from a path
+
+   vault kv get -field=first_name secret/name
+
+   vault kv get -format=json secret/name
+
+6) To get data from json response
+   vault kv get -format=json secret/name | jq -r .data.data.foo
+
+7) Versioning of secrets
+   vault kv put secret/name full_name="Amit Thawait"
+
+8) Delete a secret (Soft delete but can't be read with a get call)(Deletes the latest version of the key)
+   vault kv delete secret/name
+
+   Older version of secret can still be retrieved by providing the version option in command line
+   vault kv get -format=json -version=2 secret/name (Should be null)
+
+   vault kv get -format=json -version=1 secret/name
+   
+9) Destroy a secret (Hard deletes a specific version)
+   vault kv put secret/name foo=bar
+
+   vault kv destroy -versions=1 secret/name
+
+10) Enabling secret storing at path other than secret/
+    vault secrets enable -path=foo kv
+
+    To list secret engines
+    vault secrets list
+
+    vault kv put foo/bar a=b
+
+    vault kv get foo/bar
+
+
+Dynamic credentials creation using Vault:
+=========================================
+1) Enable AWS secrets engine
+   vault secrets enable -path=aws aws
+
+   vault secrets list
+
+   Configure the AWS secrets engine
+
+   AWS Console >> IAM >> Users >> Create a demo user >> Add permission frome existing policy 
+
+   vault write aws/config/root \
+    access_key=AKISLQPBXCENIQ \
+    secret_key=z1Pdn03TnpG+9jpPSOlAsuQw99PUW+eB \
+    region=us-east-1
+
+2) With the secrets engine enabled, learn about it with the vault path-help command:
+
+   vault path-help aws
+
+3) Creating a role
+   vault write aws/roles/my-ec2-full-access \
+   credential_type=iam_user \
+   policy_document=-<<EOF
+   {
+		"Version": "2012-10-17",
+		"Statement": [
+			{
+				"Action": "ec2:*",
+				"Effect": "Allow",
+				"Resource": "*"
+			}
+		]
+	}
+
+	EOF
+
+4) Check user in AWS Console
+   IAM >> Users
+   This is how you can ask for a dynamic credentials in runtime without a human intervention.
+   On demand access provisioning.
+
+   vault read aws/creds/my-ec2-full-access -format=json
+
+5) Till this point the following things have happened
+   - Configured my AWS admin credentials in vault
+   - Created a EC2FullAccess role for AWS within vault (Not in AWS)
+   - Asked Vault to get a leased credential from AWS for the role(EC2FullAccess) we created
+
+
+Creating leased vault token based on policy
+=========================================== 
+
+1) Write a policy
+   vault policy list
+
+   vault policy write my-policy -<<EOF
+# Dev servers have version 2 of KV secrets engine mounted by default, so will
+# need these paths to grant permissions:
+path "secret/data/*" {
+  capabilities = ["create", "update"]
+}
+
+path "secret/data/foo" {
+  capabilities = ["read"]
+}
+
+EOF
+
+   vault policy list
+   vault policy read my-policy
+
+2) vault token create -policy=my-policy
+
+3) vault login s.StaCJXk1pQFD2sYeGv48CWSj
+
+	Verify that you can write any data to secret/data/, but only read from secret/data/foo.
+
+	NOTE: When you access the KV v2 secrets engine using the vault kv CLI commands, you can omit /data in the secret path.
+
+	vault secrets list
+	Login with root 
+
+	vault kv put secret/creds password=my-secret-password
+
+    vault kv get secret/creds
+
+    Login with root
+    vault kv put secret/foo lang=en
+
+    Login with leased user
+    vault kv get secret/foo
+
+
+Authentication in Vault
+=======================
+Authentication:
+---------------
+When starting the Vault server in dev mode, it automatically logs you in as the root user with admin permissions. In a non-dev setup, you would have had to authenticate first.
+
+Vault supports many different authentication mechanisms, but they all funnel into a single "session token", which we call the "Vault token".
+
+Authentication is simply the process by which a user or machine gets a Vault token.
+
+Tokens
+------
+Token authentication is enabled by default in Vault and cannot be disabled.
+
+vault token create
+
+By default, this will create a child token of your current token that inherits all the same policies. The "child" concept here is important: tokens always have a parent, and when that parent token is revoked, children can also be revoked all in one operation. This makes it easy when removing access for a user, to remove access for all sub-tokens that user created as well.
+
+Recommended Patterns
+--------------------
+In practice, operators should not use the token create command to generate Vault tokens for users or machines. Instead, those users or machines should authenticate to Vault using any of Vault's configured auth methods such as GitHub, LDAP, AppRole, etc.
+
+Supported Auth methods by vault :
+https://www.vaultproject.io/docs/auth/
+
+vault auth help (press tab)
+alicloud  aws       centrify  cert      cf        gcp       github    ldap      oci       oidc      okta      pcf       radius    token     userpass
+
+Example with Github
+-------------------
+1) Enable github auth
+   vault auth list
+   
+   vault auth enable -path=github github
+
+   vault auth list
+
+2) Login with Github
+   vault login -method=github
+   Error authenticating: Error making API request.
+
+	URL: PUT http://127.0.0.1:8200/v1/auth/github/login
+	Code: 400. Errors:
+
+	* configuration has not been set
+
+3) Set github configuration
+   vault write auth/github/config organization=vaultdemoamit
+   
+4) Github >> Settings >> Developer settings >> Personal access tokens >> Generate new token
+   vault login -method=github
+   3a12jk8b1234f0ed864e2da0fabcdff6d5cdbb
+
+5) vault policy read default
+
+6) vault kv put secret/foo lang=en #(Should not work)
+   vault kv put cubbyhole/name first_name=Amit #(Should work)
+
+7) vault auth disable github/
+
+
+Deploy Vault Production grade :
+===============================
+1) Install Consul (https://learn.hashicorp.com/consul/getting-started/install.html) and run it
+
+   consul agent -dev
+
+2) Start the vault server
+
+   vault server -config=config.hcl
+
+3) 
+
+
+Vault static and dynamic secrets demo
+=====================================
+Reference: https://www.youtube.com/watch?v=KIAXQr17-WQ
+
+Prerequisite:
+Kubernetes cluster with vault installed using Shipyard (https://shipyard.demo.gs/).
+
+Clone repo : https://github.com/nicholasjackson/demo-vault.git
+
+Static secrets example :
+------------------------
+1) Start shipyard (create a kubernetes cluster with k3s and vault)
+
+   yard up --help
+
+   yard up
+
+   docker ps
+
+   export KUBECONFIG="$HOME/.shipyard/yards/shipyard/kubeconfig.yml"
+
+   kubectl get nodes
+
+   kubectl get pods
+
+   kubectl get svc
+
+   export VAULT_ADDR='http://127.0.0.1:8200'
+
+2) Clone repo
+   git clone https://github.com/nicholasjackson/demo-vault.git
+
+3) cd static_secrets
+
+   vault login root
+
+   vault auth list
+
+   # Enable and configure Kubernetes Authentication
+   vault auth enable kubernetes
+
+4) Write config for kubernetes auth
+
+   kubectl exec $(kubectl get pods --selector "app.kubernetes.io/instance=vault,component=server" -o jsonpath="{.items[0].metadata.name}") -c vault -- \
+   sh -c ' \
+    vault write auth/kubernetes/config \
+       token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+       kubernetes_host=https://${KUBERNETES_PORT_443_TCP_ADDR}:443 \
+       kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+
+5) Write a secret to the database
+
+   vault secrets list
+
+   vault kv put secret/web api_key=abc123fd
+
+   vault kv get -format=json secret/web
+
+6) Write policy allowing read access to that secret
+
+   vault policy write web-static ./config/web-policy.hcl
+
+7) Assign the policy to users who authenticate with Kubernetes service accounts called web
+
+   vault write auth/kubernetes/role/web \
+    bound_service_account_names=web \
+    bound_service_account_namespaces=default \
+    policies=web-static \
+    ttl=1h
+
+8) kubectl apply -f config/web.yml
+
+   kubectl get pods
+
+   kubectl get svc
+
+9) yard expose --service-name svc/web-service --port 9090:9090
+
+   docker ps
+
+10) kubectl exec -it $(kubectl get pods --selector "app=web" -o jsonpath="{.items[0].metadata.name}") -c web -- cat /vault/secrets/web
+
+11) kubectl exec -it $(kubectl get pods --selector "app=web" -o jsonpath="{.items[0].metadata.name}") -c vault-agent sh
+
+    env | grep VAULT
+
+    echo $VAULT_CONFIG | base64 -d
+
+    export VAULT_ADDR='http://vault.default.svc:8200'
+
+    vault login `cat /home/vault/.token`
+
+    vault kv get secret/web
+
+Dynamic Secrets Example :
+-------------------------
+cd dynamic-secrets-k8s
+
+kubectl get clusterrolebindings.rbac.authorization.k8s.io
+kubectl get clusterrolebindings.rbac.authorization.k8s.io vault-server-binding -o yaml
+
+1) kubectl exec $(kubectl get pods --selector "app.kubernetes.io/instance=vault,component=server" -o jsonpath="{.items[0].metadata.name}") -c vault -- \
+   sh -c ' \
+    vault write auth/kubernetes/config \
+       token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+       kubernetes_host=https://${KUBERNETES_PORT_443_TCP_ADDR}:443 \
+       kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+
+2) Enable and configure PostgresSQL Dynamic secrets
+
+   vault secrets enable database
+
+3) vault write database/config/wizard \
+    plugin_name=postgresql-database-plugin \
+    verify_connection=false \
+    allowed_roles="*" \
+    connection_url="postgresql://{{username}}:{{password}}@postgres:5432/wizard?sslmode=disable" \
+    username="postgres" \
+    password="password"
+
+   vault read database/config/wizard
+
+4) kubectl apply -f config/postgres.yml
+
+5) Check Postgres DB setup and check login with postgres user.
+
+   kubectl exec -it $(kubectl get pods --selector "app=postgres" -o jsonpath="{.items[0].metadata.name}") -c postgres bash
+
+   root@postgres-9cb85bc58-t2z57:/# psql -U postgres
+
+   postgres=# \l
+
+   postgres=# \c wizard;
+
+   wizard=# \dt
+
+   wizard=# \q
+
+6) Rotate the database root password
+
+   vault write --force database/rotate-root/wizard
+
+   kubectl exec -it $(kubectl get pods --selector "app=postgres" -o jsonpath="{.items[0].metadata.name}") -c postgres bash
+
+7) Create a role allowing credentials to be created with access for all tables in the DB
+
+   vault write database/roles/db-app \
+    db_name=wizard \
+    creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; \
+        GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"{{name}}\";" \
+    revocation_statements="ALTER ROLE \"{{name}}\" NOLOGIN;"\
+    default_ttl="1h" \
+    max_ttl="24h"
+
+   vault read database/roles/db-app
+
+8) You can test the generation of credentials for your application by using the command
+
+   vault read database/creds/<role>
+
+   vault read database/creds/db-app
+
+9) Write the policy to allow read access to the role
+
+   vault policy write web-dynamic ./config/web-policy.hcl
+
+10) Assign the policy to users who authenticate with Kubernetes service accounts called web
+
+    vault write auth/kubernetes/role/web \
+    bound_service_account_names=web \
+    bound_service_account_namespaces=default \
+    policies=web-dynamic \
+    ttl=1h
+
+11) kubectl apply -f config/web.yml
+
+    kubectl get pods
+
+12) kubectl exec -it $(kubectl get pods --selector "app=web" -o jsonpath="{.items[0].metadata.name}") -c web sh
+
+    cat /vault/secrets/db-creds
+
+    kubectl exec -it $(kubectl get pods --selector "app=web" -o jsonpath="{.items[1].metadata.name}") -c web sh
+
+    cat /vault/secrets/db-creds
+
+13) kubectl exec -it $(kubectl get pods --selector "app=postgres" -o jsonpath="{.items[0].metadata.name}") -c postgres bash
+
+    psql -U
+
+    psql -d wizard -U
+
+    CREATE DATABASE abc;
+
+    CREATE TABLE account(
+		user_id serial PRIMARY KEY,
+		username VARCHAR (50) UNIQUE NOT NULL,
+		password VARCHAR (50) NOT NULL,
+		email VARCHAR (355) UNIQUE NOT NULL,
+		created_on TIMESTAMP NOT NULL,
+		last_login TIMESTAMP
+	);
+
+    \dt
