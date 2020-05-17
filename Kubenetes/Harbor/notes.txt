@@ -25,6 +25,7 @@ Harbor can also use clair in an offline environment where during the 1st install
 Harbor Docs:
 ------------
 https://goharbor.io/docs/1.10/
+https://goharbor.io/blog/harbor-2.0/
 
 Intro to Harbor
 ---------------
@@ -288,3 +289,20 @@ Helm 2 used to create namespace incase of non-existent namespaces given during h
 In Helm 3, you need to create a namespace beforehand.
 
 helm install metabase myharboramit/metabase --namespace db
+
+=======================================================================================================================
+
+Harbor 2.0
+----------
+Reference : https://goharbor.io/blog/harbor-2.0/
+
+https://github.com/goharbor/harbor/releases/tag/v2.0.0
+
+Harbor 2.0. This release makes Harbor the first OCI ( Open Container Initiative)-compliant open source registry capable of storing a multitude of cloud-native artifacts like container images, Helm charts, OPAs, Singularity, and much more.
+
+Enable Trivy to be the default vulnerability scanner which simplifies the configuration of Trivy scanner.
+
+OCI is a tried-and-true industry standard that defines specifications around format, runtime, and the distribution of cloud-native artifacts. Most users are familiar with some of the more popular OCI-compliant artifacts, like docker images and Helm charts. The OCI specification helps bring artifact authors and registry vendors together behind a common standard. As a developer, I can now adopt the OCI standard for my artifacts and be confident that I can use an OCI-compliant registry like Harbor with minimal to no changes.
+
+For example, Helm charts can now be pushed onto Harbor via Helm3. Instead of being hosted separately in ChartMuseum, Helm charts are now stored under artifacts alongside container images. In this figure below, we see a container image, a Helm chart, and a Cloud Native Application Bundles (CNAB) hosted in the same project.
+Image : https://goharbor.io/blog/img/harbor-2.0-artifacts.png
