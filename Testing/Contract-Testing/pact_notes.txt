@@ -1,0 +1,72 @@
+The unit test will perform the following steps:
+
+1. Start a server that mocks the provider with the given interactions.
+2. Call the getUser method which will call the mocked provider.
+3. Assert the returned User object.
+4. Write the Pact file based on the given interactions.
+
+The interactions will be defined in a separate method, annotated with @Pact. Steps 1. and 4. will be handled by the Pact framework’s PactProviderRuleMk2 Junit rule and steps 2. and 3. will be in a regular @Test method.
+
+
+
+uponReceiving(…) is just the description of the contract.
+given(…) can be used to prepare the provider i.e. bring it into a certain state.
+
+
+Note: It is very important to use stringType instead of stringValue even though stringValue is used in the pact-jvm documentation. stringType generates a matcher that just checks the type whereas stringValue puts the concrete value into the contract.
+
+
+In consumer test:
+it starts a mock server that will return the expected response and writes the Pact JSON file at the end.
+
+
+ * We will go through several scenarios that can happen in the lifecycle of an API and show how Pact will behave.
+
+1) Provider adds a field to the API
+The provider adds a new field to the API. Nothing will happen, everything will still pass because the consumer only cares about the attributes in its contract.
+
+2) Provider deletes a field from the API
+Removal of an unused field: The provider decides to remove the legacyId field from the API. They can just do it because the consumer does not expect it to be part of the response. The contract test still passes.
+
+3) Removal of a used field:
+The provider decides to rename the name field to fullname (which is the same as removing the name field from the contract’s perspective):
+The provider test fails because the consumer’s contract is violated since it expects the name field.
+
+4) Provider changes date format
+The provider test fails because the consumer’s contract is violated since it expects a different format.
+
+5) Consumer breaks own implementation
+Someone new in the consumer team wants to rename name to fullname. They refactor the class accordingly. This assertion in the unit test will now fail:
+
+assertThat(user.getFullname()).isEqualTo("user name for CDC");
+Because the response from the mocked server does not contain the fullname field (just the name field).
+
+6) Consumer adds a new interaction (and new provider state)
+The consumer wants to ensure that a 404 is returned if the user does not exist. A new Pact definition is added to the consumer unit test.
+
+After running the test the generated Pact file contains two interactions:
+
+The provider test will now execute and verify both interactions against the Spring Boot application sequentially. The test for the new interaction fails because the requested provider state does not exist. But only adding the state will still result in a failure because we did not yet add any real state setup - we always return user with ID 1.
+
+check blog https://kreuzwerker.de/post/writing-contract-tests-with-pact-in-spring-boot
+
+7) Consumer needs a new field
+The consumer would like to have a new field nickname in the response. They change their unit test, generate the new Pact file and pass it to the provider. The provider test will fail until they add the new field.
+
+
+* Here are three of our most important lessons of writing contract tests:
+
+1) Mock as little as possible on the provider site
+Have you noticed how we skimmed over the user creation in the previous section? It turns out that it’s actually not that obvious where those users come from. In one provider we initially mocked the service layer and returned a mocked user. However, this mocked user always had all possible fields set. So the contract tests kept passing even when one of the fields that the consumer expected was never set by the real service anymore (because the users in the database never had that field anymore). That’s why we later chose to mock as far back as possible - the database layer (using the real database was not possible for various reasons).
+
+2) Be strict on the consumer site
+We have a consumer in a legacy system where the communication with the provider is similar to the UserServiceClient in the example above - a Rest Template that just parses the response.
+We have had several discussions about whether it’s sufficient to use this class in the contract test or not. Why? If the provider stops sending a field, the class just parses it as null value and throws no error. However, a lot of the fields are mandatory and the service layer throws a runtime exception if they are missing. Since the service layer is not part of the contract test, these exceptions are never detected. In the end we agreed that it would be better to include some parts of the service layer in the contract test.
+For a new consumer we wrote the client in a way that it additionally validates the response. In this way exceptions are thrown by the client itself and the service layer can rely on mandatory fields being present.
+
+3) Echo input back instead of testing functionality
+We only covered a simple GET request so far where the consumer only cared about the endpoint name and the response object. It’s not that straightforward with non-simple GET operations.
+Let’s say we have an endpoint which returns a list with a limited number of users:
+GET /users?limit={limit}
+The consumer wants to ensure that the provider accepts the limit parameter. It’s not sufficient to just write a contract that passes the parameter and expects a successful response. Why? Because if the provider removes the parameter from the controller, it will still return a successful response. Spring Boot by default just ignores any unknown query parameters.
+Of course the consumer could just write a test that passing a limit of 5 will result in 5 users being returned. But the consumer actually does not want to test the internal logic of the provider. This should be covered by the provider’s own functional tests. You could argue that it’s no big deal to ensure that exactly 5 users are returned. But image a sorting parameter instead with a complicated algorithm behind it - do you really want to re-implement that sorting logic in every single consumer?
