@@ -1,0 +1,28 @@
+Spring Best Practices:
+----------------------
+*) Dependency injection(DI) via
+   1) private properties - Least preferred (Issues in testing)
+   2) Setter
+   3) Constructor (Most preferred) (Create private final property and use constructor injection)
+
+*) DI can be done with concrete class or with interfaces
+   Generally DI with concrete class should be avoided
+   DI via interfaces is preferred
+   - Allows runtime to decide implementation to inject
+   - Follows interface segregation principle of SOLID
+   - Also make your code more testable.
+   Ex: Database interfaces are used and DB providers provides the implementation.
+
+*) Inversion of control(IoC) is a technique to allow dependencies to be injected at runtime.
+   Dependencies are not predetermined.
+   Spring Framework container is often called IoC container because that container will determined what will be injected as dependency.
+
+   Reference : https://www.udemy.com/course/spring-framework-5-beginner-to-guru/learn/lecture/17846818#overview
+
+*) Spring stereotype hierarchy
+   @Component
+     - @Controller
+       - @RestController
+     - @Repository
+     - @Service
+
