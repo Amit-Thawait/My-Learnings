@@ -1,0 +1,10 @@
+Gradle plugin development:
+
+https://docs.gradle.org/current/userguide/java_gradle_plugin.html#java_gradle_plugin
+
+The Java Gradle Plugin development plugin can be used to assist in the development of Gradle plugins. It automatically applies the Java Library plugin, adds the gradleApi() dependency to the api configuration and performs validation of plugin metadata during jar task execution.
+
+Testing gradle plugin
+https://docs.gradle.org/current/userguide/test_kit.html#test_kit
+
+
