@@ -1,0 +1,16 @@
+https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html
+
+https://github.com/OWASP/CheatSheetSeries
+
+https://github.com/swisskyrepo/PayloadsAllTheThings
+
+Learn concepts
+https://tryhackme.com/
+
+https://www.contrastsecurity.com/
+
+https://research.securitum.com/
+
+https://www.hackerone.com/
+
+https://www.hackerone.com/for-hackers/hacker-101
