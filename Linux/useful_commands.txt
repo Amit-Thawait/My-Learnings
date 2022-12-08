@@ -1,3 +1,7 @@
 Delete mutiple docker images matching a pattern:
-
+------------------------------------------------
 for i in `docker images | grep confluent | awk '{print $1 ":" $2}'` ; do ; docker rmi $i ; done
+
+Kill all processes for a given process_name:
+--------------------------------------------
+ps aux | grep <keyword1>  | grep <keyword2> | awk '{print $2}' | xargs kill -9
