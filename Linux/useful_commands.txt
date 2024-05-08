@@ -5,3 +5,7 @@ for i in `docker images | grep confluent | awk '{print $1 ":" $2}'` ; do ; docke
 Kill all processes for a given process_name:
 --------------------------------------------
 ps aux | grep <keyword1>  | grep <keyword2> | awk '{print $2}' | xargs kill -9
+
+Redirect command output to a file and put it in background:
+-----------------------------------------------------------
+some_cmd > some_file 2>&1 &
