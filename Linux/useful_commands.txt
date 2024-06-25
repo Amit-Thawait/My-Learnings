@@ -9,3 +9,11 @@ ps aux | grep <keyword1>  | grep <keyword2> | awk '{print $2}' | xargs kill -9
 Redirect command output to a file and put it in background:
 -----------------------------------------------------------
 some_cmd > some_file 2>&1 &
+
+Encrypt a file in mac:
+----------------------
+zip -e <encrypted-filename>.zip <filename-to-encrypt>
+
+Decrypt file in mac:
+--------------------
+unzip <encrypted-filename>.zip
